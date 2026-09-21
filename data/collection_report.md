@@ -1,174 +1,215 @@
 # Collection Report — Official MCP Registry Crawl (Mission Brief 01)
 
-> Produced by `pilot/crawl_registry.py` (extended for this brief). Every number below is
-> computed from the frozen snapshot named in §1 — nothing is estimated or recalled
-> (AGENTS.md §2.1). Detector outputs elsewhere in `data/` are **candidates, not verdicts**
-> (AGENTS.md §2.3). This snapshot is a **prefix** of the registry, not a census — see §5.1.
+> Produced by `pilot/crawl_registry.py`. Every number below is computed from the frozen
+> snapshots named in §1 — nothing is estimated or recalled (AGENTS.md §2.1). Detector outputs
+> are **candidates, not verdicts** (AGENTS.md §2.3). This snapshot is a **prefix** of the
+> registry, not a census: the 200-page brake was reached with the cursor still live (§5.1).
+> v1 of this report (60-page run, 1,967 servers) is preserved in git commit `0429072`.
 
 ## 1. Provenance
 
 | | |
 |---|---|
-| Run started (UTC) | `2026-09-21T11:12:17.996634+00:00` |
-| Run finished (UTC) | `2026-09-21T11:13:53.196421+00:00` |
-| Command | `python3 pilot/crawl_registry.py --max-pages 60 --probe-pages 1 --out data/servers.jsonl --raw-dir data/raw/registry` |
+| Current dataset run started (UTC) | `2026-09-21T11:19:07.746726+00:00` |
+| Current dataset run finished (UTC) | `2026-09-21T11:24:33.737273+00:00` (wall clock 5 min 26 s) |
+| Command | `python3 pilot/crawl_registry.py --max-pages 200 --probe-pages 1 --out data/servers.jsonl --raw-dir data/raw/registry` |
 | Endpoint | `GET https://registry.modelcontextprotocol.io/v0/servers` — params `limit=100`, `cursor` from `metadata.nextCursor` |
-| Raw snapshot | `data/raw/registry/20260921T111217Z/` — 60 × `page-NNN.json` (verbatim bodies) + 1 × `probe-001.json` + `crawl_meta.json` |
-| `data/servers.jsonl` | 925,222 bytes · sha256 `06dfa656544721d8e32a03d5629c8fc64a0ef7d87382c97553a02968852aafe5` |
-| `data/analysis.csv` | sha256 `bf5d5f49938ef81cba58804ac5625c7c6bd1b7fe0882f56ac4f59bee46683afa` |
+| Raw snapshot (current) | `data/raw/registry/20260921T111907Z/` — 200 × `page-NNN.json` + 1 × `probe-001.json` + `crawl_meta.json` (19.0 MB) |
+| Raw snapshot (earlier 60-page run, kept for drift comparison) | `data/raw/registry/20260921T111217Z/` — 60 pages + probe + meta (6.2 MB) |
+| `data/servers.jsonl` | 3,685,409 bytes · sha256 `65022f3e2c6ba4e7785543e17c2867d254e2513b66576722621c4b9fcc7b92d8` |
+| `data/analysis.csv` | sha256 `7091455e2cec4f13068441c17dbf530c774514ab48ed47dc685545446450648f` |
 | Python / deps | CPython 3.11.11 · `requests` 2.34.2 (stdlib + `requests` only, AGENTS.md §2.7) |
-| Git stamp | `unavailable (not a git repository)` — the working tree is not under version control (§5.6) |
-| **External spend** | **$0.00** — 61 unauthenticated GETs, no API key, no credential, no third-party server endpoint contacted |
+| Git stamp at capture | `0429072-dirty` — repo initialised 2026-09-21; checkpoint commit `0429072` precedes this crawl |
+| **External spend** | **$0.00** — public unauthenticated GETs, no API key, no credential, no third-party server endpoint contacted |
 
-Raw-page fidelity was verified byte-for-byte: the saved `page-001.json` (sha256
-`69f471324a5fb032b4e09a249350094cbd40efd8b0b023b60681816a6a21ca80`) is identical to a
-fresh live `GET ?limit=100` of the same page.
+Raw-page fidelity was verified byte-for-byte **for both snapshots**: each `page-001.json`
+(sha256 `69f471324a5fb032b4e09a249350094cbd40efd8b0b023b60681816a6a21ca80`, identical across
+runs) equals a fresh live `GET ?limit=100` of the same page. The registry head was therefore
+stable across the whole session, which is why the two snapshots are drift-comparable.
 
 ## 2. Collection scale
 
 | Metric | Value |
 |---|---|
-| Pages fetched | **60** (100 entries/page) |
-| Entries seen (per-version, pre-dedupe) | **6,000** |
-| **Unique servers after `isLatest` dedupe** | **1,967** |
-| Kept by dedupe | **32.8%** of entries |
-| Entries that replaced an earlier same-name record | 3,494 |
-| Entries dropped as non-latest older versions | 539 |
-| Structural anomalies | **0** — every entry carried `server.name`; no malformed pages, no retries needed |
-| Exhaustion probe (page 61) | 100 entries returned → **cursor still live** |
+| Pages fetched | **200** (100 entries/page) — the pre-authorised hard brake |
+| Entries seen (per-version, pre-dedupe) | **20,000** |
+| **Unique servers after `isLatest` dedupe** | **7,766** |
+| Kept by dedupe | **38.8%** of entries |
+| Entries that replaced an earlier same-name record | 10,451 |
+| Entries dropped as older non-latest versions | 1,783 |
+| Structural anomalies | **0** — every entry carried `server.name`; no retries, no malformed page |
+| Exhaustion probe (page 201) | 100 entries returned → **cursor still live** |
 
-Reconciliation: 1,967 + 3,494 + 539 = **6,000** entries ✓
+Reconciliation: 7,766 + 10,451 + 1,783 = **20,000** entries ✓
 
-**Why 6,000 entries become 1,967 servers.** The registry paginates **per version**
-(`metadata.nextCursor` is a `<name>:<version>` key), so the stream interleaves releases of
-the same server. This is not a rounding detail — it is a 3.05× inflation factor for anyone
-who counts entries instead of deduping. The effect is uneven: pages 5–12 delivered 1,200
-consecutive entries without adding a single new server name (190 servers at both ends of that
-block), while pages 33–41 added 474 new names (886 → 1,360). Methods section should state the
-dedupe rule explicitly.
+**Why 20,000 entries become 7,766 servers.** The registry paginates **per version**
+(`metadata.nextCursor` is a `<name>:<version>` key), so the stream interleaves releases of the
+same server — a **2.58× inflation factor** for anyone counting entries instead of deduping.
+The effect is uneven: pages 5–12 added no new name at all, while pages 33–41 added 474
+(886 → 1,360) and pages 130–140 added ~1,600. The Methods section must state the dedupe rule
+explicitly, because "number of MCP servers" is otherwise off by more than 2×.
 
-## 3. Composition of the 1,967 unique servers
+**One retained server is `is_latest=false`:** `dev.eusend/eusend` v0.5.0 — none of its
+registry entries is flagged latest, so the fallback rule (§5.7) selected it. This is the only
+row in 7,766 where the fallback decided the outcome, and it is harmless at this rate, but it
+means the dataset is not *purely* `isLatest`-filtered.
+
+## 3. Composition of the 7,766 unique servers
 
 | Property | Servers | Share |
 |---|---|---|
-| `repository.url` present | 1,009 | **51.3%** |
-| … of those, `github.com` | 1,005 | **51.1%** |
-| Package-based (`packages[]` non-empty) | 287 | 14.6% |
-| Remote-based (`remotes[]` non-empty) | 1,764 | **89.7%** |
-| Both package and remote | 91 | 4.6% |
-| Neither (metadata-only listing) | 7 | 0.4% |
+| `repository.url` present | 3,677 | **47.3%** |
+| … of those, `github.com` | 3,652 | **47.0%** |
+| Package-based (`packages[]` non-empty) | 1,216 | 15.7% |
+| Remote-based (`remotes[]` non-empty) | 6,936 | **89.3%** |
+| Both package and remote | 418 | 5.4% |
+| Neither (metadata-only listing) | 32 | 0.4% |
 
-Remote transport types (a server may expose several remotes): `streamable-http` **1,770**,
-`sse` **52**. So the ecosystem is overwhelmingly **remote/HTTP**, not package-install —
+Remote transport types (a server may expose several remotes): `streamable-http` **6,968**,
+`sse` **191**. The ecosystem is overwhelmingly **remote/HTTP** rather than package-install,
 which matters for the threat model: a remote server's tool descriptions can change at any
-time without any install-time signal (rug-pull / description-drift exposure), and the
-`repository.url` we rely on for GitHub enrichment covers only about half of it.
+time with no install-time signal (rug-pull / description-drift exposure), and the
+`repository.url` we rely on for GitHub enrichment covers only 47% of it.
 
-`status` among unique servers: `active` 1,950 (99.1%), `deprecated` 17.
-Across all 6,000 raw entries: `active` 5,940, `deprecated` 60.
+`status` among retained servers: `active` 7,718 (99.4%), `deprecated` 48.
+Across all 20,000 raw entries: `active` 19,702, `deprecated` 298.
 
-Namespace labels (first segment of the reverse-DNS name): `ai` 1,495 · `app` 456 ·
-`agency` 6 · `ac` 3 · `al` 2 — i.e. 76.0% of the snapshot lives under `ai.*`, which is a
-naming convention, not a quality signal.
+Namespace labels (first segment of the reverse-DNS name): `com` 5,010 (64.5%) · `ai` 1,495
+(19.3%) · `app` 532 (6.9%) · `co` 162 · `dev` 136. The namespace mix changed substantially
+with depth (the 60-page prefix was 76% `ai.*`), which is a concrete reason why
+head-of-cursor subsampling is not representative — see §4.
 
-## 4. Pilot (n=108) vs full prefix (n=1,967)
+## 4. Detector rates across crawl depths — and the framing decision
 
-| Metric | Pilot (first 2 pages) | Full prefix (60 pages) |
-|---|---|---|
-| Unique servers | 108 | 1,967 |
-| ≥1 dangerous-capability pattern | 18.5% | **7.1%** |
-| ≥1 poisoning-pattern candidate | 1.9% | **4.2%** |
-| GitHub-linked | 46.3% | **51.1%** |
+| Metric | Pilot (2 pages, n=108) | 60-page run (n=1,967) | Current (200 pages, n=7,766) |
+|---|---|---|---|
+| ≥1 dangerous-capability pattern | 18.5% | 7.1% | **6.2%** |
+| ≥1 poisoning-pattern candidate | 1.9% | 4.2% | **2.6%** |
+| GitHub-linked | 46.3% | 51.1% | **47.0%** |
 
-⚠️ **The headline number moved in the wrong direction for the pilot's success criterion.**
-PLAN.md §3 ticked "≥15% servers with dangerous capabilities → the story exists" on the
-strength of the 108-server head-of-cursor sample; over 1,967 servers the same detectors flag
-**7.1%**. The two samples are not equivalent (the pilot was a non-random head of the cursor
-order, and the dangerous-capability rate clearly varies along that order), so the pilot
-figure should not be quoted as an ecosystem estimate. This is a framing decision for the
-human, not something the crawler should paper over; it is flagged in PLAN.md §3/§5.
+**Decision taken (PI, 2026-09-21).** The pilot success criterion "≥15% of servers with
+dangerous capabilities" is **retired**, and there will be **no pivot to the ASI03
+privilege/scope angle**. Rationale recorded at decision time:
 
-The refreshed triage queue is `data/analysis.csv` (1,967 rows, sorted by `suspicion_score`).
-Top capability classes: `secret_env_access` 73 (3.7%), `network_egress` 50 (2.5%),
-`shell_execution` 12 (0.6%), `database_write` 5 (0.3%), `file_read_sensitive` 2 (0.1%),
-`file_write_delete` 1 (0.1%). Poisoning-pattern candidates: `imperative_to_model` 56 (2.8%),
-`exfiltration_language` 14 (0.7%), `fake_system_role` 10 (0.5%), `stealth_concealment` 3
-(0.2%). These remain **candidates pending Brief 03 manual validation**.
+1. Registry **server-level descriptions are short marketing text** — a few dozen words written
+   to sell the server. Sentence-level regexes have almost nothing to bite on, so the headline
+   percentage measures prose style more than capability. The real poisoning surface is **tool
+   descriptions**, which Brief 02 (`fetch_github.py`) extracts from source.
+2. The pilot figure was **not a sample** — it was the head of the cursor order, and it is
+   biased. The rate drifts 18.5% → 7.1% → 6.2% as the crawl deepens, and the poisoning rate is
+   non-monotonic (1.9% → 4.2% → 2.6%). A number that keeps moving with crawl depth is not a
+   finding about the ecosystem; it is a finding about sampling.
+3. Therefore the contribution is stated as **per-class composition at scale** (below) plus
+   **validated detector precision** (Brief 03) and the tool-level surface (Brief 02) — not as
+   a single headline percentage.
+
+**This delta is itself a Methods-section contribution:** registry cursor order is not random,
+so head-of-cursor slices of MCP registries are biased, and any prior or future work that
+crawls "the first N pages" will over-estimate dangerous-capability prevalence. Quantified here
+as: 18.5% (first 2 pages) vs 6.2% (first 200 pages) on identical detectors.
+
+**Detector output at 7,766 servers** (`data/analysis.csv`, all still candidates):
+
+*Dangerous-capability classes* — `secret_env_access` 251 (3.2%) · `network_egress` 182 (2.3%) ·
+`shell_execution` 24 (0.3%) · `database_write` 23 (0.3%) · `file_read_sensitive` 12 (0.2%) ·
+`file_write_delete` 4 (0.1%) · `package_install` 2 (0.0%). Total ≥1 flag: **480 (6.2%)**,
+i.e. the surface is dominated by *credential-adjacent* and *network* access rather than
+shell/file destruction — a composition statement, which is what the decision above asks for.
+
+*Poisoning-pattern candidates* — `imperative_to_model` 128 (1.6%) · `exfiltration_language`
+38 (0.5%) · `fake_system_role` 21 (0.3%) · `stealth_concealment` 10 (0.1%) ·
+`sensitive_file_target` 1 (0.0%) · `cross_tool_shadowing` 1 (0.0%). Total ≥1 flag: **199 (2.6%)**.
+
+**A caution that Brief 03 must settle.** The 15 highest-`suspicion_score` rows were inspected
+by hand for the first time during this brief. Every one of them is a **plausible false
+positive**: a marketing URL tripping `exfiltration_language` (`https?://\S+`), "never a safety
+score" and "Never spends" tripping `imperative_to_model` (`\bnever\b`), "for your assistant:"
+tripping `fake_system_role` (`\bassistant[,:]`), "check a document for hidden text" tripping
+`stealth_concealment` (`\bhidden\b`), and a *security-auditing* server (`com.opzyai/mcp`,
+"secrets, .env exposure, git-history leaks, CVEs") tripping `sensitive_file_target`. The
+maximum `suspicion_score` in the whole 7,766-row queue is only **4**, so there is no high-score
+tail to lean on. This is informal triage, not the validation protocol — Brief 03 owns the
+rubric and the numbers — but it is strong prior evidence that precision will be low and that
+**no case study may be built from `analysis.csv` without manual validation** (AGENTS.md §2.3).
 
 ## 5. Limitations and anomalies
 
-**5.1 This is a prefix, not a census.** The exhaustion probe (page 61) returned another
-100 per-version entries, so `cursor_exhausted = false`: the registry holds **more than
-6,000 per-version entries**, and 1,967 is a **lower bound** on the number of unique servers.
-Brief 01 specifies `--max-pages 60`, so the crawl stopped there by design. Any paper claim
-must therefore read "the first 6,000 registry entries (cursor order)" — not "the registry".
-Raising the cap is a one-flag change (`--max-pages N`) costing $0 and ~1.4 s/page; it was
-**not** done unilaterally, because the page cap is an explicit brief/scope decision
-(AGENTS.md §2.4).
+**5.1 Still a prefix, not a census.** The 200-page brake was reached with the cursor live
+(probe page 201 returned 100 entries), so the registry holds **more than 20,000 per-version
+entries** and 7,766 is a **lower bound** on unique servers. The page cap was pre-authorised at
+200; continuing is a one-flag change (`--max-pages N`, ~1.5 s/page, $0) and needs a new
+authorisation. Every claim must read "the first 20,000 registry entries (cursor order)".
+The honest conclusion is that **the ecosystem is bigger than any previous estimate in this
+repo**: 108 → 1,967 → 7,766 unique servers, each checkpoint still short of exhaustion.
 
 **5.2 No secondary registries, by design.** PulseMCP / mcp.so / Smithery were not touched
-(brief `Don'ts`; PLAN.md §2). Coverage is official-registry-only, so any server published
-only elsewhere is invisible here. Parked in `FUTURE_WORK.md`.
+(brief `Don'ts`; PLAN.md §2). Coverage is official-registry-only, so servers published only
+elsewhere are invisible. Parked in `FUTURE_WORK.md`.
 
 **5.3 Registry API only.** No `remotes[]` endpoint was contacted and no server code was
-executed (AGENTS.md §2.2). Consequently this dataset contains **no tool descriptions** — only
-server-level metadata. The tool-level poisoning surface is Brief 02's job
-(`pilot/fetch_github.py`).
+executed (AGENTS.md §2.2). This dataset therefore contains **no tool descriptions** — only
+server-level metadata. The tool-level poisoning surface is Brief 02's job.
 
-**5.4 Detectors are heuristics.** The §4 percentages say "patterns consistent with", not
-"these servers are malicious". Several capability patterns are deliberately broad
-(`\btokens?\b`, `\bfetch\b`), so expect false positives until Brief 03 reports precision —
-the `imperative_to_model` class fires on ordinary English ("never a safety score"), visible
-in the top rows of `data/analysis.csv`.
+**5.4 Detectors are heuristics.** Every percentage in §4 says "patterns consistent with", not
+"these servers are malicious". The `analysis.csv` top rows are dominated by substring false
+positives (§4), so expect low precision until Brief 03 reports it. Do not quote §4 rates
+without the precision numbers.
 
-**5.5 Single snapshot.** Rug-pull / description drift (taxonomy item 4) cannot be observed in
-one crawl. The UTC-stamped raw snapshots are the substrate for a future diff-based
-measurement (`FUTURE_WORK.md` item 3).
+**5.5 Single logical snapshot per run, over a mutating registry.** Each run takes minutes
+(5 min 26 s for 200 pages) against a live, concurrently-updated collection. Keyset pagination
+during inserts can in principle skip or duplicate entries; the crawl makes no attempt to
+correct for that, and both snapshots are therefore "as observed", not point-in-time. The two
+snapshots on disk (60-page and 200-page) permit a first drift check: the registry head was
+byte-stable across the session (§1), but no per-server drift analysis has been done
+(`FUTURE_WORK.md` item 3).
 
-**5.6 No git repository.** `git rev-parse` fails in this working tree, so every artifact is
-stamped `git: unavailable (not a git repository)` and "committed" here means "written to
-`data/`", not "in a VCS". AGENTS.md §2.6 asks for a git-status stamp; that requirement is
-**not satisfied** and needs a human decision (initialise a repo, or amend the rule). The
-timestamp + input/output sha256 stamps do work and are recorded in
-`data/raw/registry/20260921T111217Z/crawl_meta.json`.
+**5.6 Git stamp — resolved.** The working tree is now a git repository (initialised
+2026-09-21 at the project root where `AGENTS.md` lives), so the AGENTS.md §2.6 git-status
+stamp is satisfied: this crawl recorded `0429072-dirty` (checkpoint commit `0429072` plus the
+uncommitted crawl artifacts). Raw API snapshots **are** version-controlled (19.0 MB + 6.2 MB),
+so the dataset — not just the code — is reproducible from the repo.
 
 **5.7 Dedupe rule.** For each name we keep `isLatest=true`; if no entry is flagged latest we
-fall back to the lexicographically newest `version` string. All 1,967 retained servers carry
-`is_latest=true`, so the fallback path decided nothing in this run.
+fall back to the lexicographically newest `version` string. That fallback fired exactly
+**once** in 7,766 servers (`dev.eusend/eusend`, §2), so the rule is documented but not load-bearing.
+
+**5.8 Version strings are not semver-compared,** which only matters for the fallback in §5.7.
+
+**5.9 Rate/latency variance.** The registry intermittently slowed from ~1.5 s/page to ~11 s/page
+with no HTTP errors and no retries, then recovered. Timing is therefore not a stable
+reproducibility property; content is (see §6). If a future run appears stalled, check the log
+before assuming a hang.
 
 ## 6. Reproducing these numbers
 
 ```bash
 # from the repository root
-sha256sum data/servers.jsonl            # expect 06dfa656…52aafe5
-python3 /tmp/collection_stats.py        # composition table in §3 (verbatim source: Appendix A)
+sha256sum data/servers.jsonl     # expect 65022f3e…7b92d8
+python3 /tmp/collection_stats.py                 # composition table in §3
 python3 pilot/analyze.py --inp data/servers.jsonl --out data/analysis.csv   # §4 detector numbers
 python3 pilot/crawl_registry.py --max-pages 2 --probe-pages 1 \
-        --out /tmp/replay.jsonl --raw-dir /tmp/replay   # re-crawl check (the live registry will have moved)
+        --out /tmp/replay.jsonl --raw-dir /tmp/replay   # live re-crawl check
 ```
 
 Determinism evidence: `pilot/analyze.py` was run twice over the frozen snapshot and both runs
-produced byte-identical output (`bf5d5f49938ef81cba58804ac5625c7c6bd1b7fe0882f56ac4f59bee46683afa`).
-Re-running the *crawl* is not expected to be byte-identical — the registry is live. The
-2-page smoke test did reproduce the previously committed pilot `data/servers.jsonl`
-byte-for-byte (`7ace596c4f7ce618dcb8ecdad0864cf835a606d48d4f340be08fc23998d097ed`), which
-confirms the modified script is behaviour-preserving. Determinism is therefore claimed **over
-the frozen snapshot**, which is exactly why `data/raw/` exists.
+produced byte-identical output (`7091455e2cec4f13068441c17dbf530c774514ab48ed47dc685545446450648f`).
+Re-running the *crawl* is not expected to be byte-identical — the registry is live. Determinism
+is therefore claimed **over the frozen snapshot**, which is exactly why `data/raw/` exists and
+is committed.
 
 ## 7. Acceptance criteria — Brief 01
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| `data/servers.jsonl` ≥1,500 unique servers, or documents why fewer | ✅ **PASS** | **1,967** unique servers (§2), sha256 `06dfa656…52aafe5` |
-| Raw snapshot on disk | ✅ **PASS** | `data/raw/registry/20260921T111217Z/` — 60 pages + probe + `crawl_meta.json`; byte-fidelity verified (§1) |
-| Re-running analysis reproduces identical counts | ✅ **PASS** | two `analyze.py` runs → identical sha256 (§6); caveat: the crawl itself is not re-runnable against a live registry (§5.5, §6) |
-| Collection report committed | ✅ **PASS (caveat)** | this file; "committed" = present in `data/`, since no VCS exists (§5.6) |
+| `data/servers.jsonl` ≥1,500 unique servers, or documents why fewer | ✅ **PASS** | **7,766** unique servers (§2), sha256 `65022f3e…7b92d8` |
+| Raw snapshot on disk | ✅ **PASS** | `data/raw/registry/20260921T111907Z/` — 200 pages + probe + `crawl_meta.json`; byte-fidelity verified (§1) |
+| Re-running analysis reproduces identical counts | ✅ **PASS** | two `analyze.py` runs → identical sha256 (§6); caveat: the crawl itself is not re-runnable against a live registry (§5.5) |
+| Collection report committed | ✅ **PASS** | this file is under version control (repo initialised 2026-09-21, §5.6) |
 | Don't add secondary registries | ✅ honored | official registry only (§5.2) |
-| Don't hit any server endpoint — registry API only | ✅ honored | no `remotes[]` contacted; 61 GETs to `registry.modelcontextprotocol.io` only (§5.3) |
+| Don't hit any server endpoint — registry API only | ✅ honored | no `remotes[]` contacted; registry GETs only (§5.3) |
 
-**Spend:** $0.00 of the $50 pilot cap. **Brief 01 outcome:** the ≥1,500-server bar is met, so
-the brief passes; the two items needing human attention are the §4 rate revision
-(18.5% → 7.1%) and the §5.1 prefix limitation.
+**Spend:** $0.00 against the $50 pilot cap (all crawls, probes and re-checks this session).
+**Open item:** the 200-page brake (§5.1) — a true census needs another run with a higher cap.
 
 ## Appendix A — the §3 statistics snippet (verbatim)
 
@@ -197,6 +238,9 @@ print('statuses                 :', dict(collections.Counter(s.get('status') for
 print('is_latest true           :', sum(1 for s in servers if s.get('is_latest')))
 ```
 
-The output of this snippet plus the `pilot/analyze.py` run is what populates §2–§4; the same
-file is kept at `/tmp/collection_stats.py` for the duration of this session.
+The `/tmp` helper scripts used this session (`collection_stats.py`, `census_checks.py`,
+`top15.py`, `acceptance_check.py`) are throwaway analysis aids; the only maintained code is
+`pilot/`. Reproduce §3 from the snippet above and §4 from `pilot/analyze.py`.
+
+
 

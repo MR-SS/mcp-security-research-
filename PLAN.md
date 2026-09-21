@@ -37,19 +37,21 @@
 ## 3. The pilot (weeks 1–2) ⭐ — STATUS: PASSED on first smoke test
 
 > Smallest end-to-end pipeline. It already ran on the first 108 registry servers:
-> **18.5%** had ≥1 dangerous-capability flag (criterion was ≥15% ✅), **1.9%** poisoning-pattern candidates, **46%** GitHub-linked.
+> **18.5%** had ≥1 dangerous-capability flag, **1.9%** poisoning-pattern candidates, **46%** GitHub-linked.
+> ⚠️ **Pilot-only figures, deliberately superseded** — the same detectors give 7.1% / 4.2% / 51.1% at
+> 1,967 servers and 6.2% / 2.6% / 47.0% at 7,766 servers. Crawl-depth series: `data/collection_report.md` §4.
 
 **Remaining pilot work:**
-- [x] Full crawl (`--max-pages 60`) — **DONE 2026-09-21**: 60 pages → 6,000 per-version entries → **1,967 unique servers**, $0.00, raw snapshot + `crawl_meta.json` provenance in `data/raw/registry/20260921T111217Z/`; full write-up in `data/collection_report.md`. ⚠️ the cursor was still live at page 60 → this is a *prefix* of the registry, not a census.
+- [x] Full crawl — **DONE 2026-09-21, two runs**: 60 pages → **1,967 unique servers**; then the pre-authorised continuation to the **200-page brake** → 20,000 per-version entries → **7,766 unique servers** (38.8% kept by `isLatest` dedupe), $0.00 both runs. Snapshots: `data/raw/registry/20260921T111217Z/` (60 pages, 6.2 MB) and `data/raw/registry/20260921T111907Z/` (200 pages, 19.0 MB); write-up in `data/collection_report.md`. ⚠️ the cursor was still live at page 200 → the dataset is a *prefix* of the registry, not a census.
 - [ ] Manual labeling of top-100 candidates → detector precision
 - [ ] 5 real suspicious descriptions → 20 templated cases → ASR on 2 models
 
 **Pilot success criteria (met/pending):**
-- [x] ≥15% servers with dangerous capabilities → the story exists — ⚠️ **REVISED by the full crawl: 7.1% (n=1,967) vs 18.5% (n=108 pilot head-of-cursor)**. The ≥15% bar is NOT met at scale; the framing has to be re-argued (prevalence + capability-class concentration, or the ASI03 pivot) — human decision, see `data/collection_report.md` §4.
+- ~~≥15% servers with dangerous capabilities → the story exists~~ **RETIRED 2026-09-21 (PI decision) — replaced by per-class composition at scale.** Reasons: (a) registry **server-level descriptions are short marketing text**, so a headline % measures prose rather than capability — the real poisoning surface is **tool descriptions** (Brief 02); (b) the pilot was a **non-random head-of-cursor slice** and the rate drifts with crawl depth (18.5% @ 108 → 7.1% @ 1,967 → 6.2% @ 7,766), which is itself a **Methods-section finding about sampling bias**; (c) **no ASI03 pivot**. Contribution = composition + validated detector precision (Brief 03) + tool-level surface (Brief 02). See `data/collection_report.md` §4.
 - [ ] ≥1 manually-confirmed poisoning case → the hero example
 - [ ] ASR > 0 on ≥1 model → the impact section
 
-*If all failed → pivot to the ASI03 privilege/scope angle on the same dataset.*
+*If all failed → pivot to the ASI03 privilege/scope angle on the same dataset.* (Exit criterion left on the books for the record; **the PI explicitly declined this pivot on 2026-09-21**.)
 
 ---
 
@@ -59,7 +61,7 @@
 |---|---|---|
 | 1 | Read the 6 key papers (AGENTS.md §5) · run pilot pipeline · **start arXiv endorser search** | servers.jsonl (pilot) |
 | 2 | Finish pilot · draft methods section rough | pilot table |
-| 3–4 | Full crawl ✅ (done 2026-09-21: 1,967 servers) · GitHub enrichment · label 100-sample for precision/recall | final dataset + validated detectors |
+| 3–4 | Full crawl ✅ (done 2026-09-21: 7,766 servers) · GitHub enrichment · label 100-sample for precision/recall | final dataset + validated detectors |
 | 5 | Full live experiments (40 tests, 3 models) · begin responsible disclosure | ASR results + disclosure tickets |
 | 6 | Full draft (8–10 pp, ACM/USENIX style) | draft v1 |
 | 7 | Polish · public repo · Zenodo DOI · 1–2 external reviews (OWASP community) | draft v2 + artifact |
@@ -76,9 +78,10 @@
 | High false-positive rate in detectors | High | Manual 100-sample validation; report precision — it's a methodological contribution |
 | Legal/ethics exposure | Low | Public metadata only; no executing third-party code; 90-day disclosure; Ethics section |
 | Scope creep | High | This file's §2; every new idea → `FUTURE_WORK.md` |
-| **Pilot rate did not survive scaling** (dangerous-capability share 18.5% @ n=108 → **7.1% @ n=1,967**) | **Realised** | Report both numbers honestly; state that the pilot was a non-random head-of-cursor sample; re-frame the contribution around capability-class composition + validated detector precision rather than a headline %; ASI03 pivot stays available |
-| **Snapshot is a registry prefix** (cursor still live after 60 pages → ≥100 further entries) | **Realised** (2026-09-21) | Phrase every claim as "first 6,000 registry entries (cursor order)"; `--max-pages N` gives a true census for $0 (~1.4 s/page) — human decision, deliberately not taken unilaterally |
-| **No git repository in the working tree** → AGENTS.md §2.6 git-status stamp cannot be satisfied | **Realised** | Artifacts are stamped `git: unavailable (not a repository)` plus timestamps and input/output sha256; human decision: `git init` + initial commit, or amend the rule |
+| **Pilot rate did not survive scaling** (≥1 dangerous-capability flag: 18.5% @ n=108 → 7.1% @ n=1,967 → **6.2% @ n=7,766**) | **Realised** | Criterion retired, no ASI03 pivot (PI, 2026-09-21); contribution re-framed as per-class composition + validated detector precision; the drift itself is written up as a sampling-bias finding (`data/collection_report.md` §4) |
+| **Registry is larger than any run's page cap** (cursor still live at page 200; 7,766 unique and rising) | **Realised** | All claims phrased as "first 20,000 registry entries (cursor order)"; another `--max-pages` run is a $0 one-flag change pending authorisation |
+| ~~No git repository → git-status stamp impossible~~ **RESOLVED 2026-09-21** | Closed | Repo initialised at the project root; pre-crawl checkpoint `0429072`; raw API snapshots committed (rule §2.6 satisfied) |
+| **Detector precision likely very low** (informal triage: the 15 highest-scoring rows are all benign substring matches — URLs, "never", "assistant:", ".env" — and the max `suspicion_score` over 7,766 rows is 4) | High | Brief 03 owns the validation protocol: label the top-100 + 50 random negatives, report precision per class, propose regex fixes as a versioned diff; never build a case study straight from `analysis.csv` |
 
 ---
 

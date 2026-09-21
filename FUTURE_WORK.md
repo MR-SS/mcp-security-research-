@@ -44,3 +44,14 @@
 *Interesting:* if `limit` can exceed 100, a full crawl costs fewer requests.
 *Deferred:* cosmetic; brief 01 asks for 100/page paging.
 *Unblocked by:* a quick API probe (documented, not guessed — AGENTS.md §2.1).
+
+**8. Resumable crawling (cursor persistence).**
+*Interesting:* the registry is far larger than expected — 7,766 unique servers after 20,000
+per-version entries, with the cursor **still live at the 200-page brake**. A true census within
+one process would take a long single run (and any interruption loses everything); persisting
+`metadata.nextCursor` after each page would let a census be assembled across sessions and make
+the raw snapshots appendable.
+*Deferred:* adding a resume mode changes the provenance model (one snapshot dir would then span
+several runs), which is a design decision for the PI, not a silent crawler change.
+*Unblocked by:* a brief that specifies the snapshot layout for multi-run crawls + the authorisation
+to raise `--max-pages` beyond 200.
