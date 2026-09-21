@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Local scratch
+/tmp/
+*.log
+
+# Workspace exports / archives
+workspace-*.zip
