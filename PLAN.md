@@ -44,6 +44,15 @@
 **Remaining pilot work:**
 - [x] Full crawl — **DONE 2026-09-21, two runs**: 60 pages → **1,967 unique servers**; then the pre-authorised continuation to the **200-page brake** → 20,000 per-version entries → **7,766 unique servers** (38.8% kept by `isLatest` dedupe), $0.00 both runs. Snapshots: `data/raw/registry/20260921T111217Z/` (60 pages, 6.2 MB) and `data/raw/registry/20260921T111907Z/` (200 pages, 19.0 MB); write-up in `data/collection_report.md`. ⚠️ the cursor was still live at page 200 → the dataset is a *prefix* of the registry, not a census.
 - [ ] Manual labeling of top-100 candidates → detector precision
+  **Brief 03 hypothesis (PI, 2026-09-21): precision ≈ 0–15% at server level** — the null-result
+  framing for registry-level heuristics is accepted. Brief 03 proceeds on the 150-sample exactly
+  as designed, and the false-positive analysis (substring overreach: bare URLs, `never`, `.env`,
+  `assistant:`) goes into `data/validation_report.md` **verbatim**.
+  *Structural explanation now on record:* the registry schema caps `server.description` at
+  **100 chars** — observed max exactly 100 across all 20,000 entries (median 91) — so a
+  server-level description is roughly one sentence of marketing copy. Sentence-level poisoning
+  heuristics at this level are therefore near-blind by construction, which is why the tool-level
+  surface (Brief 02) carries the real signal.
 - [ ] 5 real suspicious descriptions → 20 templated cases → ASR on 2 models
 
 **Pilot success criteria (met/pending):**
@@ -63,7 +72,7 @@
 | 2 | Finish pilot · draft methods section rough | pilot table |
 | 3–4 | Full crawl ✅ (done 2026-09-21: 7,766 servers) · GitHub enrichment · label 100-sample for precision/recall | final dataset + validated detectors |
 | 5 | Full live experiments (40 tests, 3 models) · begin responsible disclosure | ASR results + disclosure tickets |
-| 6 | Full draft (8–10 pp, ACM/USENIX style) | draft v1 |
+| 6 | Full draft (8–10 pp, ACM/USENIX style) · **approved stretch: re-crawl the census and diff it against the 2026-09-21 snapshot → description-drift statistics over the ~89% mutable-remote surface (one figure, $0)** | draft v1 + drift figure |
 | 7 | Polish · public repo · Zenodo DOI · 1–2 external reviews (OWASP community) | draft v2 + artifact |
 | 8 | **Submit to arXiv** · update résumé/LinkedIn | ✅ arXiv ID |
 

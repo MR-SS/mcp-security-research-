@@ -25,6 +25,7 @@ Solo, part-time research project. Goal: an **arXiv preprint in ~8 weeks** measur
 5. **Budget guard:** before any paid API call, print an estimate; pilot cap $50.
 6. **Reproducibility:** pin dependencies; save raw API responses to `data/raw/`; every generated artifact gets a timestamp + git-status stamp.
 7. Code style: Python 3.10+, stdlib + `requests` only unless a task brief says otherwise; no pandas/matplotlib in the pilot (keep it dependency-light).
+8. **Credentials (added 2026-09-21):** API tokens (e.g. `GITHUB_TOKEN`) are read from the environment at runtime only. An agent must **never print, write, commit, or embed a token** in any artifact, log, raw snapshot, or dataset, and must never echo it back in chat. Scripts read `os.environ`/`os.getenv`, fail cleanly with instructions when the variable is absent, and document the required scope. Tokens are human-provided, least-privilege, and short-lived (the project uses a public-read-only, 7-day GitHub PAT).
 
 ## 3. Repository layout
 

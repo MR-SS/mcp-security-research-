@@ -20,10 +20,17 @@
 *Deferred:* contacting a third-party endpoint is dynamic analysis and is explicitly OUT of scope (PLAN.md §2, AGENTS.md §2.2 — never execute/contact third-party servers). Brief 01 forbids hitting server endpoints.
 *Unblocked by:* phase-2 work with an explicit ethics review, sandboxing, and probably institutional review — not a solo-pilot add-on.
 
-**3. Longitudinal rug-pull / description-drift monitoring.**
-*Interesting:* taxonomy item 4 (rug pull / description drift) can only be measured by comparing snapshots over time; a single crawl cannot observe mutation.
-*Deferred:* Brief 01 is one snapshot; a time series needs scheduled re-crawls and a data-availability plan.
-*Unblocked by:* re-running the crawl on a schedule (raw snapshots in `data/raw/registry/<timestamp>/` are already versioned for exactly this) and diffing hashes per server name.
+**3. Longitudinal rug-pull / description-drift monitoring — ✅ APPROVED STRETCH (week 6, $0).**
+*Interesting:* taxonomy item 4 (rug pull / description drift) can only be measured by comparing
+snapshots over time; a single crawl cannot observe mutation. The 2026-09-21 census is the
+baseline, and **89.3% of servers are remote-served**, i.e. their tool metadata can change
+server-side with no install-time signal.
+*Approved plan (PI, 2026-09-21):* **one** full census re-crawl at week 6, diffed per server name
+against the 2026-09-21 snapshot (description hash / version / remotes), producing description-drift
+statistics and **one figure** for the paper.
+*Guard:* exactly one re-crawl and one figure — anything more goes back to this parking lot. Reuse
+the raw-snapshot + probe protocol, and use **the same page cap on both sides** so the diff stays
+comparable.
 
 **4. Package-registry enrichment from `packages[].identifier`.**
 *Interesting:* PyPI/npm download counts and publish history would let us weight findings by real adoption (the PyPI-malware-measurement genre does this).
