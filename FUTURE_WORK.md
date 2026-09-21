@@ -55,3 +55,30 @@ the raw snapshots appendable.
 several runs), which is a design decision for the PI, not a silent crawler change.
 *Unblocked by:* a brief that specifies the snapshot layout for multi-run crawls + the authorisation
 to raise `--max-pages` beyond 200.
+
+**9. `isSecret` metadata as a high-precision capability signal.**
+*Interesting:* registry `server.packages[].environmentVariables[]` (and `remotes[].headers[]`)
+carry explicit `isSecret: true` / `isRequired: true` flags — e.g. `com.pulsemcp/slack` declares
+`SLACK_BOT_TOKEN` as a required secret. That is a **declared** credential dependency rather than
+a regex guess on marketing prose, so it should give near-perfect precision for the
+credential-adjacent class that the current `secret_env_access` rule (3.2% of servers) only
+approximates.
+*Deferred:* detector changes must go through the versioned-diff process in Brief 03 (AGENTS.md
+§2.3), and the Methods section needs detector versions frozen and comparable.
+*Unblocked by:* a Brief 03 proposal adding an `is_secret_declared` flag **alongside** the v1 prose
+heuristics (not replacing them).
+
+---
+
+## Security-scan note (2026-09-21, pre-publication)
+
+Before pushing these artifacts, tracked files were scanned for credential patterns
+(`ghp_/gho_/github_pat_`, `AKIA…`, `sk-…`, `xox[baprs]-`, PEM headers, JWTs, `AIza…`). Two
+regex hits were investigated and both are **documentation prose, not secrets**:
+
+- `com.pulsemcp/slack` metadata: `"description": "Slack Bot User OAuth Token starting with xoxb-."`
+  (a `isSecret: true` env-var *documentation* string);
+- the phrase "password authentication" in a server description.
+
+No live credential, key or token was found in the dataset or in the raw snapshots.
+
