@@ -54,16 +54,17 @@ POISON_PATTERNS = {
 }
 
 # ---------- 3. Instruction-channel measurement (v2) — NOT a poisoning verdict ----------
-# Answers "is this description *addressed to* an agent/model at all?", i.e. is the
-# instruction channel in use. Benign servers trip it constantly ("For AI agents",
-# "your agent never sees the plaintext"), so it must never be reported as malice and
-# never summed with poison counts. Known over-trigger to watch in validation:
-# LLM-serving servers describe themselves in model vocabulary ("run any AI model"),
-# which matches the audience rule although no agent is being addressed.
+# `model_addressed` answers "is this description *addressed to* an agent/model at
+# all?", i.e. is the instruction channel in use. Benign servers trip it constantly
+# ("For AI agents", "your agent never sees the plaintext"), so it must never be
+# reported as malice and never summed with poison counts. Known over-trigger to
+# watch in validation: LLM-serving servers describe themselves in model vocabulary
+# ("run any AI model"), which matches the audience rule although no agent is being
+# addressed.
 RULES_VERSION = "v2"
 
 ADDRESSING_PATTERNS = {
-    "agent_audience": [
+    "model_addressed": [
         r"\b(a|an|any|the|your|our|other|every)\s+(ai\s+)?(agent|assistant|model|llm|bot)s?\b",
         r"\bfor\s+(ai\s+)?(agents?|assistants?|models?|llms?|bots?)\b",
         r"\bai\s+(agents?|assistants?|models?|coders?|clients?)\b",

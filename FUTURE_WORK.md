@@ -52,16 +52,18 @@ comparable.
 *Deferred:* cosmetic; brief 01 asks for 100/page paging.
 *Unblocked by:* a quick API probe (documented, not guessed — AGENTS.md §2.1).
 
-**8. Resumable crawling (cursor persistence).**
-*Interesting:* the registry is far larger than expected — 7,766 unique servers after 20,000
-per-version entries, with the cursor **still live at the 200-page brake**. A true census within
-one process would take a long single run (and any interruption loses everything); persisting
-`metadata.nextCursor` after each page would let a census be assembled across sessions and make
-the raw snapshots appendable.
-*Deferred:* adding a resume mode changes the provenance model (one snapshot dir would then span
-several runs), which is a design decision for the PI, not a silent crawler change.
-*Unblocked by:* a brief that specifies the snapshot layout for multi-run crawls + the authorisation
-to raise `--max-pages` beyond 200.
+**8. Rolling census depth — ACTIVE PLAN (PI-authorised 2026-09-21).**
+*Situation:* the registry is far larger than expected — 17,167 unique servers after 60,000
+per-version entries, with the cursor **still live at the 600-page brake**. Every run so far
+is a cursor-order prefix, and prefix composition shifts with depth (transport mix, detector
+rates, namespace mix all move — see `data/collection_report.md` §§3–4).
+*Plan:* continue crawling in capped runs with the same raw-snapshot + probe protocol until
+a probe page returns <100 entries (true exhaustion). Each continuation needs explicit PI
+authorisation for its `--max-pages`; no run proceeds on an agent's own authority.
+*Guard:* identical command shape every time; report stays depth-qualified
+("first N entries, cursor order") until exhaustion is actually observed.
+*Note:* cursor-persistence / resume-across-sessions was considered and rejected for now —
+one snapshot dir must equal one run, or the provenance model breaks.
 
 **9. `isSecret` metadata as a high-precision capability signal.**
 *Interesting:* registry `server.packages[].environmentVariables[]` (and `remotes[].headers[]`)

@@ -26,6 +26,13 @@ Solo, part-time research project. Goal: an **arXiv preprint in ~8 weeks** measur
 6. **Reproducibility:** pin dependencies; save raw API responses to `data/raw/`; every generated artifact gets a timestamp + git-status stamp.
 7. Code style: Python 3.10+, stdlib + `requests` only unless a task brief says otherwise; no pandas/matplotlib in the pilot (keep it dependency-light).
 8. **Credentials (added 2026-09-21):** API tokens (e.g. `GITHUB_TOKEN`) are read from the environment at runtime only. An agent must **never print, write, commit, or embed a token** in any artifact, log, raw snapshot, or dataset, and must never echo it back in chat. Scripts read `os.environ`/`os.getenv`, fail cleanly with instructions when the variable is absent, and document the required scope. Tokens are human-provided, least-privilege, and short-lived (the project uses a public-read-only, 7-day GitHub PAT).
+9. **Detector versions are tracked explicitly (added 2026-09-21):** v1 (frozen, recoverable at
+commit `6cca247`) = `CAPABILITY_PATTERNS` + `POISON_PATTERNS`, and the `suspicion_score`
+definition stays v1 so the triage queue remains comparable across runs. v2 (current) adds
+**only** the `model_addressed` instruction-channel class alongside v1 — never replacing or
+re-weighting v1 rules, never summed into any poisoning statistic or into `suspicion_score`.
+Any future detector change arrives as a versioned diff via Brief 03, with the Methods
+section freezing each version: no silent regex edits.
 
 ## 3. Repository layout
 

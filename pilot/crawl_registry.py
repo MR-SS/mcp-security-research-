@@ -25,8 +25,12 @@ BASE = "https://registry.modelcontextprotocol.io/v0/servers"
 OFFICIAL_META = "io.modelcontextprotocol.registry/official"
 
 
-def fetch_page(cursor=None, limit=100, retries=3):
-    """One registry page -> (parsed_json, verbatim_response_text)."""
+def fetch_page(cursor=None, limit=100, retries=5):
+    """One registry page -> (parsed_json, verbatim_response_text).
+
+    Retries cover transient proxy/network faults (observed: a sandbox ProxyError that
+    killed a 600-page run at page 273 when the budget was only 3 attempts).
+    """
     params = {"limit": limit}
     if cursor:
         params["cursor"] = cursor
@@ -38,8 +42,8 @@ def fetch_page(cursor=None, limit=100, retries=3):
         except (requests.RequestException, json.JSONDecodeError) as e:
             if attempt == retries - 1:
                 raise
-            wait = 2 ** (attempt + 1)
-            print(f"  retry in {wait}s ({e})", file=sys.stderr)
+            wait = min(2 ** (attempt + 1), 30)
+            print(f"  retry {attempt + 1}/{retries - 1} in {wait}s ({type(e).__name__})", file=sys.stderr)
             time.sleep(wait)
 
 
@@ -90,7 +94,8 @@ def normalize(entry):
     }
 
 
-def crawl(max_pages=50, sleep=0.4, raw_dir=None, limit=100, probe_pages=0):
+def crawl(max_pages=50, sleep=0.4, raw_dir=None, limit=100, probe_pages=0, retries=5,
+          checkpoint=None, checkpoint_every=50):
     """Page through the registry; returns (records, meta).
 
     `meta` carries every provenance/scaling number the collection report needs.
@@ -105,7 +110,7 @@ def crawl(max_pages=50, sleep=0.4, raw_dir=None, limit=100, probe_pages=0):
     exhausted = False
 
     while pages < max_pages:
-        data, raw_text = fetch_page(cursor, limit=limit)
+        data, raw_text = fetch_page(cursor, limit=limit, retries=retries)
         if raw_dir:
             with open(os.path.join(raw_dir, f"page-{pages + 1:03d}.json"), "w", encoding="utf-8") as f:
                 f.write(raw_text)
@@ -135,6 +140,9 @@ def crawl(max_pages=50, sleep=0.4, raw_dir=None, limit=100, probe_pages=0):
         pages += 1
         cursor = (data.get("metadata") or {}).get("nextCursor")
         print(f"page {pages}: {len(entries)} entries, {len(records)} unique servers so far", file=sys.stderr)
+        if checkpoint and checkpoint_every and pages % checkpoint_every == 0:
+            checkpoint(list(records.values()), pages)
+            print(f"  [checkpoint] {len(records)} servers written after page {pages}", file=sys.stderr)
         if not cursor:
             exhausted = True
             break
@@ -144,7 +152,7 @@ def crawl(max_pages=50, sleep=0.4, raw_dir=None, limit=100, probe_pages=0):
     for i in range(probe_pages):
         if exhausted or not cursor:
             break
-        data, raw_text = fetch_page(cursor, limit=limit)
+        data, raw_text = fetch_page(cursor, limit=limit, retries=retries)
         if raw_dir:
             with open(os.path.join(raw_dir, f"probe-{i + 1:03d}.json"), "w", encoding="utf-8") as f:
                 f.write(raw_text)
@@ -172,6 +180,14 @@ def crawl(max_pages=50, sleep=0.4, raw_dir=None, limit=100, probe_pages=0):
     return list(records.values()), meta
 
 
+def write_jsonl(path, records):
+    """Write the normalized dataset: one JSON object per line, parents created."""
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        for r in records:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-pages", type=int, default=50, help="safety cap on pages (100/page)")
@@ -182,6 +198,10 @@ def main():
     ap.add_argument("--probe-pages", type=int, default=0,
                     help="extra page fetches (saved raw, NOT normalized) to test cursor exhaustion")
     ap.add_argument("--sleep", type=float, default=0.4, help="politeness delay between requests (seconds)")
+    ap.add_argument("--retries", type=int, default=5,
+                    help="per-page retry budget for transient proxy/network faults (default 5, capped 30s backoff)")
+    ap.add_argument("--checkpoint-every", type=int, default=50,
+                    help="rewrite the output dataset every N pages so a long crawl survives a late failure")
     args = ap.parse_args()
 
     # AGENTS.md §2.5: print the spend/scope estimate BEFORE any external call.
@@ -196,15 +216,29 @@ def main():
         print(f"[repro] verbatim API snapshot -> {raw_dir}", file=sys.stderr)
 
     started = datetime.now(timezone.utc).isoformat()
-    servers, meta = crawl(max_pages=args.max_pages, sleep=args.sleep, raw_dir=raw_dir,
-                          limit=args.limit, probe_pages=args.probe_pages)
 
-    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
-    with open(args.out, "w", encoding="utf-8") as f:
-        for s in servers:
-            f.write(json.dumps(s, ensure_ascii=False) + "\n")
+    def checkpoint(records, pages):
+        write_jsonl(args.out, records)   # durability: one proxy blip must not lose the run
+
+    completed = True
+    try:
+        servers, meta = crawl(max_pages=args.max_pages, sleep=args.sleep, raw_dir=raw_dir,
+                              limit=args.limit, probe_pages=args.probe_pages,
+                              retries=args.retries, checkpoint=checkpoint,
+                              checkpoint_every=args.checkpoint_every)
+    except (requests.RequestException, json.JSONDecodeError) as e:
+        completed = False
+        servers = []
+        meta = {"error": f"{type(e).__name__}: {e}"}
+        print(f"\n[fatal] crawl aborted after the retry budget: {type(e).__name__}: {e}", file=sys.stderr)
+        print(f"[fatal] last checkpointed dataset (if any) is at {args.out}; raw pages kept in {raw_dir}",
+              file=sys.stderr)
+
+    if servers:
+        write_jsonl(args.out, servers)
 
     meta.update({
+        "completed": completed,
         "started_utc": started,
         "finished_utc": datetime.now(timezone.utc).isoformat(),
         "base_url": BASE,
@@ -219,6 +253,9 @@ def main():
     if raw_dir:
         with open(os.path.join(raw_dir, "crawl_meta.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, indent=2, ensure_ascii=False)
+
+    if not completed:
+        sys.exit(2)
 
     print(f"\nSaved {len(servers)} unique latest-version servers -> {args.out}")
     print(f"entries seen: {meta['entries_seen']} | unique servers: {meta['unique_servers']} "

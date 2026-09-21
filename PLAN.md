@@ -38,11 +38,12 @@
 
 > Smallest end-to-end pipeline. It already ran on the first 108 registry servers:
 > **18.5%** had ≥1 dangerous-capability flag, **1.9%** poisoning-pattern candidates, **46%** GitHub-linked.
-> ⚠️ **Pilot-only figures, deliberately superseded** — the same detectors give 7.1% / 4.2% / 51.1% at
-> 1,967 servers and 6.2% / 2.6% / 47.0% at 7,766 servers. Crawl-depth series: `data/collection_report.md` §4.
+> ⚠️ **Pilot-only figures, deliberately superseded** — the same v1 detectors give 7.1% / 4.2% / 51.1% at
+> 1,967 servers, 6.2% / 2.6% / 47.0% at 7,766, and 8.8% / 1.8% / 65.8% at 17,167 servers.
+> Crawl-depth series: `data/collection_report.md` §4.
 
 **Remaining pilot work:**
-- [x] Full crawl — **DONE 2026-09-21, two runs**: 60 pages → **1,967 unique servers**; then the pre-authorised continuation to the **200-page brake** → 20,000 per-version entries → **7,766 unique servers** (38.8% kept by `isLatest` dedupe), $0.00 both runs. Snapshots: `data/raw/registry/20260921T111217Z/` (60 pages, 6.2 MB) and `data/raw/registry/20260921T111907Z/` (200 pages, 19.0 MB); write-up in `data/collection_report.md`. ⚠️ the cursor was still live at page 200 → the dataset is a *prefix* of the registry, not a census.
+- [x] Full crawl — **DONE 2026-09-21, three runs**: 60 pages → **1,967 unique servers**; pre-authorised continuation to the **200-page brake** → 20,000 entries → **7,766**; PI-authorised continuation to the **600-page brake** → 60,000 per-version entries → **17,167 unique servers** (28.6% kept by `isLatest` dedupe), $0.00 all runs. Snapshots: `data/raw/registry/20260921T111217Z/` (60 pages, 6.2 MB), `.../20260921T111907Z/` (200 pages, 19.0 MB), `.../20260921T115232Z/` (600 pages, 64 MB); write-up in `data/collection_report.md`. ⚠️ the cursor was still live at page 600 → the dataset is a *prefix* of the registry (**>60,000 entries**), not a census; `FUTURE_WORK.md` item 8 is the standing plan.
 - [ ] Manual labeling of top-100 candidates → detector precision
   **Brief 03 hypothesis (PI, 2026-09-21): precision ≈ 0–15% at server level** — the null-result
   framing for registry-level heuristics is accepted. Brief 03 proceeds on the 150-sample exactly
