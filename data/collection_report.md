@@ -207,17 +207,21 @@ with no HTTP errors and no retries, then recovered. Timing is therefore not a st
 reproducibility property; content is (see §6). If a future run appears stalled, check the log
 before assuming a hang.
 
-**5.10 Duplicate-registration census — `server::tool` is not a unique key.**
+**5.10 Duplicate-registration census — `server::tool` is not a unique key.** *(added 2026-09-27T11:50Z, commit `4d347fc`)*
 In `data/github_tools.jsonl` (16,763 rows): **(a)** 1,484 distinct full names
 (`server_name::tool_name`) appear on 2+ evidence rows; **(b)** 1,092 of those (73.6%) are
 `generic:unnamed` registrations; **(c)** top-5 duplicated names: `com.smartbear/smartbear-mcp::readme:unnamed`
 (20 rows), `com.files/python-mcp::generic:unnamed` (19), `com.keboola/mcp::generic:unnamed` (19),
 `com.scanmalware.mcp/scanmalware-mcp::decorator:unnamed` (19), `io.github.aahl/mcp-notify::generic:unnamed`
 (19); **(d)** descriptions **differ** across rows for 1,327 of the 1,484 duplicated names (89.3%),
-are identical for 157 — e.g. `com.smartbear/smartbear-mcp::readme:unnamed` pairs "BearQ workspace
-URL, blank to disable BearQ tools" with "BearQ API base URL - leave blank to use the default".
-Consequence: per-name counting over-counts distinct tools; the Brief-03 sample disambiguates by
-matching the sampled `description` (exactly one evidence row aligns per sampled row).
+are identical for 157. Example pair for `com.keboola/mcp::generic:unnamed`:
+"Text of the answer to a documentation query." and
+"List of URLs to the sources of the answer."
+A full name alone cannot identify an evidence row. For sampled rows 21 and 33,
+matching the sampled description resolves each to one evidence record; this is
+not a uniqueness guarantee for the entire sample.
+
+Computed 2026-09-27T11:50:05Z; git-status stamp: `4d347fc-clean` before this correction.
 
 Producing command (a)–(c):
 
