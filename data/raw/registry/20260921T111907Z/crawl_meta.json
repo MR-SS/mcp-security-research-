@@ -1,0 +1,28 @@
+{
+  "pages_fetched": 200,
+  "entries_seen": 20000,
+  "unique_servers": 7766,
+  "dedupe_replacements": 10451,
+  "dedupe_dropped": 1783,
+  "cursor_exhausted": false,
+  "probe": {
+    "requested": 1,
+    "pages_fetched": 1,
+    "entries_seen": 100
+  },
+  "statuses": {
+    "active": 19702,
+    "deprecated": 298
+  },
+  "anomalies": [],
+  "started_utc": "2026-09-21T11:19:07.746726+00:00",
+  "finished_utc": "2026-09-21T11:24:33.737273+00:00",
+  "base_url": "https://registry.modelcontextprotocol.io/v0/servers",
+  "limit": 100,
+  "max_pages": 200,
+  "out": "/home/sajjad/Paper/mcp-security-research/mcp-security-research/data/servers.jsonl",
+  "out_bytes": 3685409,
+  "out_sha256": "65022f3e2c6ba4e7785543e17c2867d254e2513b66576722621c4b9fcc7b92d8",
+  "git": "0429072-dirty",
+  "python": "3.11.11"
+}

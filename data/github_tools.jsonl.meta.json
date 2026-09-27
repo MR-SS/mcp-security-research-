@@ -1,0 +1,92 @@
+{
+ "started_utc": "2026-09-22T05:21:58.746526+00:00",
+ "finished_utc": "2026-09-22T10:16:24.254447+00:00",
+ "wall_seconds": 17665.5,
+ "population": {
+  "github_linked_servers": 11288,
+  "distinct_repos": 9785,
+  "big_namespaces": {
+   "ai.smithery": {
+    "servers": 175,
+    "repos_total": 150,
+    "repos_sampled": 25
+   },
+   "app.wishpool": {
+    "servers": 125,
+    "repos_total": 125,
+    "repos_sampled": 25
+   },
+   "com.a2awire": {
+    "servers": 102,
+    "repos_total": 1,
+    "repos_sampled": 1
+   },
+   "com.mcparmory": {
+    "servers": 76,
+    "repos_total": 1,
+    "repos_sampled": 1
+   },
+   "eu.ansvar": {
+    "servers": 106,
+    "repos_total": 96,
+    "repos_sampled": 25
+   },
+   "io.github.Br0ski777": {
+    "servers": 101,
+    "repos_total": 101,
+    "repos_sampled": 25
+   },
+   "io.github.CSOAI-ORG": {
+    "servers": 326,
+    "repos_total": 325,
+    "repos_sampled": 25
+   },
+   "io.github.Servosity": {
+    "servers": 67,
+    "repos_total": 1,
+    "repos_sampled": 1
+   },
+   "io.github.WYRE-AI": {
+    "servers": 79,
+    "repos_total": 79,
+    "repos_sampled": 25
+   },
+   "io.github.chrischall": {
+    "servers": 69,
+    "repos_total": 64,
+    "repos_sampled": 25
+   },
+   "io.github.codespar": {
+    "servers": 127,
+    "repos_total": 1,
+    "repos_sampled": 1
+   },
+   "io.github.cyanheads": {
+    "servers": 129,
+    "repos_total": 129,
+    "repos_sampled": 25
+   }
+  },
+  "run_repos": 9339
+ },
+ "todo": 7615,
+ "repos_reached": 3440,
+ "repos_with_tools": 3032,
+ "tools_total": 11508,
+ "failures": {
+  "repo-not-found": 1572,
+  "no-tools-found": 408,
+  "http:HTTPError": 2,
+  "http:ProxyError": 2600,
+  "http:ChunkedEncodingError": 1
+ },
+ "paused": null,
+ "visited_repos": 6330,
+ "api_calls_this_run": 8458,
+ "spend_usd": 0.0,
+ "git": null,
+ "seed": 42,
+ "big_ns_threshold": 50,
+ "big_ns_sample": 25,
+ "max_tools_per_repo": 20
+}
