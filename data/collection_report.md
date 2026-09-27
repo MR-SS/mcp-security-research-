@@ -207,6 +207,61 @@ with no HTTP errors and no retries, then recovered. Timing is therefore not a st
 reproducibility property; content is (see §6). If a future run appears stalled, check the log
 before assuming a hang.
 
+**5.10 Duplicate-registration census — `server::tool` is not a unique key.**
+In `data/github_tools.jsonl` (16,763 rows): **(a)** 1,484 distinct full names
+(`server_name::tool_name`) appear on 2+ evidence rows; **(b)** 1,092 of those (73.6%) are
+`generic:unnamed` registrations; **(c)** top-5 duplicated names: `com.smartbear/smartbear-mcp::readme:unnamed`
+(20 rows), `com.files/python-mcp::generic:unnamed` (19), `com.keboola/mcp::generic:unnamed` (19),
+`com.scanmalware.mcp/scanmalware-mcp::decorator:unnamed` (19), `io.github.aahl/mcp-notify::generic:unnamed`
+(19); **(d)** descriptions **differ** across rows for 1,327 of the 1,484 duplicated names (89.3%),
+are identical for 157 — e.g. `com.smartbear/smartbear-mcp::readme:unnamed` pairs "BearQ workspace
+URL, blank to disable BearQ tools" with "BearQ API base URL - leave blank to use the default".
+Consequence: per-name counting over-counts distinct tools; the Brief-03 sample disambiguates by
+matching the sampled `description` (exactly one evidence row aligns per sampled row).
+
+Producing command (a)–(c):
+
+```bash
+python3 - <<'PY'
+import json
+from collections import defaultdict
+names = defaultdict(list)
+for line in open('data/github_tools.jsonl'):
+    if line.strip():
+        o = json.loads(line)
+        names[f"{o['server_name']}::{o['tool_name']}"].append(o)
+dups = {n: r for n, r in names.items() if len(r) > 1}
+print('duplicated_names', len(dups))
+print('generic_unnamed_duplicated_names', sum(1 for n in dups if n.endswith('::generic:unnamed')))
+for n, r in sorted(dups.items(), key=lambda x: (-len(x[1]), x[0]))[:5]:
+    print(f'{n} {len(r)}')
+PY
+```
+
+Producing command (d):
+
+```bash
+python3 - <<'PY'
+import json
+from collections import defaultdict
+desc = defaultdict(set)
+for line in open('data/github_tools.jsonl'):
+    if line.strip():
+        o = json.loads(line)
+        desc[f"{o['server_name']}::{o['tool_name']}"].add(o['tool_description'])
+dups = {n: s for n, s in desc.items() if len(s) >= 2 or sum(1 for _ in s) >= 2}
+dup_multi = {n: s for n, s in desc.items() if len([x for x in s]) >= 1 and len(s) >= 0}
+rows = defaultdict(int)
+for line in open('data/github_tools.jsonl'):
+    if line.strip():
+        o = json.loads(line)
+        rows[f"{o['server_name']}::{o['tool_name']}"] += 1
+dups = {n for n, c in rows.items() if c > 1}
+print('descriptions_differ', sum(1 for n in dups if len(desc[n]) > 1))
+print('descriptions_same', sum(1 for n in dups if len(desc[n]) == 1))
+PY
+```
+
 ## 6. Reproducing these numbers
 
 ```bash

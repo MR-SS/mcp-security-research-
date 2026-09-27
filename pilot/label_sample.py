@@ -221,7 +221,12 @@ def prompt_label(row, idx, labels, disp_text=None):
                 return None, None
             return ('tp' if key == 't' else 'u'), note
         if key == 'f':
-            return 'fp', ''
+            try:
+                note = prompt_note('fp', required=False)
+            except EOFError:
+                print("\n  stdin closed while entering the note — quitting.")
+                return None, None
+            return 'fp', note
         if key == 'fn':
             if has_fn:
                 return 'fn', ''
@@ -363,20 +368,24 @@ def _prompt_line(prompt):
     return input()                         # piped/non-tty (tests, fixtures)
 
 
-def prompt_note(purpose):
+def prompt_note(purpose, required=True):
     """Read ONE note; a pasted block is joined, never silently truncated."""
+    prompt = ("  note (single line; paste OK, required for "
+              f"{purpose}): ") if required else "  note (optional, Enter to skip): "
     while True:
-        first = _prompt_line(f"  note (single line; paste OK, required for {purpose}): ")
+        first = _prompt_line(prompt)
         extra = _drain_pasted_lines(sys.stdin.fileno()) if _tty_available() else []
         raw = '\n'.join([first] + extra)
         note = _collapse(raw)
         if not note:
-            print("  NOTE REQUIRED — write something.")
-            continue
+            if required:
+                print("  NOTE REQUIRED — write something.")
+                continue
+            return ''
         if extra:
             print(f"  NOTE JOINED to one line ({len(extra) + 1} pasted lines — "
                   f"{len(note)} chars kept, nothing dropped).")
-        warn = note_profile(note)
+        warn = note_profile(note) if required else None
         if warn:
             print(f"  WARNING: {warn}")
             print(f"  -> would store: {note!r}")
