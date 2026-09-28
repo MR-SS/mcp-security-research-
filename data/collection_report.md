@@ -384,6 +384,78 @@ print('descriptions_same', sum(1 for n in dups if len(desc[n]) == 1))
 PY
 ```
 
+**5.12 Unicode hidden-character scan — NFKC + Cc/Cf strip byte-diff over stored `tool_description`.** *(added 2026-09-28T13:10Z, at HEAD `69237e0`)*
+
+Mirrors the hidden-character check (Type V in the AgentsID taxonomy) **on our own corpus**, so the paper can say "we also scanned" rather than citing the check from outside. Byte-level diff between the raw stored description and its NFKC-normalized form with Unicode category `Cc` (control) + `Cf` (format) characters removed — the codepoint classes that carry invisible payload (zero-width joiners, bidi overrides, soft hyphens, tag characters).
+
+**Headline numbers (16,763 stored descriptions, `data/github_tools.jsonl`):**
+
+- **Zero hidden characters found: 0 `Cc` and 0 `Cf` codepoints across the entire corpus** — the strip pipeline removes nothing, so no description-level concealment via control/format characters exists in the stored evidence base. Honest scope note: the extractor already collapses newlines (0 of 16,763 stored descriptions contain `\n`), so the one trivially-expected `Cc` class is absent **by extraction, not by absence upstream**; the finding is that *nothing beyond that* — no zero-width, bidi, soft-hyphen, or other format codepoint — hides in the stored text.
+- **Byte delta (raw − normalized+stripped): 88 of 16,763 rows (0.52%) with a positive delta, totaling 436 B, max 20 B per description**; 0 rows show a negative delta (NFKC expansion). All 88 deltas come from **visible** fullwidth CJK punctuation folding (U+FF0C FULLWIDTH COMMA, U+FF08/U+FF09 FULLWIDTH PARENTHESES, U+FF1A FULLWIDTH COLON, U+FF1B FULLWIDTH SEMICOLON) — byte-length shrinks because the ASCII fold is narrower, not because anything was stripped.
+- 119/16,763 rows are NFKC-changed at all; 31 of those with zero byte delta (exclusively U+2026 HORIZONTAL ELLIPSIS → `...`).
+
+Top-10 rows by byte delta (per-codepoint detail in `data/unicode_scan.csv`):
+
+| `server::tool` | delta | folded codepoints |
+|---|---|---|
+| `io.github.RollingGo-AI/hotelbooking::generic:unnamed` | 20 B | U+FF0C ×4, U+FF08 ×2, U+FF09 ×2, U+FF1A ×1 |
+| `cn.pianam.mcp/devtools-mcp::decorator:unnamed` (4 evidence rows, §5.10 dup-key) | 18 B each | U+FF08/U+FF09 ×4, U+FF0C/U+FF1A/U+FF1B variants |
+| `com.zhijipaipan/zhiji-bazi::bazi_compute` | 14 B | U+FF0C ×3, U+FF08, U+FF09, U+FF1A |
+| `io.github.ascript-cn/ascript-mcp::listtools:unnamed` | 12 B | U+FF08 ×2, U+FF09 ×2, U+FF1A, U+FF0C |
+| `cc.ssave/tiktok-instagram-downloader::generic:unnamed` | 10 B | U+FF08 ×2, U+FF09 ×2, U+FF0C |
+| `cn.pianam.mcp/stock-mcp::decorator:unnamed` | 10 B | U+FF08 ×2, U+FF09 ×2, U+FF0C |
+| `io.github.chenxiaofie/memory-mcp::listtools:unnamed` | 10 B | U+FF08 ×2, U+FF09 ×2, U+FF1A |
+
+**Co-occurrence with our flags (150-row labeled sample only — detectors are NOT re-run corpus-wide):** 148/150 sample rows resolve via the exact `(server_name, tool_name)` + 300-char-prefix join (the 2 unresolved — `ca.swiftsign/mcp`, `com.frontiercrown.signer/nostr-signer` — are `generic:unnamed` name collisions, the §5.10 dup-key mechanism); 98/148 carry ≥1 detector flag; **exactly 1/148 sample rows has any byte delta — row 34 (`io.github.XZXZZX-Ai/bilibili-mcp::get_video_info`, the sample's only non-English row: 3× U+FF0C + 1× U+FF1A) — and it is a flagged row whose human label is `fp`** (the bilingual defensive guard, §5.9 / P6 seed). No hidden-byte co-occurrence with any human-confirmed TP row.
+
+**Interpretation and caveats.** Negative result for the Type V mirror: in the official-registry population as stored, concealment-by-codepoint does not appear — in contrast to §5.11's upstream **truncation**, which demonstrably hides material capability language (a different mechanism: text absent from the stored view vs. text invisible within it). Scanner-blind classes stated honestly: visually confusable *letters* (Cyrillic homoglyphs, Mathematical Alphanumeric Symbols) are categories L/Sm, not Cc/Cf, and are **not** covered by this scan (detection-side question, parked with P6); and for the 1,082 §5.11-cut rows a hidden run upstream of the extractor's view cannot be ruled out — the corpus-wide re-extraction (FUTURE_WORK item 12) precedes any stronger claim.
+
+Artifact: `data/unicode_scan.csv` (16,763 rows; columns `idx, server_name, tool_name, repo, raw_bytes, raw_chars, final_bytes, final_chars, byte_delta, char_delta, cc_stripped, cf_stripped, nfkc_changed, codepoints_stripped, has_hidden`), sha256 `4f9eccbb202e1e16efdfde2b8b31152b3edbd114d9954aee90bc4e46813da110`.
+
+Producing command (a)+(b):
+
+```bash
+python3 - <<'PY'
+import json, csv, unicodedata, hashlib
+from collections import Counter
+
+CC_CF = ('Cc', 'Cf')
+
+scan, desc_by_idx = [], {}
+with open('data/github_tools.jsonl') as f:
+    for i, line in enumerate(f, 1):
+        if not line.strip():
+            continue
+        o = json.loads(line)
+        d = o.get('tool_description') or ''
+        desc_by_idx[i] = d
+        nf = unicodedata.normalize('NFKC', d)
+        stripped = [c for c in nf if unicodedata.category(c) in CC_CF]
+        keep = ''.join(c for c in nf if unicodedata.category(c) not in CC_CF)
+        raw_b, final_b = len(d.encode('utf-8')), len(keep.encode('utf-8'))
+        cc = sum(1 for c in stripped if unicodedata.category(c) == 'Cc')
+        cps = Counter(f"U+{ord(c):04X}({unicodedata.category(c)})" for c in stripped)
+        scan.append({
+            'idx': i, 'server_name': o.get('server_name', ''), 'tool_name': o.get('tool_name', ''),
+            'repo': o.get('repo', ''), 'raw_bytes': raw_b, 'raw_chars': len(d),
+            'final_bytes': final_b, 'final_chars': len(keep), 'byte_delta': raw_b - final_b,
+            'char_delta': len(d) - len(keep), 'cc_stripped': cc, 'cf_stripped': len(stripped) - cc,
+            'nfkc_changed': nf != d, 'codepoints_stripped': ';'.join(f"{k}x{v}" for k, v in sorted(cps.items())),
+            'has_hidden': raw_b > final_b,
+        })
+
+with open('data/unicode_scan.csv', 'w', newline='') as f:
+    w = csv.DictWriter(f, fieldnames=list(scan[0].keys()))
+    w.writeheader()
+    w.writerows(scan)
+sha = hashlib.sha256(open('data/unicode_scan.csv', 'rb').read()).hexdigest()
+print('rows_scanned', len(scan))
+print('rows_hidden_byte_delta_gt0', sum(r['has_hidden'] for r in scan))
+print('total_hidden_bytes', sum(r['byte_delta'] for r in scan))
+print('unicode_scan_csv_sha256', sha)
+PY
+```
+
 ## 6. Reproducing these numbers
 
 ```bash

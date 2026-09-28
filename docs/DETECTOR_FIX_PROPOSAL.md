@@ -13,7 +13,7 @@ The repo's detector lineage is: **v1** frozen at commit `6cca247` (`CAPABILITY_P
 `POISON_PATTERNS`, `suspicion_score` definition fixed) and **v2** = v1 + the
 `model_addressed`/`second_person_imperative` channel classes (reported separately, never
 summed into poisoning statistics). The current detector **remains the paper's baseline**;
-the six proposals below are therefore **v3 candidates** — adopted, if at all, only through
+the seven proposals below are therefore **v3 candidates** — adopted, if at all, only through
 Brief 03's versioned-diff process with the Methods section updated, never as silent regex
 edits. All evaluation happens on the frozen corpus (`data/servers.jsonl` sha256 `be197ec0…`,
 `data/github_tools.jsonl` as committed); row order in any regenerated sample CSV must be
@@ -131,6 +131,32 @@ rationales — no speculative hardening.
   spot for any future multilingual re-scan.
 - **(d) Validation.** Fires on row 34; silent on the 149 others at the proposed threshold;
   threshold sweep reported in the validation appendix.
+
+### P7 — New poison candidate: `confirmation_bypass` (non-scoring until v3 validation)
+
+- **(a) Measured failure.** The sample contains a benign instance of the approval/confirmation
+  bypass phrasing family with **no detector class covering it**: row 47 (`ai.novence/mcp::bootstrap`,
+  human `fp`) — *"do not wait for OTP"* — where the PI's note records the imperative as real but
+  benign product-flow onboarding, and explicitly tags the row a watch-item. The same phrasing
+  family ("skip/avoid redundant approvals", "not needed before", "proceed without") is the
+  mechanism behind the Type III toxic flow in the AgentsID Weaponized-by-Design census, where a
+  tool talks a second, security-relevant tool out of its confirmation gate; nothing in v1/v2
+  would fire on a weaponized version of row 47's sentence today.
+- **(b) Fix.** Add a v3 poison class firing when a tool description instructs the agent to
+  **skip, relax, or proceed past a confirmation/verification/second-factor gate** (trigger
+  family: `skip|avoid|bypass|not needed before|do not wait (for)|proceed without` + a
+  confirmation noun `approval|confirmation|consent|OTP|2FA|verification|review` within the
+  sentence). Deliberately **non-scoring until v3 validation** (AGENTS.md §2.3): at the sample's
+  measured base rate (5.6% flag-instance precision) an uncalibrated class of this breadth would
+  be near-pure FP, so v3 ships it as an annotation column; scoring only if the re-validation
+  protocol (§3) shows the benign-funnel readings (row 47) separable from gate-suppression.
+- **(c) Expected effect.** Zero effect on every existing v1/v2 number (new column); adds
+  candidate recall for the confirmed-by-others Type III mechanism with row 47 as the labeled
+  benign anchor of the family.
+- **(d) Validation.** Fires on a weaponized row-47 paraphrase fixture (to be written at
+  adoption time — never committed as a usable payload, AGENTS.md §2.2); stays silent on row 47
+  as stored ("do not wait for OTP" inside vendor's own verification-relaxed funnel is the exact
+  boundary case the threshold must be tuned against); §3 protocol.
 
 ## 3. Expected impact (ESTIMATES — not measurements) and re-validation protocol
 

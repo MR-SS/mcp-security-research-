@@ -186,6 +186,27 @@ with a per-row diff report against the frozen file; labels and sample row order 
 
 ---
 
+**13. Cross-server capability graphs (AgentsID Toxic Flow Type IV, Data Exfiltration Chains) —
+needs the re-extracted, graph-ready evidence base.**
+*Idea (seeded 2026-09-28 by the AgentsID Weaponized-by-Design census, verified against the
+public report the same day):* construct per-server directed graphs of tool capabilities
+(credential_reader → external_reader → network_sender …) and count servers whose graph contains
+a sensitive-source-to-external-sink path. AgentsID reports 188 servers with exfiltration chains,
+unvalidated; our tool-description rows are the unit of evidence, so the graph level is one
+server's full tool manifest — not covered by any current artifact.
+*Why interesting:* it is the one toxic-flow mechanism invisible to per-description detectors
+(their own §5.5: "no individual tool description is malicious"), and our human-validated
+labeling discipline could be extended to chain verdicts — the calibration the census lacks.
+*Deferred:* three hard prerequisites: (a) FUTURE_WORK #12's corpus-wide chain-aware
+re-extraction (the graph is only as good as the stored descriptions); (b) per-server tool
+manifests regrouped from evidence rows (`server::tool` is not unique, §5.10); (c) a labeled
+sample of *graphs* (not rows) through the Brief-03 workflow — a versioned artifact decision.
+*Unblocked by:* #12 landing plus a new brief defining the capability-noun lexicon, the
+path-counting rule, and a graph-level validation sample; the Type III analog at description
+level is already seeded as P7 (`confirmation_bypass`) in `docs/DETECTOR_FIX_PROPOSAL.md`.
+
+---
+
 Before pushing these artifacts, tracked files were scanned for credential patterns
 (`ghp_/gho_/github_pat_`, `AKIA…`, `sk-…`, `xox[baprs]-`, PEM headers, JWTs, `AIza…`). Two
 regex hits were investigated and both are **documentation prose, not secrets**:
