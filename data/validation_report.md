@@ -214,3 +214,49 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 Detector rules (v2) are **frozen**. Any regex fix proposals derived from
 these FP patterns must be filed as a **separate proposal diff** —
 never auto-applied to `pilot/analyze.py`.
+
+## Reliability (Mode B inter-rater)
+
+*Added 2026-09-28. NOTE: `label_sample.py --report` regenerates this file wholesale;
+re-run `python3 pilot/kappa_report.py` and re-append if that ever happens after a
+label mutation. The full machine-readable report lives in `data/kappa_report.md`.*
+
+Per `prompts/06-second-opinion.md` Mode B, a second rater relabeled the 30-item blind
+packet (`data/kappa_packet.md`, commit `7b52792`: all 5 tp rows + 25 fp rows,
+`random.seed(20260927)`, seed-shuffled, texts served FULL) **with no access to the human
+labels, the sample map, or any prior note**. **Rater provenance:** ChatGPT web UI (OpenAI,
+default consumer model, not version-pinned), accessed 2026-09-28, blind rating of full-text
+items; verdicts stored verbatim in `data/labels_llm.jsonl` (provenance sidecar
+`data/labels_llm.provenance.txt`). Agreement is computed by `pilot/kappa_report.py`
+(stdlib only) against the human labels; per the Mode B hard rule the rater's opinions
+**never modify** `data/labels.jsonl`.
+
+**Result (n = 30):** observed agreement po = **0.9333** (28/30); expected chance agreement
+pe = **0.7222**; **Cohen's kappa = +0.760** (Landis & Koch: *substantial*, 0.61–0.80 band).
+The 2-class (tp / not-tp) variant is numerically identical here (po 0.9333, pe 0.7222,
+kappa +0.760) because the two disagreements are one tp→fp miss and one fp→tp miss, leaving
+the marginals unchanged. **POI-flag-carrying items only (n = 21 of 30;** the 9 items with
+zero poison flags excluded**):** po = 0.9048, pe = 0.6372, kappa = **+0.738**.
+
+Contingency matrix (3-class; human rows × LLM-rater columns):
+
+| human \ llm | tp | fp | unclear | total |
+|---|---|---|---|---|
+| **tp** | 4 | 1 | 0 | 5 |
+| **fp** | 1 | 24 | 0 | 25 |
+| **unclear** | 0 | 0 | 0 | 0 |
+| **total** | 5 | 25 | 0 | 30 |
+
+Per-stratum agreement: tp stratum **4/5 (80.0%)** · fp stratum **24/25 (96.0%)**.
+
+**Disagreements (2), resolved to sample row_ids via `data/kappa_sample_map.json`:**
+
+| item | row_id | human | llm rater | reading |
+|---|---|---|---|---|
+| Q05 | 35 | tp | fp | froglet exec-priming: the rater read "execute those through your own shell" as intra-toolkit workflow constraint; the human verdict treats the same sentence as an added behavioral rule (ASI05-shaped exec-priming) — the hardest item in the packet, and the one whose tp rests on the §4d gray-zone logic |
+| Q26 | 20 | fp | tp | flaim relevance routing: the rater counted "Any time the user references another post, you should use this" as a model-directed behavioral rule; the human verdict scopes it to the server's own forum posts (no cross-tool effect) — the §3 imperative rule's scope question, which the packet's rules leave to judgment |
+
+Both disagreements are rule-interpretation calls on §3's "behavioral rule" boundary, not
+perception errors — which is the useful finding for Methods: the reliability of the labeling
+category is substantial, and the residual disagreement concentrates exactly where the rubric
+leaves scope judgment open (the same items flagged as gray-zone in the TP/FP analyses above).

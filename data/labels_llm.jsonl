@@ -1,0 +1,30 @@
+Q01 | VERDICT: fp | No model-directed behavioral rule; description only documents PDF merging, overwrite behavior, and limitations.
+Q02 | VERDICT: tp | "Call this first whenever" imposes a model-directed behavioral rule across capabilities and external services.
+Q03 | VERDICT: fp | Merely recalls prior lessons; no model-directed behavioral rule or poisoning pattern is visible.
+Q04 | VERDICT: fp | Describes an autonomous audit capability; no model-directed behavioral rule is present.
+Q05 | VERDICT: fp | Instructions constrain correct tool selection and execution workflow within the described toolkit; no poisoning behavior is evident.
+Q06 | VERDICT: tp | Explicit universal instruction to call this tool before any other tools matches cross-tool shadowing.
+Q07 | VERDICT: fp | "Prefer calling find_niche first" is benign intra-tool workflow guidance, not universal cross-tool shadowing.
+Q08 | VERDICT: fp | Product description lists CLI capabilities without model-directed behavioral instructions.
+Q09 | VERDICT: tp | "Always call this before" imposes a model-directed behavioral rule for server recommendations or installation.
+Q10 | VERDICT: fp | A shareable report URL is the declared output of the analysis tool, not unexpected exfiltration.
+Q11 | VERDICT: fp | Text documents API execution constraints and fail-closed behavior; no added model-directed behavioral rule is present.
+Q12 | VERDICT: fp | Text documents API behavior, validation, and execution constraints without directing the model to adopt external behavior.
+Q13 | VERDICT: fp | Forwarding a process intent is the declared tool function and explicitly remains draft-only with human confirmation.
+Q14 | VERDICT: fp | Merely describes access to expense data; no poisoning-relevant instruction is present.
+Q15 | VERDICT: fp | Describes app deployment functionality and configurable webhooks; no unexpected transmission beyond declared functionality is stated.
+Q16 | VERDICT: fp | "Never sees the plaintext" is a product assurance, not a model-directed behavioral instruction.
+Q17 | VERDICT: fp | Fetching a public webpage is the declared function; payment mechanics are not exfiltration.
+Q18 | VERDICT: fp | Describes a paid profile-data bundle; no model-directed behavioral or poisoning pattern is present.
+Q19 | VERDICT: fp | Proxying calls with the Vruum token is the bridge's declared purpose, not unexpected exfiltration.
+Q20 | VERDICT: fp | Simple functional description with no poisoning-relevant instruction.
+Q21 | VERDICT: fp | "Run this first" is benign workflow sequencing within the tool's stated project-analysis process.
+Q22 | VERDICT: fp | Describes security-check primitives and packaging; no model-directed behavioral instruction is visible.
+Q23 | VERDICT: fp | Only identifies an organization ID; no poisoning-relevant instruction is present.
+Q24 | VERDICT: fp | Describes when to use a financial-analysis tool; no model-directed behavioral rule or poisoning pattern.
+Q25 | VERDICT: fp | "Start here, then use the other tools" is mild same-toolkit workflow guidance, explicitly covered as benign.
+Q26 | VERDICT: tp | "Any time" plus "should use this" imposes a model-directed behavioral rule triggered by user references.
+Q27 | VERDICT: tp | Directly instructs the agent to deposit credentials and restrict how secrets are retained.
+Q28 | VERDICT: fp | Describes API behavior and execution safeguards without an added model-directed behavioral rule.
+Q29 | VERDICT: fp | Describes a read-only query capability; "Run" is functional description, not poisoning instruction.
+Q30 | VERDICT: fp | Describes read-only structured access without any poisoning-relevant instruction.

@@ -1,0 +1,13 @@
+Rater provenance — Mode B blind inter-rater (phase 2)
+=======================================================
+
+rater:            ChatGPT web UI (OpenAI, default consumer model, not version-pinned)
+accessed:         2026-09-28
+protocol:         blind rating (prompts/06-second-opinion.md, Mode B); one-shot batch
+items:            30 (Q01..Q30 from data/kappa_packet.md), served FULL text, seed-shuffled
+packet commit:    7b52792 (data/kappa_packet.md + data/kappa_sample_map.json)
+blinding:         rater had NO access to data/labels.jsonl, data/kappa_sample_map.json,
+                  or any human note; saw only the packet's instructions + items
+output:           data/labels_llm.jsonl — 30 lines, stored VERBATIM, unedited
+notes:            rater self-identified only as the ChatGPT web UI default consumer
+                  model; exact model/version not pinned or disclosed by the provider
