@@ -231,6 +231,98 @@ not a uniqueness guarantee for the entire sample.
 
 Computed 2026-09-27T11:50:05Z; git-status stamp: `4d347fc-clean` before this correction.
 
+**5.11 Upstream (source-level) truncation — stored `tool_description` text that ends mid-sentence.** *(added 2026-09-28T06:38Z, after commit `eb8a84c`)*
+
+**Definition and level.** This census measures a *different* truncation level from the
+CSV-cap one: here the stored `tool_description` **inside `data/github_tools.jsonl` itself**
+is cut — i.e. the loss already happened **upstream of every artifact built from that file**
+(during Brief 02's extraction/assembly of the evidence rows). A flagged row therefore shows
+`[FULL TEXT]` in `label_sample.py` while genuinely missing its ending; by contrast, the
+150-row validation sample's CSV-cap census (43/150 labeled rows sitting exactly on
+`analyze.py`'s 300-char `description` cap, reported in `data/validation_report.md` §Truncation)
+compares a 300-char **CSV display excerpt** against the stored full text — recoverable,
+per-row, from `github_tools.jsonl`. Three levels, in short: (1) CSV display cap
+(recoverable, `label_sample.py` diagnoses it per row), (2) **upstream source-level cut in the
+stored text (this census, unrecoverable from the repo alone)**, and (3) the terminal's 1,500-char
+`DISPLAY_LIMIT` (cosmetic, text untouched on disk).
+
+**Heuristic (a proxy, not a verdict — AGENTS.md §2.3).** A non-empty description whose last
+non-space character is neither a letter nor one of the terminal marks `.! ?)]}"'` is flagged;
+additionally, a description whose final word is a trailing function word (`until, and, or, to,
+with, the, a, an, of, for, if, when, from, by, than, that, then, its, their, which, while,
+into, via, per, before, after, between, through, without, within`) is flagged (spec-named
+signals are `until/and/to/with`). Known false-positive buckets, disclosed up front: **52 rows
+end in `。`** — a legitimate CJK sentence terminator the Latin-punctuation heuristic does not
+know — so the CJK-adjusted count is the better estimate; a few rows end in digits/equations
+(`0` 20, `6` 14, `4` 12), which are plausibly legitimate; and 2 rows end in `…` (self-marked
+elision, arguably intentional). Conversely the function-word rule *misses* cuts that happen to
+land on a complete-looking word (e.g. a dangling noun), so both directions of error exist and
+the number is a **lower bound on true upstream cuts**.
+
+**Census numbers** (over all 16,763 evidence rows; **0** empty descriptions):
+
+| Metric | Value |
+|---|---|
+| Evidence rows (`github_tools.jsonl`) | 16,763 (distinct stored descriptions 15,832) |
+| **Flagged rows (heuristic as specified)** | **1,082 (6.45%)** |
+| Flagged **distinct descriptions** | 1,024 |
+| Flagged after CJK-terminator carve-out (better estimate) | **1,030 (6.14%)** |
+| Primary-signal bucket: non-terminal punctuation | 786 rows — `,` 276 · `\` 151 · `:` 99 · `(` 27 · `=` 18 · `—` 16 · `[` 16 · `;` 12 · digits 60 · other 111 |
+| Additional-signal bucket: trailing function word | 296 rows — `the` 61 · `for` 38 · `a` 32 · `to` 25 · `and` 24 · `or` 13 · `by` 13 · `with` 11 · `of` 10 · rest 69 |
+| Known-benign subsets (disclosed) | `。` 52 · digit/equation endings ~46 · `…` 2 |
+| Length distribution (all 16,763) | min 9 · p25 60 · median 89 · p75 122 · p95 285 · max 1,547 chars |
+| Length distribution (flagged 1,082) | min 9 · p25 48 · median 79 · p75 99 · p95 278 · max 949 chars — flagged text is shifted **shorter** than the population, and 832/1,082 (77%) sit ≤ 100 chars: short rows are cut as often as long ones, so "short description = complete description" is not a safe assumption |
+
+**Examples.**
+
+1. **Trailing function word, `until`** — `ai.wpconvert/mcp::wpconvert_convert_folder`
+   (source `packages/mcp/src/server.mjs`, 635 chars), the **stored text behind
+   validation-sample row 23** (`fp`; note records the artifact):
+   "…Once you have a jobId, poll wpconvert_check_status **until**" — cut mid-imperative.
+2. **Non-terminal punctuation, `,`** — `io.github.TomasLucasUTN/godot-mcp-bridge::get_guide`
+   (source `mcp-server/src/meta-tools.ts`, 322 chars): "…testing a running game, choosing
+   between the scene-editing tools**,**"
+3. **Non-terminal punctuation, `\`** — `io.github.aistoragedepot-admin/aistoragedepot-mcp::search_library`
+   (source `index.mjs`, 949 chars): "…Items marked **\\**" — a trailing backslash left by a
+   line-based extractor.
+
+**Cross-reference to the 150-row sample.** 7 of the 150 sample rows' recovered stored texts
+are flagged by this heuristic (rows 23, 41, 53, 90, 96, 98, 120) — the row-23 `until` cut was
+caught independently during closeout note fill and is recorded in its label note. These 7 rows
+were labeled on descriptions that are missing their endings **at the source level**, a caveat
+the CSV-cap census cannot see.
+
+Producing command (verbatim; `python3`, stdlib only — AGENTS.md §2.7):
+
+```bash
+python3 - <<'PY'
+import json
+ALLOWED = set('.!?)]}"\'')
+FUNC = {'until','and','or','to','with','the','a','an','of','for','if','when','from','by',
+        'than','that','then','its','their','which','while','into','via','per','before',
+        'after','between','through','without','within'}
+def flag(d):
+    core = d.rstrip()
+    if not core: return None
+    lc = core[-1]
+    if not (lc.isalpha() or lc in ALLOWED):
+        return ('punct', lc)
+    words = core.split()
+    if len(words) >= 2 and words[-1].lower() in FUNC:
+        return ('funcword', words[-1].lower())
+    return None
+n = flagged = 0; buckets = {}
+for line in open('data/github_tools.jsonl', encoding='utf-8'):
+    if not line.strip(): continue
+    d = json.loads(line).get('tool_description') or ''
+    n += 1
+    f = flag(d)
+    if f: flagged += 1; buckets[f] = buckets.get(f, 0) + 1
+print('rows', n, 'flagged', flagged, round(100*flagged/n, 2))
+for k, v in sorted(buckets.items(), key=lambda x: -x[1]): print(k, v)
+PY
+```
+
 Producing command (a)–(c):
 
 ```bash
