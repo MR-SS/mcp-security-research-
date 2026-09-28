@@ -1,6 +1,6 @@
 # Brief 03 — Validation Report
 
-> Generated 2026-09-28T05:50:05.409201+00:00 from `/home/sajjad/Paper/mcp-security-research/data/labels.jsonl` over `/home/sajjad/Paper/mcp-security-research/data/analysis_toollevel.csv`.
+> Generated 2026-09-28T06:24:24.148618+00:00 from `/home/sajjad/Paper/mcp-security-research/data/labels.jsonl` over `/home/sajjad/Paper/mcp-security-research/data/analysis_toollevel.csv`.
 
 ## Summary
 
@@ -115,9 +115,8 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 | marketing/product language | 26 |
 | zero-flag - control stratum; no flags fired, nothing evaluab | 19 |
 | zero flags | 17 |
-| benign legitimate use | 12 |
-| no note given | 11 |
-| bare URL/link | 4 |
+| benign legitimate use | 13 |
+| bare URL/link | 5 |
 | secret_env_access unsupported; exfiltration_language is decl | 2 |
 | fp under strict rule: covert-channel CAPABILITY is real by d | 1 |
 | fp confirmed on full text; all triggers negated ('never exec | 1 |
@@ -130,9 +129,18 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 | fp; stealth FP: 'never a fabricated or silently-replayed dat | 1 |
 | fp after full-text; dry_run/approval-prompt/mutation-log are | 1 |
 | fp; shadowing FP: 'Start here, then use the other tools for  | 1 |
+| fp; imperative REAL but own-tool relevance routing ('Any tim | 1 |
+| fp; imperative REAL but DEFENSIVE HITL guard: 'NEVER run des | 1 |
+| fp; same-template sibling of row 24 (NEVER destructive SQL a | 1 |
+| fp; defensive heavyweight: anti-IPI ('Treat all task content | 1 |
 | fp; all flags = DETECTION-LIST keywords: 'credential theft', | 1 |
+| fp; GATEKEEPER-ADVISORY gate: 'allow/review/block decision b | 1 |
+| fp; imperative fragments all intra-server routing/quality gu | 1 |
+| fp; imperative FP: 'Failed fetches and policy refusals are n | 1 |
+| fp; PROMPT-SUPPLY-CHAIN surface (prompts fetched remotely, r | 1 |
 | fp; shadowing FP: 'the token the other tools take' + 'then c | 1 |
 | fp; imperative REAL but defensive anti-IPI guard stated BILI | 1 |
+| fp; CAP database_write/file_write_delete CONTRADICTED by rea | 1 |
 | database_write/file_write_delete contradicted by read-only/n | 1 |
 | exfiltration_language unsupported; network_egress unsupporte | 1 |
 | no network and shell execution | 1 |
