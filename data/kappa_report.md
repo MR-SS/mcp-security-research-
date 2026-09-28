@@ -1,6 +1,6 @@
 # Mode B inter-rater reliability — Cohen's kappa (phase 2)
 
-> Generated 2026-09-28T08:09:58Z by `pilot/kappa_report.py` (stdlib only). Mode B hard rule: the blind rater never modifies `data/labels.jsonl`.
+> Generated 2026-09-28T08:48:49Z by `pilot/kappa_report.py` (stdlib only). Mode B hard rule: the blind rater never modifies `data/labels.jsonl`.
 > Inputs: `kappa_sample_map.json` (sha256 41fa24a5bd99d4af…), `labels.jsonl` (sha256 be587210928db242…), `labels_llm.jsonl` (sha256 891103e4b27992a5…), seed 20260927 · base_commit 183334e.
 
 ## All 30 items — 3-class (tp / fp / unclear)
@@ -46,4 +46,6 @@
 | Q26 | 20 | fp | tp |
 
 *Interpretation convention (Landis & Koch): <0 poor · 0.01–0.20 slight · 0.21–0.40 fair · 0.41–0.60 moderate · 0.61–0.80 substantial · 0.81–1.00 almost perfect. The blind rater's opinions never modify `data/labels.jsonl` (Mode B hard rule).*
+
+*Errata 2026-09-28: the Q26/row 20 disagreement row is `io.github.basehub-ai/forums::generic:unnamed` (basehub forums); earlier draft text called it 'flaim' — app.flaim/mcp is sample row 52, which is not in the packet.*
 

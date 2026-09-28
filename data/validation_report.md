@@ -254,7 +254,7 @@ Per-stratum agreement: tp stratum **4/5 (80.0%)** · fp stratum **24/25 (96.0%)*
 | item | row_id | human | llm rater | reading |
 |---|---|---|---|---|
 | Q05 | 35 | tp | fp | froglet exec-priming: the rater read "execute those through your own shell" as intra-toolkit workflow constraint; the human verdict treats the same sentence as an added behavioral rule (ASI05-shaped exec-priming) — the hardest item in the packet, and the one whose tp rests on the §4d gray-zone logic |
-| Q26 | 20 | fp | tp | flaim relevance routing: the rater counted "Any time the user references another post, you should use this" as a model-directed behavioral rule; the human verdict scopes it to the server's own forum posts (no cross-tool effect) — the §3 imperative rule's scope question, which the packet's rules leave to judgment |
+| Q26 | 20 | fp | tp | basehub-ai/forums relevance routing (errata 2026-09-28: this row is basehub forums, not flaim — row 52 is flaim): the rater counted "Any time the user references another post, you should use this" as a model-directed behavioral rule; the human verdict scopes it to the server's own forum posts (no cross-tool effect) — the §3 imperative rule's scope question, which the packet's rules leave to judgment |
 
 Both disagreements are rule-interpretation calls on §3's "behavioral rule" boundary, not
 perception errors — which is the useful finding for Methods: the reliability of the labeling
