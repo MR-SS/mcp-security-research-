@@ -323,6 +323,24 @@ for k, v in sorted(buckets.items(), key=lambda x: -x[1]): print(k, v)
 PY
 ```
 
+**Re-extraction outcome (2026-09-28 validity pass).** All 7 sample rows flagged above were
+re-judged on their **upstream-full** texts, recovered from the live public source files
+(`raw.githubusercontent.com`, branch `main`, no token; HTTP 200 in 7/7 — the `master`
+fallback never fired). Deltas vs the stored text: +28 (row 53), +50 (row 98), +62 (row 23),
++468 (row 120), +493 (row 90), +668 (row 96), +787 (row 41) — **median +468**. Three cut
+mechanisms: (1) the extraction regex `[^"']{10,2000}` halting at the first embedded quote
+(rows 23, 53, 96, 98 — visible cuts at `until`, `via`, `{status:`, `the`); (2) descriptions
+authored as `+`-concatenated multi-fragment literals, truncated at the first fragment
+boundary (rows 41, 90, 120); (3) extractor line residue (row 90's stored trailing `\`).
+Every stored text matched its live-file anchor verbatim, so upstream drift is not a
+confound for these 7. Verdicts: **0/7 flips — all 7 confirmed `fp` on the full text**
+(row 120 is a zero-flag control and stays zero-flag); the sample's label counts are
+unchanged. But the cuts demonstrably hid **material capability language** — row 41's
+bot-detection evasion/impersonation parameters, row 98's deny-by-default WP-CLI allowlist,
+row 90's anti-SSRF refusals — which is the materiality evidence for treating stored-cuts as
+an evidence-quality defect rather than a cosmetic one (per-row judgments in
+`data/labels.jsonl`; corpus-wide follow-up parked as `FUTURE_WORK.md` item 12).
+
 Producing command (a)–(c):
 
 ```bash

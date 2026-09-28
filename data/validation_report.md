@@ -1,6 +1,6 @@
 # Brief 03 — Validation Report
 
-> Generated 2026-09-28T06:24:24.148618+00:00 from `/home/sajjad/Paper/mcp-security-research/data/labels.jsonl` over `/home/sajjad/Paper/mcp-security-research/data/analysis_toollevel.csv`.
+> Generated 2026-09-28T07:32:27.582959+00:00 from `/home/sajjad/Paper/mcp-security-research/data/labels.jsonl` over `/home/sajjad/Paper/mcp-security-research/data/analysis_toollevel.csv`.
 
 ## Summary
 
@@ -114,9 +114,9 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 |---|---|
 | marketing/product language | 26 |
 | zero-flag - control stratum; no flags fired, nothing evaluab | 19 |
-| zero flags | 17 |
+| zero flags | 16 |
 | benign legitimate use | 13 |
-| bare URL/link | 5 |
+| bare URL/link | 6 |
 | secret_env_access unsupported; exfiltration_language is decl | 2 |
 | fp under strict rule: covert-channel CAPABILITY is real by d | 1 |
 | fp confirmed on full text; all triggers negated ('never exec | 1 |
@@ -148,6 +148,7 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 | secret_env_access is authentication wording, not explicit cr | 1 |
 | shell_execution unsupported; exfiltration_language is declar | 1 |
 | exfiltration_language is declared proxy function, not added/ | 1 |
+| fp CONFIRMED on upstream-full (+28): 'NEVER asks for credent | 1 |
 | network_egress TP-by-text (“Send a sample payload to a regis | 1 |
 | secret_env_access TP-by-text (“Set the returned key as SWIFT | 1 |
 | secret_env FP — wallet/signing context ≠ secret credential a | 1 |
@@ -163,13 +164,11 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 | secret_env_access FP — “tokens” = billing/usage units, not c | 1 |
 | network_egress TP-by-text (“Send an Instagram DM”); exfiltra | 1 |
 | network_egress TP-by-text (“publish, schedule, ... social me | 1 |
-| network_egress TP-by-text ('Fetch a live website'); exfiltra | 1 |
 | secret_env_access FP — “Never store secrets” is a prohibitio | 1 |
 | secret_env_access TP-by-text ('your API token'); imperative  | 1 |
 | secret_env_access TP-by-text (“Kamy API key” + Authorization | 1 |
-| imperative REAL but functional self-service onboarding: “the | 1 |
+| fp CONFIRMED on upstream-full (+668); self-service onboardin | 1 |
 | file_write_delete TP-by-text (“written to output_path”); imp | 1 |
-| shell_execution TP-by-text (“Execute a WP-CLI command”); imp | 1 |
 | secret_env_access FP — “secrets” appears in a prohibition, n | 1 |
 | zero-flag — ordinary Watchgoose check listing/health-check w | 1 |
 | zero-flag — simple stock-name/code input description; no poi | 1 |
@@ -179,6 +178,7 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 | zero-flag — ordinary expense-data access description; no mod | 1 |
 | model_addressed TP-by-text (“AI agents”); channel-only, no m | 1 |
 | model_addressed TP-by-text (“the model”); defensive security | 1 |
+| fp CONFIRMED on upstream-full (+468, was zero-flag control r | 1 |
 | model_addressed TP-by-text (“Built for AI agents”); channel- | 1 |
 | model_addressed only; channel measurement (channel-open), no | 1 |
 

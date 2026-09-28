@@ -158,6 +158,34 @@ a `--code` flag alongside `--note`, with the report grouping on the code instead
 
 ---
 
+**12. `fetch_github.py`: '+'-chain (multi-fragment) description extraction gap — corpus-wide re-extraction.**
+*Root cause (found 2026-09-28, §5.11 validity pass on the 7 source-truncated sample rows):*
+the extraction regexes capture `[^"']{10,2000}` — they stop at the **first embedded quote**,
+and they do not follow descriptions authored as `"fragment" +\n "fragment" + ...` chains.
+Both mechanisms store a cut description while the upstream source file holds the full one.
+In the 150-row sample, 7 rows are affected; upstream re-extraction recovered **all 7**
+(median delta +468 chars, max +787), and the hidden continuations carried **material
+capability language** (bot-detection evasion parameters, deny-by-default command allowlists,
+anti-SSRF refusals) even though 0/7 verdicts flipped. Corpus-wide prevalence is unknown:
+`data/collection_report.md` §5.11's endpoint heuristic flags **1,082/16,763 stored
+descriptions (6.45%; 6.14% after the CJK carve-out)** as ending mid-sentence, but the
+'+'-chain share of those, and the number of *complete-looking* cuts the heuristic misses,
+are unmeasured.
+*Interesting:* a corpus-wide re-extraction (walk `+`-chains and multi-line template
+literals, escape-aware; verify each stored text as a verbatim prefix of its upstream
+literal) would both repair the evidence base for any future detector iteration and
+quantify how much capability language the current dataset under-reports — a Methods-grade
+data-quality number.
+*Deferred:* `github_tools.jsonl` is the frozen evidence base behind every label, the
+150-row sample, and both reports (AGENTS.md §2.9 — artifact versions stay comparable);
+a regenerated file shifts no `row_id`s but changes stored text hash-wide, so it needs an
+explicit artifact-version decision, and the pilot timeline is closed for collection work.
+*Unblocked by:* a versioned Brief-02 amendment adding a chain-aware extractor plus a
+`description_truncated_at_source` column, run to a new side file first (`github_tools_v2.jsonl`)
+with a per-row diff report against the frozen file; labels and sample row order stay intact.
+
+---
+
 Before pushing these artifacts, tracked files were scanned for credential patterns
 (`ghp_/gho_/github_pat_`, `AKIA…`, `sk-…`, `xox[baprs]-`, PEM headers, JWTs, `AIza…`). Two
 regex hits were investigated and both are **documentation prose, not secrets**:
