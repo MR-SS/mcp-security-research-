@@ -150,13 +150,26 @@ rationales — no speculative hardening.
   measured base rate (5.6% flag-instance precision) an uncalibrated class of this breadth would
   be near-pure FP, so v3 ships it as an annotation column; scoring only if the re-validation
   protocol (§3) shows the benign-funnel readings (row 47) separable from gate-suppression.
+  **Measured FP-risk surface (§5.13 sizing, 2026-09-28 — measurement, not estimate):** the
+  9-phrase literal family fires on **2/16,763 frozen-corpus rows** — the benign row-47 funnel
+  ("do not wait for OTP") and one dependency-ordering sentence ("get_auth_status, get_balance,
+  get_policy and get_quote are not needed before it", no flag) — so the bare phrase family is
+  1/2 benign on this population; with the confirmation-noun gate required above, the surface
+  collapses to **1/16,763 (row 47, human-labeled `fp`)**. The noun gate is therefore
+  measured-necessary (it suppresses the API-sequencing FP), and the class has no calibratable
+  cross-sectional surface in this population — which is itself the argument for keeping it
+  non-scoring while shipping it as an annotation column (prospective value: the week-6 drift
+  re-crawl; other populations, where AgentsID reports Type III "financially concentrated").
 - **(c) Expected effect.** Zero effect on every existing v1/v2 number (new column); adds
   candidate recall for the confirmed-by-others Type III mechanism with row 47 as the labeled
   benign anchor of the family.
 - **(d) Validation.** Fires on a weaponized row-47 paraphrase fixture (to be written at
-  adoption time — never committed as a usable payload, AGENTS.md §2.2); stays silent on row 47
-  as stored ("do not wait for OTP" inside vendor's own verification-relaxed funnel is the exact
-  boundary case the threshold must be tuned against); §3 protocol.
+  adoption time — never committed as a usable payload, AGENTS.md §2.2); **does not stay silent
+  on row 47 as stored** — "do not wait for" + the noun `OTP` is exactly in-family (confirmed by
+  the §5.13 scan), so row 47 is the labeled *negative* fixture the threshold must learn to
+  leave unflagged (or downgrade to a gated annotation); the row-5682 API-sequencing sentence
+  ("not needed before" with no confirmation noun) is the second negative fixture, suppressed
+  by the noun gate; §3 protocol.
 
 ## 3. Expected impact (ESTIMATES — not measurements) and re-validation protocol
 

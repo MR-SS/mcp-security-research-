@@ -456,6 +456,85 @@ print('unicode_scan_csv_sha256', sha)
 PY
 ```
 
+**5.13 P7 confirmation-bypass surface sizing — trigger-phrase scan + co-flag analysis.** *(added 2026-09-28T13:25Z, at HEAD `d7980b3`)*
+
+Non-scoring sizing pass for the `confirmation_bypass` v3 candidate (P7 in `docs/DETECTOR_FIX_PROPOSAL.md`, seeded by AgentsID Toxic Flow Type III + the row 47 watch-item): the frozen corpus is scanned for the conservative 9-phrase literal trigger family (case-insensitive): `avoid redundant approv` · `skip verification` · `skip approv` · `not needed before` · `proceed without` · `do not wait for` · `without confirmation` · `no confirmation needed` · `unnecessary approval` (AgentsID's `unnecessary confirmation` variant is not in the family and was not scanned). Co-flagging is computed by **importing the frozen v2 detector** (`pilot/analyze.py::scan_text`) — rules are not re-implemented.
+
+**Headline: 2 of 16,763 stored descriptions (0.012%) contain any trigger phrase — 2 distinct servers, 2 total hits.** Per-phrase row counts: `not needed before` 1 · `do not wait for` 1 · all seven others 0. Co-flag: **1 of the 2 rows carries an existing v2 flag**; 1 carries none. Both hits read benign:
+
+- `[493] ai.novence/mcp::bootstrap` — *"Returns apiKey immediately — do not wait for OTP"* — co-flag `CAP:secret_env_access; POI:imperative_to_model` — this is the **row 47 evidence row itself** (human label `fp`, the vendor's verification-relaxed onboarding funnel).
+- `[5682] finance.fibrous/fibx::generic:unnamed` — *"get_auth_status, get_balance, get_policy and get_quote are not needed before it"* — no existing flag — **dependency-ordering prose** (which API calls precede which), not gate suppression.
+
+**Interpretation.** (1) Population contrast, mirroring §5.12's Type V result: confirmation-bypass phrasing is **effectively absent from the official-registry population** (2/16,763, both benign-shaped), where AgentsID reports Type III as "financially concentrated" with a top-6 CRITICAL rule (`security_bypass`, 482 findings) in its npm/PyPI corpus — different populations, honestly measured on both sides. (2) The proposed **confirmation-noun gate is measured-necessary**: the bare phrase `not needed before` fires on pure API sequencing (row 5682), so P7 without the noun requirement (`approval|confirmation|consent|OTP|2FA|verification|review` in-sentence) would add that FP; with the gate, row 5682 is suppressed. (3) With the gate, the class as specified fires on **exactly 1/16,763 stored descriptions — row 47, human-labeled `fp`** — so its measured precision prospect on this population is 0/1 at n=2, and its recall opportunity is equally ~0: the surface is too small to calibrate the class here. P7 therefore stays **non-scoring**, and its value is prospective (week-6 drift re-crawl; other populations) rather than cross-sectional. This measurement supersedes the earlier expectation that the class "stays silent on row 47 as stored" — it does not; see the corrected P7 (d).
+
+Caveats: literal phrase family (no morphology beyond the `approv` stems), so paraphrases outside the family are unmeasured; stored-text caveat of §5.11 applies (cuts can hide continuations); `server::tool` is not a unique key (§5.10).
+
+Artifact: `data/p7_bypass_scan.csv` (2 rows; columns `idx, server_name, tool_name, repo, phrases, n_phrase_hits, context, co_flag, rules_version, has_co_flag`), sha256 `c2a7903b04d1b5215ab5d944abb71aec95adce18251b1ee5d8ac2f2957e8650d`.
+
+Producing command:
+
+```bash
+python3 - <<'PY'
+import json, csv, re, hashlib, importlib.util
+from collections import Counter
+
+spec = importlib.util.spec_from_file_location('analyze', 'pilot/analyze.py')
+analyze = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(analyze)   # frozen v2 rules; imported, never re-implemented
+
+PHRASES = ['avoid redundant approv', 'skip verification', 'skip approv', 'not needed before',
+           'proceed without', 'do not wait for', 'without confirmation', 'no confirmation needed',
+           'unnecessary approval']
+rx = [(p, re.compile(re.escape(p), re.IGNORECASE)) for p in PHRASES]
+
+rows, descs = [], []
+with open('data/github_tools.jsonl') as f:
+    for i, line in enumerate(f, 1):
+        if not line.strip():
+            continue
+        o = json.loads(line)
+        d = o.get('tool_description') or ''
+        descs.append(d)
+        hit = [(p, m.start()) for p, r in rx for m in r.finditer(d)]
+        if hit:
+            rows.append({
+                'idx': i, 'server_name': o.get('server_name', ''), 'tool_name': o.get('tool_name', ''),
+                'repo': o.get('repo', ''), 'phrases': ';'.join(p for p, _ in hit),
+                'n_phrase_hits': len(hit),
+                'context': d[max(0, hit[0][1] - 60):hit[0][1] + len(hit[0][0]) + 60].replace('\n', ' '),
+                'co_flag': '', 'rules_version': 'v2 (imported pilot/analyze.py scan_text)',
+                'has_co_flag': False,
+            })
+
+for r in rows:
+    hits = analyze.scan_text(descs[r['idx'] - 1])
+    cap = sorted(k.split(':', 1)[1] for k in hits if k.startswith('capability:'))
+    poi = sorted(k.split(':', 1)[1] for k in hits if k.startswith('poison:'))
+    adr = sorted(k.split(':', 1)[1] for k in hits if k.startswith('addressing:'))
+    parts = []
+    if cap: parts.append('CAP:' + ','.join(cap))
+    if poi: parts.append('POI:' + ','.join(poi))
+    if adr: parts.append('ADR:' + ','.join(adr))
+    r['co_flag'] = '; '.join(parts)
+    r['has_co_flag'] = bool(cap or poi or adr)
+
+with open('data/p7_bypass_scan.csv', 'w', newline='') as f:
+    w = csv.DictWriter(f, fieldnames=['idx', 'server_name', 'tool_name', 'repo', 'phrases',
+                                      'n_phrase_hits', 'context', 'co_flag', 'rules_version', 'has_co_flag'])
+    w.writeheader()
+    w.writerows(rows)
+sha = hashlib.sha256(open('data/p7_bypass_scan.csv', 'rb').read()).hexdigest()
+
+per_phrase = Counter(p for r in rows for p in set(r['phrases'].split(';')))
+print('rows_with_trigger_phrase', len(rows))
+print('distinct_servers', len({r['server_name'] for r in rows}))
+print('rows_with_co_existing_flag', sum(r['has_co_flag'] for r in rows))
+for p in PHRASES:
+    print(f"  {p!r}: {per_phrase.get(p, 0)}")
+print('p7_bypass_scan_csv_sha256', sha)
+PY
+```
+
 ## 6. Reproducing these numbers
 
 ```bash

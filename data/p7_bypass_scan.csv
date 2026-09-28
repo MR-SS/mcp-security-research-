@@ -1,0 +1,3 @@
+idx,server_name,tool_name,repo,phrases,n_phrase_hits,context,co_flag,rules_version,has_co_flag
+493,ai.novence/mcp,bootstrap,Novence-ai/mcp,do not wait for,1,y_email is AFTER the live URL. Returns apiKey immediately — do not wait for OTP.,CAP:secret_env_access; POI:imperative_to_model,v2 (imported pilot/analyze.py scan_text),True
+5682,finance.fibrous/fibx,generic:unnamed,Fibrous-Finance/fibx,not needed before,1," get_auth_status, get_balance, get_policy and get_quote are not needed before it. It executes nothing; where the host renders MCP Apps UI",,v2 (imported pilot/analyze.py scan_text),False
