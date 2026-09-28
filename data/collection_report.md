@@ -207,6 +207,14 @@ with no HTTP errors and no retries, then recovered. Timing is therefore not a st
 reproducibility property; content is (see §6). If a future run appears stalled, check the log
 before assuming a hang.
 
+- **ListTools `unnamed` family:** the `listtools:unnamed` extraction family includes tool
+  descriptions harvested from live ListTools responses, with some argument-level text
+  mixed in (validation-sample rows **103, 122, 133, 141, 148**). These are not necessarily
+  standalone tool descriptions; the family is an extraction-provenance/data-quality caveat.
+- **Registry metadata inconsistency:** validation-sample row **130** has registry server
+  name `ecommerce-intelligence-mcp-server` but manifest name `redfin-mcp-server'`. Record identity
+  cannot be assumed consistent across registry metadata and the fetched manifest.
+
 **5.10 Duplicate-registration census — `server::tool` is not a unique key.** *(added 2026-09-27T11:50Z, commit `4d347fc`)*
 In `data/github_tools.jsonl` (16,763 rows): **(a)** 1,484 distinct full names
 (`server_name::tool_name`) appear on 2+ evidence rows; **(b)** 1,092 of those (73.6%) are

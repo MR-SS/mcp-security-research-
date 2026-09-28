@@ -1,21 +1,21 @@
 # Brief 03 — Validation Report
 
-> Generated 2026-09-27T13:33:12.320535+00:00 from `/home/sajjad/Paper/mcp-security-research/data/labels.jsonl` over `/home/sajjad/Paper/mcp-security-research/data/analysis_toollevel.csv`.
+> Generated 2026-09-28T05:50:05.409201+00:00 from `/home/sajjad/Paper/mcp-security-research/data/labels.jsonl` over `/home/sajjad/Paper/mcp-security-research/data/analysis_toollevel.csv`.
 
 ## Summary
 
 | Metric | Value |
 |---|---|
 | Total rows in sample | 150 |
-| Labeled rows | 103 |
-| Unlabeled rows | 47 |
+| Labeled rows | 150 |
+| Unlabeled rows | 0 |
 | Skip | 0 |
 | TP rows | 5 |
-| FP rows | 98 |
+| FP rows | 145 |
 | Unclear rows | 0 |
 | False-negative (zero-flag) rows | 0 |
 | Flag instances on TP rows | 15 |
-| Flag instances on FP rows | 248 |
+| Flag instances on FP rows | 253 |
 
 *Rows count rows. Flag instances count (row, class) pairs across those rows: one row can carry several classes, so flag instances on FP rows exceed FP rows. Precision below uses the per-class instance counts.*
 
@@ -31,7 +31,7 @@
 | `file_read_sensitive` | 1 | 1 | 0.50 |
 | `file_write_delete` | 0 | 4 | 0.00 |
 | `imperative_to_model` | 5 | 71 | 0.07 |
-| `model_addressed` | 0 | 16 | 0.00 |
+| `model_addressed` | 0 | 21 | 0.00 |
 | `network_egress` | 0 | 21 | 0.00 |
 | `second_person_imperative` | 4 | 17 | 0.19 |
 | `secret_env_access` | 3 | 50 | 0.06 |
@@ -40,7 +40,7 @@
 
 ## Unclear rate
 
-Unclear / all labeled: 0/103 = 0.00%
+Unclear / all labeled: 0/150 = 0.00%
 
 ## False-negative rate (zero-flag rows only)
 
@@ -50,7 +50,7 @@ FN / zero-flag rows: 0/50 = 0.00%
 
 `analyze.py` writes the CSV `description` column truncated to 300 chars (`CSV_DESC_LIMIT`; lines 176 and 212), while the detector scanned the **full** text from `github_tools.jsonl`. The initial labeling pass therefore showed the human a 300-char excerpt, so labels on capped rows rest on less evidence than the detector saw — 43/150 sample rows sit exactly on the cap.
 
-* Cap-affected labeled rows: **43 of 103** labeled (42%).
+* Cap-affected labeled rows: **43 of 150** labeled (29%).
 * Of these, 0 carry a `u` label and are covered by `--review-unclear`: none.
 * The remaining **43** are the `--review-truncated` queue: 0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 16, 18, 20, 22, 23, 26, 27, 28, 29, 30, 32, 33, 35, 38, 52, 58, 60, 70, 71, 72, 78, 79, 80, 81, 82, 83, 84, 85, 95, 96, 97, 98, 99.
 * Re-review is done on full text in `github_tools.jsonl`; every replacement is archived to `labels.jsonl.superseded` and logged to `labels.audit.jsonl`.
@@ -112,7 +112,9 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 
 | Reason | Count |
 |---|---|
-| marketing/product language | 24 |
+| marketing/product language | 26 |
+| zero-flag - control stratum; no flags fired, nothing evaluab | 19 |
+| zero flags | 17 |
 | benign legitimate use | 12 |
 | no note given | 11 |
 | bare URL/link | 4 |
@@ -162,6 +164,15 @@ One entry per FP ROW; the first matching bucket wins (marketing/product language
 | shell_execution TP-by-text (“Execute a WP-CLI command”); imp | 1 |
 | secret_env_access FP — “secrets” appears in a prohibition, n | 1 |
 | zero-flag — ordinary Watchgoose check listing/health-check w | 1 |
+| zero-flag — simple stock-name/code input description; no poi | 1 |
+| zero-flag — ordinary food-name resolution capability; no mod | 1 |
+| zero-flag — ordinary time-tracking query/use guidance; “Use  | 1 |
+| zero-flag — ordinary AI fashion-design functionality descrip | 1 |
+| zero-flag — ordinary expense-data access description; no mod | 1 |
+| model_addressed TP-by-text (“AI agents”); channel-only, no m | 1 |
+| model_addressed TP-by-text (“the model”); defensive security | 1 |
+| model_addressed TP-by-text (“Built for AI agents”); channel- | 1 |
+| model_addressed only; channel measurement (channel-open), no | 1 |
 
 ## TP examples by class
 
