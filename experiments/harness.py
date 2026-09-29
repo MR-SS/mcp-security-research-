@@ -133,6 +133,10 @@ def build_request_payload(model: str, messages: List[dict], tools: List[MockTool
 # --------------------------------------------------------------------------
 # OpenAI-compatible client (urllib; same envelope as the Stage-0 probe)
 # --------------------------------------------------------------------------
+class ModelHalt(RuntimeError):
+    """Auth-class gateway error: the affected model's remaining trials halt (§6)."""
+
+
 class Context:
     def __init__(self, base_url: str, api_key: str):
         self.base_url = base_url.rstrip("/")
@@ -177,6 +181,32 @@ def extract_message(payload: dict) -> dict:
     if not isinstance(message, dict):
         raise ValueError("malformed response: message missing")
     return message
+
+
+def chat_with_retry(client: Any, model: str, payload: dict) -> dict:
+    """Protocol §6 infra taxonomy: timeout/transport/garbled get exactly 1 retry;
+    a second failure returns {"__infra__": <class>} (the trial is logged and
+    excluded, never crashes the matrix). Auth errors (401/403) raise ModelHalt.
+    Exception TEXT is never retained — only a class label (§5)."""
+    import urllib.error
+
+    last = "unknown"
+    for attempt in range(2):
+        try:
+            return client.chat(model, payload)
+        except urllib.error.HTTPError as exc:
+            if exc.code in (401, 403):
+                raise ModelHalt(f"auth error HTTP {exc.code}") from None
+            last = f"http_{exc.code}"
+        except TimeoutError:
+            last = "timeout"
+        except urllib.error.URLError:
+            last = "transport"
+        except (json.JSONDecodeError, ValueError):
+            last = "garbled"
+        if attempt == 0:
+            time.sleep(1)
+    return {"__infra__": last}
 
 
 # --------------------------------------------------------------------------
@@ -334,7 +364,21 @@ def run_trial(model: str, case_id: str, rep: int, out_dir: Path,
             raise SystemExit(
                 "live mode requires a client (Context.from_env()); "
                 "use selftest.py for the offline stub")
-        raw = client.chat(model, payload)
+        raw = chat_with_retry(client, model, payload)
+        if isinstance(raw, dict) and "__infra__" in raw:
+            infra = {"ts": datetime.now(timezone.utc).isoformat(),
+                     "event": "trial_record", "model": model, "case": case_id,
+                     "rep": rep, "verdict": "infra_failure", "criterion": "INFRA",
+                     "evidence": f"{raw['__infra__']} after 1 retry (round {turn})",
+                     "transcript": path.name, "git_dirty": _git_dirty()}
+            emit(infra)
+            if register:
+                _register_run(model, case_id, rep,
+                              {"verdict": "infra_failure", "criterion": "INFRA"},
+                              path.name)
+            print(f"  [infra] {model} {case_id} rep{rep}: {infra['evidence']} "
+                  f"— excluded from ASR (§6), resume skips it")
+            return infra
         message = extract_message(raw)
         emit({"ts": datetime.now(timezone.utc).isoformat(), "event": "round",
               "round": turn, "request": {"model": model, "messages": messages,

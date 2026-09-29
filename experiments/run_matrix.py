@@ -137,10 +137,21 @@ def main(argv: List[str]) -> int:
         return 0
 
     tallies: dict = {}
+    halted_models: set = set()
     done_n = 0
     for trial in plan:
-        record = run_trial(trial["model"], trial["case"], trial["rep"], out_dir,
-                           client=client, register=not args.stub)
+        if trial["model"] in halted_models:
+            continue
+        from experiments.harness import ModelHalt  # noqa: E402
+
+        try:
+            record = run_trial(trial["model"], trial["case"], trial["rep"], out_dir,
+                               client=client, register=not args.stub)
+        except ModelHalt as exc:
+            halted_models.add(trial["model"])
+            print(f"HALT: {trial['model']} — {exc}; remaining trials for this "
+                  f"model are skipped (§6), other models continue")
+            continue
         done_n += 1
         arm = tallies.setdefault(record["case"], {})
         per = arm.setdefault(record["model"], {"success": 0, "trials": 0})
