@@ -1,4 +1,4 @@
-# Security Posture of Public MCP Servers
+# Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions
 
 A measurement study of the public **Model Context Protocol (MCP)** ecosystem: what fraction of
 public servers expose dangerous capabilities, and what fraction ship metadata with patterns

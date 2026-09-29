@@ -43,3 +43,6 @@
    (12-style same-server siblings: rows 24/25, 36/37, 60/61, 94/95) are never double-counted.
 7. **Markdown now, LaTeX later**: keep structure in `##` sections with the numbering used
    in `main.md`; figures/tables stay simple pipes so conversion is mechanical.
+8. **Title locked 2026-09-28 (PI choice B)**: *Calibrating the Alarms: A Registry-Grounded,
+   Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions* —
+   do not retitle; the working title "Security Posture of Public MCP Servers…" is retired.

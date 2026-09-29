@@ -1,8 +1,10 @@
-# A Registry-Grounded, Human-Validated Calibration of Tool-Description Poisoning Detectors on the Official MCP Registry
+# Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions
 
-*Measurement study draft — skeleton with drafted sections; Markdown now, LaTeX later.
-Every number traces to a repo artifact (see `paper/CONVENTIONS.md` §1); unverified and
-pending items are marked inline.*
+*Preprint draft — 2026-09-29 — Sajjad Rahim Nouri, Islamic Azad University, Ramsar Branch*
+
+*Skeleton with drafted sections; Markdown now, LaTeX later. Every number traces to a
+repo artifact (see `paper/CONVENTIONS.md` §1); unverified and pending items are marked
+inline.*
 
 ---
 
@@ -10,22 +12,22 @@ pending items are marked inline.*
 
 The Model Context Protocol (MCP) lets servers expose tools to LLM agents, and each tool's
 natural-language description is injected verbatim into the agent's context — a
-server-controlled, instruction-shaped channel. We ask how much poisoning signal is really
-in that channel, and — the focus of this study — how much of what current detectors report
-is true. We assemble a registry-grounded population (16,763 tool descriptions from 4,725
-repositories, drawn from 17,167 deduplicated official-registry servers) and run a frozen
-heuristic detector whose 13 firing classes emit candidates. Human validation of a
-150-row stratified sample (top-scored candidates plus a zero-flag control stratum) finds
-**flag-instance precision 5.6% (15 of 268)** and row-level true positives of **5/150
-(3.3%)**, with a blind second-rater agreement of **Cohen's κ = +0.760**. Four
-attack-shaped mechanisms appear in the wild — unconditional and conditional priority
-capture, exec-priming, and a universal credential funnel — every one written by a
-benign-intent vendor. We catalog the defensive patterns that generate most false
-positives, quantify two data-quality census findings, and file seven versioned
-detector-fix proposals (P1–P7). The result is a calibration: an evidence-based prior on
-what unvalidated poisoning counts mean in this population.
+server-controlled, instruction-shaped channel. We ask how much of what current poisoning
+detectors report about that channel is true. We assemble a registry-grounded population —
+16,763 tool descriptions from 4,725 repositories, drawn from 17,167 deduplicated
+official-registry servers — and run a frozen heuristic detector whose 13 firing classes
+emit candidates. Human validation of a 150-row stratified sample finds flag-instance
+precision 5.6% (15 of 268) and row-level true positives of 5/150, with blind second-rater
+agreement of Cohen's κ = +0.760. Four attack-shaped mechanisms appear in the wild —
+unconditional and conditional priority capture, exec-priming, and a universal credential
+funnel — every one written by a benign-intent vendor; a defensive-pattern catalog
+explains most false positives. We file seven versioned detector-fix proposals (P1–P7).
+The result is a calibration: an evidence-based prior on what unvalidated poisoning
+counts mean in this population. Code, data, labels, and audit trails are in the
+companion repository; a Zenodo DOI is pending.
 
-*(≈205 words — trim to 180 at drafting pass.)*
+<!-- abstract: 178 words counting numbers as words (whitespace split); 173 if the 5
+     standalone em-dashes are excluded; PI cap 180. -->
 
 ## 2. Introduction
 

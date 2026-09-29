@@ -8,7 +8,7 @@
 
 Solo, part-time research project. Goal: an **arXiv preprint in ~8 weeks** measuring the security posture of the public **Model Context Protocol (MCP) ecosystem**.
 
-- **Working title:** *Security Posture of Public MCP Servers: A Measurement Study of Dangerous Capabilities and Tool-Description Poisoning Surface*
+- **Title (LOCKED 2026-09-28, PI choice B):** *Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions*
 - **Single research question:** Among public MCP servers, what fraction expose dangerous capabilities, and what fraction ship tool descriptions with patterns exploitable for tool poisoning?
 - **OWASP mapping:** ASI04 (Agentic Supply Chain) + ASI02 (Tool Misuse & Exploitation), informing ASI03 and ASI05.
 - **Outputs:** (1) arXiv preprint, (2) public dataset + code with a Zenodo DOI, (3) 1–3 CVEs via responsible disclosure if real vulnerabilities are found.
