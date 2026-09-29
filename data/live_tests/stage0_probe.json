@@ -1,0 +1,28 @@
+{
+  "timestamp_utc": "2026-09-29T08:42:56.678184+00:00",
+  "probe": "one synthetic tool, one user message",
+  "results": [
+    {
+      "model": "glm-5.3",
+      "verdict": "PASS",
+      "reason": "structured tool_calls returned"
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "verdict": "PASS",
+      "reason": "structured tool_calls returned"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "verdict": "PASS",
+      "reason": "structured tool_calls returned"
+    },
+    {
+      "model": "gpt-6-astra",
+      "verdict": "PASS",
+      "reason": "structured tool_calls returned"
+    }
+  ],
+  "git_revision": "45acd06504c1397d9e199037cfa026a38fe33405",
+  "git_dirty": true
+}
