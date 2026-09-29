@@ -75,6 +75,9 @@
 
 ## 4. Eight-week timeline
 
+- [x] Brief 04 Stage-0 probe implementation and Stage-1 protocol design (offline verification only).
+- [ ] User-run Stage-0 verdicts, matrix identity clarification, and PI go for live runs.
+
 | Week | Work | Deliverable |
 |---|---|---|
 | 1 | Read the 6 key papers (AGENTS.md §5) · run pilot pipeline · **start arXiv endorser search** | servers.jsonl (pilot) |
@@ -88,6 +91,8 @@
 ---
 
 ## 5. Risks
+
+- Brief 04: requested row/name pairs disagree with the label ledger; PI clarification required before live fixtures. Proxy tool-call support remains unverified until the user-run Stage-0 probe.
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
@@ -128,3 +133,9 @@
 ## 7. Delegation workflow
 
 Work is delegated to AI agents via the briefs in `prompts/` (numbered in execution order). Each brief is self-contained: goal, inputs, outputs, acceptance criteria, and don'ts. Give an agent `AGENTS.md` + exactly one brief per run. Rule: a brief is merged only when its acceptance criteria are met and `PLAN.md` is updated.
+
+## 8. Brief 04 decisions (append-only)
+
+- **2026-09-28 — Stage 0 / Stage 1 gate:** Brief 04 model endpoint = company proxy (OpenAI-compatible), with model list pending Stage-0 capability-probe verdicts. Live runs remain PI-go gated, $0 through the company proxy, and real keys are env-only.
+- **2026-09-28 — Budget reservation:** The original $50 Brief 04 budget is converted to a reserve for an optional paid comparability run only; no paid calls are authorised for Stage 0 or Stage 1.
+- **2026-09-29 — Stage 0/1 artifacts:** `scripts/probe_toolcalling.py` and `docs/BRIEF04_PROTOCOL.md` added; no live model calls were run by the agent. User-run probe output is written to `data/live_tests/stage0_probe.json`.

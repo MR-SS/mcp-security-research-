@@ -46,3 +46,6 @@
 8. **Title locked 2026-09-28 (PI choice B)**: *Calibrating the Alarms: A Registry-Grounded,
    Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions* —
    do not retitle; the working title "Security Posture of Public MCP Servers…" is retired.
+9. **Stage-gated live experiments (Brief 04)**: live model runs happen only on explicit PI
+   "go"; $0 spend via the company proxy; real keys live in env vars only and are never
+   written to the repo, logs, transcripts, or chat. Protocol: `docs/BRIEF04_PROTOCOL.md`.
