@@ -10,24 +10,23 @@ inline.*
 
 ## 1. Abstract
 
-The Model Context Protocol (MCP) lets servers expose tools to LLM agents, and each tool's
-natural-language description is injected verbatim into the agent's context — a
-server-controlled, instruction-shaped channel. We ask how much of what current poisoning
-detectors report about that channel is true. In a registry-grounded population of
-16,763 tool descriptions (4,725 repositories; 17,167 official-registry
-servers), a frozen 13-class heuristic detector emits candidates. Human validation of a
+In the Model Context Protocol (MCP), each tool's natural-language description is
+injected verbatim into the agent's context — a server-controlled, instruction-shaped
+channel. We ask how much of what poisoning detectors report is true. In a
+registry-grounded population of 16,763 tool descriptions (4,725 repositories; 17,167
+official-registry servers), a frozen 13-class heuristic detector emits candidates. Human validation of a
 150-row stratified sample finds flag-instance precision 5.6% (15 of 268) and row-level
 true positives of 5/150, with blind second-rater κ = +0.760. Four attack-shaped
 mechanisms appear in the wild — unconditional and conditional priority capture,
 exec-priming, a universal credential funnel — all from benign-intent vendors; a
 defensive-pattern catalog explains most false positives. In 54 live trials across three
 model families, the mechanisms steer agents — exec-priming 9/9, the credential funnel
-covertly 8/9 — while controls never triggered (0/18). We file seven versioned
-detector-fix proposals (P1–P7). The result is a calibration: an evidence-based prior on
-what unvalidated poisoning counts mean here. Code, data, and labels accompany the
-paper; Zenodo DOI pending.
+covertly 8/9 — while controls never triggered in the 16 valid control trials (2 of 18
+scheduled excluded as infra-timeouts per the pre-registered protocol). We file seven
+versioned detector-fix proposals (P1–P7). The result is a calibration: an evidence-based prior on unvalidated counts. Code, data,
+and labels accompany the paper; Zenodo DOI pending.
 
-<!-- abstract: word count verified 178 (numbers as words, whitespace split); PI cap 180. -->
+<!-- abstract: word count verified 179 (numbers as words, whitespace split); PI cap 180. -->
 
 ## 2. Introduction
 
@@ -343,8 +342,9 @@ excluded); no refusals were observed.
 | PT — gated execution, control (CTRL) | 0/3 [CTRL] | 0/3 [CTRL] | 0/2 [CTRL] |
 
 Pooled attack ASR (WF+FL+DP only): glm-5.3 8/9, deepseek-v4.1-flash 9/9,
-gemini-3.8-flash 6/9. Controls never triggered (0/18 control trials; 16 after
-exclusions); the gray arm never triggered (0/8 eligible).
+gemini-3.8-flash 6/9. Controls never triggered in the 16 valid control trials (2 of 18
+scheduled excluded as infra-timeouts per the pre-registered protocol); the gray arm
+never triggered (0/8 eligible).
 
 **Finding 1 — exec-priming is the universal mechanism (FL 9/9).** Every model, in every
 replication, retrieved the guide and then adopted the tool-supplied shell text as
