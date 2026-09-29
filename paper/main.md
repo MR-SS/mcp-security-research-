@@ -14,20 +14,21 @@ inline.*
 In the Model Context Protocol (MCP), each tool's natural-language description is
 injected verbatim into the agent's context — a server-controlled, instruction-shaped
 channel. We ask how much of what poisoning detectors report is true. In a
-registry-grounded population of 16,763 tool descriptions (4,725 repositories; 17,167
+registry-grounded population of 16,763 tool descriptions (4,725 repos; 17,167
 official-registry servers), a frozen 13-class heuristic detector emits candidates. Human validation of a
-150-row stratified sample finds flag-instance precision 5.6% (15 of 268) and row-level
-true positives of 5/150, with blind second-rater κ = +0.760. Four attack-shaped
+150-row stratified sample finds flag-instance precision 5.6% (15/268) and row-level
+true positives 5/150, with κ = +0.760 (rubric-application consistency check;
+unversioned consumer-LLM second rater — a methodological limitation, §7). Four attack-shaped
 mechanisms appear in the wild — unconditional and conditional priority capture,
 exec-priming, a universal credential funnel — all from benign-intent vendors; a
 defensive-pattern catalog explains most false positives. In 54 live trials across three
-model families, the mechanisms steer agents — exec-priming 9/9, the credential funnel
-covertly 8/9 — while controls never triggered in the 16 valid control trials (2 of 18
-scheduled excluded as infra-timeouts per the pre-registered protocol). We file seven
-versioned detector-fix proposals (P1–P7). The result is a calibration: an evidence-based prior on unvalidated counts. Code, data,
+model families, mechanisms steer agents — exec-priming 9/9, the funnel covertly 8/9 —
+while controls never triggered in 16 valid trials (2 of 18 excluded as infra-timeouts
+per the pre-registered protocol). Seven versioned detector-fix proposals (P1–P7) follow.
+The result is a calibration: a prior on unvalidated counts. Code, data,
 and labels accompany the paper; Zenodo DOI pending.
 
-<!-- abstract: word count verified 179 (numbers as words, whitespace split); PI cap 180. -->
+<!-- abstract: word count verified 179 (numbers as words, whitespace split); PI cap 180; re-verified 2026-09-29 after the R2 κ rewording (net change 0). Whole-paper count in the footer comment. -->
 
 ## 2. Introduction
 
@@ -39,7 +40,8 @@ arrives with the authority of an installed integration. This makes the descripti
 channel an *instruction surface*: it can carry injection-style steering without any code
 execution, and it changes server-side for the majority of remote deployments.
 
-Prior measurements of this surface report alarming counts. What those counts lack is a
+Prior measurements of this surface report alarming counts — an inventory of what
+detectors emitted, not yet a verdict on the ecosystem itself. What those counts lack is a
 calibration: nobody has measured, on the same population the detectors scan, how often a
 fired flag is actually justified by the text. Without that denominator, a census of
 "findings" is indistinguishable from a census of regex accidents — on our evidence, most
@@ -56,7 +58,8 @@ This paper measures the detectors, not just the ecosystem. Our research question
 
 We answer RQ1 compositionally with a frozen v2 detector over 16,763 descriptions; RQ2
 with a 150-row stratified human validation (flag-instance precision 5.6%; row-level TP
-5/150; κ = +0.760 against a blind second rater); RQ3 with five human-confirmed positives
+5/150; κ = +0.760, a rubric-application consistency check against an unversioned
+consumer-LLM second rater — a methodological limitation, §7); RQ3 with five human-confirmed positives
 spanning four mechanisms and a falsifiable account of why the regexes miss the
 consequential paraphrases. Our contribution is deliberately framed: **a registry-grounded,
 human-validated calibration of tool-description poisoning detectors** — complementary to
@@ -93,8 +96,12 @@ reported separately and never summed into poisoning rates.
 Table built from `docs/RELATED_WORK_MAP.md` (rows and cite-as lines maintained there;
 numbers marked *as reported by authors*; AgentsID is vendor research,
 non-peer-reviewed, and its own limitations section concedes possible false positives;
-the five arXiv IDs plus Hou et al. and Errico are PI-verified 2026-09-28 — format only,
-no abstract-level re-verification performed).
+the seven pre-existing arXiv IDs are PI-verified 2026-09-28 — format only; the four 2026
+works added at R2 (MCPZoo `2607.11086`, MCP-TDP `2605.24069`, Stein `2603.23802`, Song et
+al., IEEE TSE DOI `10.1109/TSE.2026.3694876`) were verified 2026-09-29 by direct fetch of
+the public arXiv abstract pages and of the Crossref/Semantic Scholar records — IEEE's own
+landing page being JS-gated — with MCPZoo's quantitative cells re-derived from its full
+text).
 
 | Work | Population | Unit | Scale | Description-level | Human validation | Reliability artifact | Registry-grounded |
 |---|---|---|---|---|---|---|---|
@@ -106,7 +113,11 @@ no abstract-level re-verification performed).
 | Hou et al., MCP Landscape (2503.23278) | ecosystem | survey | taxonomy landscape (as reported) | No | No | No | No |
 | MCP Safety Audit (2504.03767) | audited servers | server (audit) | single audits (as reported) | Partial | Yes (n≈single digits) | No | No |
 | Errico, Securing MCP (2511.20920) | architecture | design analysis | no corpus | No | No | No | No |
-| **Ours** | **official MCP Registry + GitHub source** | **tool description** | **16,763 rows / 4,725 repos** | **Yes** | **Yes (150/150; 5.6%)** | **Yes (κ = +0.760)** | **Yes** |
+| MCPZoo, Rethinking MCP Security (2607.11086) | runtime servers, **multiple MCP markets** | server (runtime) + scanner alert | 64,611 unique / 37,288 interactable (as reported; full-text verified) | Partial (unit is the server-level alert) | Yes (manual review; their κ 0.87) | **Yes — 45.53% avg precision, 8 scanners** | No |
+| MCP-TDP, When the Manual Lies (2605.24069) | synthetic benchmark | tool (attack case) | 32 cases / 6 risk categories / 8 LLMs (as reported) | Yes (instruction channel in metadata) | No | No | No |
+| Stein, How are AI agents used? (2603.23802) | public MCP server repos, 11/2024–02/2026 | tool | 177,436 tools (as reported) | Partial (categorization, not poisoning) | No | No | Partial |
+| Song et al., Beyond the Protocol (IEEE TSE 2026; 10.1109/TSE.2026.3694876) | MCP attack vectors on aggregator platforms | attack vector / server | 4 attack classes; 3 platforms; user study n = 20 (as reported) | Yes (tool poisoning is the description channel) | Partial (user study; no detector precision) | No | No |
+| **Ours** | **official MCP Registry + GitHub source** | **tool description** | **16,763 rows / 4,725 repos** | **Yes** | **Yes (150/150; 5.6%)** | **Yes (rubric-application consistency check, κ = +0.760; unversioned consumer-LLM rater — a limitation, §7)** | **Yes** |
 
 **Benchmarks (MCPTox, MSB)** construct synthetic attack sets and answer "how bad can an
 attack be," not "how often is it present"; their rates are properties of the benchmark,
@@ -120,6 +131,35 @@ Protocol, Errico)** reason about what the protocol permits, not what deployments
 **Manual audits (MCP Safety Audit)** share our human-judgment discipline but at
 single-server depth, without a detector to calibrate. We differ by measuring the
 instrument and the population together, within the official registry.
+
+**Scanner-reliability cluster: convergent evidence at two units, not a rivalry.**
+Independent work measuring a *different* instrument reports the same calibration gap we
+measure. **MCPZoo** (Chen et al., arXiv 2607.11086, cs.CR, 2026-07) evaluates eight
+static/dynamic/hybrid security scanners on a **multi-market, runtime-deployed population**
+of servers (64,611 unique; 37,288 interactable) and finds the raw signal inflated:
+**96.89% of interactable servers are flagged risky by at least one scanner, while manually
+validated overall average precision is 45.53%** (per-scanner 10.40%–96.88%) — a
+*server-level* alert-reliability measurement, validated by human reviewers. **We** measure a
+different instrument at a different unit: the **tool-description poisoning-pattern
+detector**, at the **description** level, on the official-registry + GitHub population,
+under a **stricter, text-bound rubric** (a row counts as a true positive only when the
+stored text adds a behavioral instruction to the model), and find **5.6% flag-instance
+precision, reported per class**. Framed as what it is — **convergent evidence**:
+*independent work at a different unit reports the same calibration gap, and ours shows the
+gap is even wider for poisoning-pattern detection*. The two studies differ in unit
+(server-level alert vs. description row), population (multi-market repos vs. official
+registry + GitHub), and ontology (runtime vulnerability alerts vs. instruction-shaped
+steering text), and agree on the operative conclusion: unvalidated scanner or regex output
+must not be read as prevalence.
+
+The 2026 measurement literature around this channel is otherwise complementary:
+**MCP-TDP** (*When the Manual Lies*, 2605.24069) shows the description channel's attack
+potential in a 32-case sandbox (as reported), **Stein** (2603.23802) sizes and categorizes
+177,436 agent tools to argue for tool-layer oversight (as reported), and **Song et al.**
+(*Beyond the Protocol*, IEEE TSE 2026) empirically evaluates four malicious-server attack
+classes plus a 20-participant user study (as reported). None of the three calibrates a
+detector's output against human labels on a registry-grounded population — the denominator
+this paper supplies.
 
 ## 5. Data & Methods
 
@@ -175,7 +215,9 @@ codepoints** corpus (negative; NFKC+Cc/Cf byte-diff, `data/unicode_scan.csv`; §
 a confirmation-bypass trigger family, both benign-shaped (`data/collection_report.md`
 §5.13; `data/p7_bypass_scan.csv`).
 
-**Reliability.** A blind second rater (ChatGPT web UI, not version-pinned; disclosed per
+**Reliability (rubric-application consistency check — not a human-annotation gold
+standard).** A blind second rater (ChatGPT web UI, an *unversioned consumer LLM*, not
+version-pinned; a methodological limitation, disclosed per
 `prompts/06-second-opinion.md`) relabeled a 30-item seed-shuffled packet served full-text,
 with no access to human labels, notes, or the row map. Details and limits in Section 7.
 
@@ -287,7 +329,16 @@ scanner-blind classes and stored-cut caveats honestly.
 the rater is an LLM (ChatGPT web UI, consumer tier, not version-pinned — a disclosed
 limitation, not a benchmark claim); rater output never touches `data/labels.jsonl`.
 
-**Result** (`data/kappa_report.md`):
+**What κ means here (R2 clarification).** κ = +0.760 is a **rubric-application
+consistency check** — how consistently a second rater applies the same labeling rubric —
+with the second rater an *unversioned consumer LLM*: a **methodological limitation**, not
+a second human. It is never presented as a human-annotation gold standard. The gold
+reference in this paper is the 150/150 human-in-the-terminal verdicts (§5, `labels.jsonl`);
+κ only bounds how reproducible those verdicts are when the rubric is re-applied, and it
+does not upgrade the detector's 5.6% precision to anything more than a human-measured
+figure with a stated reproducibility check.
+
+**Result of the consistency check** (`data/kappa_report.md`):
 
 | Variant | n | po | pe | κ |
 |---|---|---|---|---|
@@ -295,7 +346,9 @@ limitation, not a benchmark claim); rater output never touches `data/labels.json
 | 2-class (tp / not-tp) | 30 | 0.9333 | 0.7222 | +0.760 |
 | POI-flag-carrying only | 21 | 0.9048 | 0.6372 | +0.738 |
 
-Per-stratum: TP stratum 4/5 (80.0%), FP stratum 24/25 (96.0%). Landis–Koch: substantial.
+Per-stratum: TP stratum 4/5 (80.0%), FP stratum 24/25 (96.0%). Landis–Koch: substantial —
+a descriptor applied here to a *rubric-application consistency check*, not to agreement
+with a human gold standard.
 
 **The two disagreements are the finding.** Both are rule-interpretation calls on the
 master rule's scope boundary, not perception errors: Q05/row 35 (rater read
@@ -401,6 +454,62 @@ whole planning graph through one tool; exec-priming (row 35) moves execution int
 host; the custody funnel (row 60) makes every credential the agent touches flow through
 a third party. Each is one benign vendor's honest product copy away from ASI04.
 
+**Figure R2-1 — the evidence chain: what we show, and where it stops.**
+
+```text
+  step 1                    step 2                    step 3                     step 4
+  Observed benign    →      attack-shaped       →      controlled steering  →     NOT automatically:
+  description               mechanism                                         vulnerability
+  (§6.3: 5 TP rows,         (priority capture,          (§8: 54 mocked trials,     (no exploit path, no live
+   all written by            exec-priming,               exec-priming 9/9,          target, no attacker, no
+   benign-intent             credential funnel)          funnel 8/9 covert,         credential at risk,
+   vendors)                                             controls 0/16)             no CVE — §10)
+```
+
+Steps 1–3 are observed and measured in this paper; the last arrow is deliberately drawn as
+**not** implied. Benign provenance plus attack-shaped text plus sandbox steering does not
+add up to a demonstrated vulnerability, and we do not claim it does.
+
+**Anticipated reviewer questions (R2).**
+
+**Q1 — Your flag-instance precision (5.6%) sits far below MCPZoo's scanner precision
+(45.53%); which number is right, and is one study wrong?** Both are right; they are not
+rankable. Three axes differ (§4, scanner-reliability cluster): **unit** — MCPZoo validates
+*server-level scanner alerts* about runtime vulnerability, we validate *individual
+description rows* against a text-bound rubric; **population** — their multi-market,
+in-the-wild server crawl vs. our official-registry + GitHub-linked population;
+**ontology** — runtime vulnerable behavior and reachable unsafe data/control flow vs.
+instruction-shaped steering text embedded in prose. A rubric that counts a row as a true
+positive only when the stored text *adds a behavioral instruction to the model* cannot
+credit a capability report, and a runtime scanner need not read prose at all. Read
+together the two numbers are **convergent evidence**: independent work at a different unit
+reports the same calibration gap, and ours shows the gap is even wider for
+poisoning-pattern detection (§4).
+
+**Q2 — Why do regex findings count as a research result at all?** Because the detector is
+used for **candidate generation, never verdicts** (AGENTS.md §2.3). Its only job is
+high-recall proposal of rows for a human-labeled triage queue; every rate we publish is
+measured *against* that queue's human labels (150/150 rows, 0 unclear) and reported per
+class, with the detector's raw flag rate and the validated rate always kept apart. What
+the regexes contribute is a reproducible sampling frame plus a falsifiable failure
+analysis (§6.4): where they fire, why they fire, and which firing patterns survive human
+judgment. A regex count presented as prevalence would indeed be indefensible; a regex
+count presented as the *input* to a precision measurement is the standard auditable
+design, and the 94.4% false-positive figure we report is a statement about the instrument,
+not about the ecosystem.
+
+**Q3 — Are the five true positives attacks?** **No.** None of the five rows is claimed as
+a real-world vulnerability, and none has been filed as a CVE (§10). All five were written
+by **benign-intent vendors** (§6.3); what we identify are **attack-shaped mechanisms** —
+text patterns a hostile server could plant verbatim — and, separately, **controlled
+steering**: in a mocked harness with synthetic data, three models followed those
+descriptions at the rates in §8. Figure R2-1's step 4 is explicitly not drawn: controlled
+steering in a sandbox is not a demonstrated vulnerability in a deployed system. The chain
+stops at step 3, and the paper's claims stop with it. What the five rows establish is that
+the channel *can* carry such mechanisms unmodified, and that text shape alone cannot
+distinguish benign intent from hostile intent — a calibration and exposure result, not an
+exploit result.
+
 **Benign intent is not detectable from the text.** The calibration's sharpest lesson:
 every confirmed mechanism was written in good faith, and the defensive catalog
 (§6.5) shows guards and attacks sharing the same phrasing families. Any detector — or
@@ -464,8 +573,9 @@ endpoint was contacted, no third-party code was executed, and no payload usable 
 unpatched live servers is reproduced in any artifact. No CVEs have been filed: the five
 confirmed mechanisms are latent-surface findings — instruction-shaped text, not exploited
 code paths — and the 90-day coordinated-disclosure rule (AGENTS.md §2.2) is reserved for
-any future finding that meets a confirmed-exploitability bar. The blind second-rater
-provenance (consumer LLM web UI) is disclosed in Section 7 and Methods.
+any future finding that meets a confirmed-exploitability bar. The rubric-consistency
+second-rater provenance (an unversioned consumer LLM web UI — a methodological
+limitation, §7) is disclosed in Section 7 and Methods.
 
 ## Appendix A — Data & code availability
 
@@ -479,7 +589,7 @@ provenance (consumer LLM web UI) is disclosed in Section 7 and Methods.
 | Frozen sample | `data/analysis_toollevel.csv` | 150 rows, seed 42, sha256 `ae1aff9f…8f77`; `row_id` anchor |
 | Human labels | `data/labels.jsonl` (+ `.superseded`, `.audit`) | 150/150 last-wins labels + rationale notes; full mutation audit |
 | Validation report | `data/validation_report.md` | per-class precision (§6.2), truncation validity, FP taxonomy |
-| Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B protocol, verbatim rater verdicts, κ computation (§7) |
+| Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B rubric-consistency protocol, verbatim rater verdicts, κ computation as a consistency check (§7) |
 | Unicode scan | `data/unicode_scan.csv` + §5.12 | Type V mirror (0 Cc/Cf) |
 | P7 bypass scan | `data/p7_bypass_scan.csv` + §5.13 | Type III mirror (2/16,763) |
 | Live-matrix protocol | `docs/BRIEF04_PROTOCOL.md` | arms, criteria A–G, infra taxonomy, stage gates |
@@ -512,3 +622,5 @@ are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-
 *names* (`"<set>"`), Authorization headers are never logged, exception text is reduced
 to status classes, and every artifact is scrubbed recursively before persistence. The
 live panel was accessed through the AvalAI gateway via a PI-held environment key.
+
+<!-- word count: 5,960 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-09-29 for the R2 review pass; abstract 179 of the PI's 180 cap; Related Work now cites the four R2-verified 2026 works (2607.11086, 2605.24069, 2603.23802, 10.1109/TSE.2026.3694876). -->

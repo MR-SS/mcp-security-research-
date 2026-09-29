@@ -16,7 +16,7 @@
 | 7 CSV-cap flips / 43 cap-affected; 0/7 source-level flips | `data/validation_report.md` truncation-validity section; `data/collection_report.md` §5.11 | same as validation report |
 | §5.10 duplicate-name census (1,484) / §5.11 source-cuts (1,082 = 6.45%) / §5.12 Unicode scan (0 Cc/Cf) / §5.13 P7 surface (2 rows) | `data/collection_report.md` §5.10–§5.13 + `data/unicode_scan.csv` + `data/p7_bypass_scan.csv` | producing commands embedded in each §5.x subsection |
 | FP taxonomy buckets | `data/validation_report.md` FP-reason table (semantic grouping in `docs/FINDINGS_DISCUSSION.md` §c) | same as validation report |
-| Related-work rows & cite-as lines | `docs/RELATED_WORK_MAP.md` (AgentsID row verified against the public report 2026-09-28; arXiv IDs PI-verified 2026-09-28) | edit only with provenance note updated |
+| Related-work rows & cite-as lines | `docs/RELATED_WORK_MAP.md` (AgentsID row verified against the public report 2026-09-28; arXiv IDs PI-verified 2026-09-28; **four 2026 works agent-verified 2026-09-29 at R2** — three arXiv abstract fetches, the TSE DOI via Crossref + Semantic Scholar, MCPZoo's numbers re-derived from its full text) | edit only with provenance note updated |
 
 ## 2. Style rules for future edits
 
@@ -49,3 +49,25 @@
 9. **Stage-gated live experiments (Brief 04)**: live model runs happen only on explicit PI
    "go"; $0 spend via the company proxy; real keys live in env vars only and are never
    written to the repo, logs, transcripts, or chat. Protocol: `docs/BRIEF04_PROTOCOL.md`.
+10. **κ = +0.760 is worded as a rubric-application consistency check** — "second rater: an
+    unversioned consumer LLM — a methodological limitation (see §7)" — in *every* location
+    where the number appears (abstract, intro, tables, §5, §7, §10). It is never called or
+    implied to be a human-annotation gold standard; the gold reference is always the
+    150/150 human labels. (Binding from the R2 review, 2026-09-29.)
+11. **Calibration claims only.** Abstract, Introduction and Discussion must never assert
+    that "the ecosystem is dangerous" / "is compromised" / "is at risk" as a study result —
+    every claim is about *detector calibration*, *candidate prevalence under a stated
+    rubric*, or *controlled steering in a mocked harness*. Attack-shaped text from a
+    benign vendor is reported as a mechanism, never as a vulnerability (paper §9,
+    Figure R2-1).
+
+## 3. Edit log (append-only)
+
+- **2026-09-29 R2 review integrated** — external reviewer feedback, PI-approved: four 2026
+  works verified and cited (`docs/RELATED_WORK_MAP.md` + `paper/main.md` §4: MCPZoo
+  arXiv 2607.11086, MCP-TDP arXiv 2605.24069, Stein arXiv 2603.23802, *Beyond the Protocol*
+  DOI 10.1109/TSE.2026.3694876); new §4 **scanner-reliability cluster** paragraph
+  (server-level 45.53% vs description-level 5.6%, framed as convergent evidence); §9
+  anticipated reviewer Q1–Q3 + **Figure R2-1** evidence chain; κ wording pass per new rule
+  §2.10; calibration-only framing per new rule §2.11; abstract re-verified at **179/180**
+  words, whole paper **5,960** words (comments stripped).
