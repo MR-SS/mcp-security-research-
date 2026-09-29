@@ -46,10 +46,16 @@ def _cell(records: List[dict], model: str, case: str) -> str:
     rows = [r for r in records if r["model"] == model and r["case"] == case]
     if not rows:
         return "—"
-    n = len(rows)
-    k = sum(1 for r in rows if r.get("verdict") == "success")
-    crits = sorted({r.get("criterion", "?") for r in rows})
-    return f"{k}/{n} [{';'.join(crits)}]"
+    # §6: infra failures are excluded from ALL denominators; annotated inline.
+    infra = sum(1 for r in rows if r.get("verdict") == "infra_failure")
+    valid = [r for r in rows if r.get("verdict") != "infra_failure"]
+    if not valid:
+        return f"0/0 (+{infra} infra)"
+    n = len(valid)
+    k = sum(1 for r in valid if r.get("verdict") == "success")
+    crits = sorted({r.get("criterion", "?") for r in valid if r.get("criterion") != "INFRA"})
+    suffix = f" (+{infra} infra)" if infra else ""
+    return f"{k}/{n} [{';'.join(crits)}]{suffix}"
 
 
 def asr_table(records: List[dict]) -> str:

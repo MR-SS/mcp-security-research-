@@ -1,6 +1,7 @@
 # Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions
 
-*Preprint draft — 2026-09-29 — Sajjad Rahim Nouri, Islamic Azad University, Ramsar Branch*
+*Preprint — 2026-09-29 — Sajjad Rahim Nouri, Islamic Azad University, Ramsar Branch —
+License: CC BY 4.0.*
 
 *Skeleton with drafted sections; Markdown now, LaTeX later. Every number traces to a
 repo artifact (see `paper/CONVENTIONS.md` §1); unverified and pending items are marked
@@ -167,10 +168,12 @@ cap*: the sample CSV stores 300-char excerpts while the detector scanned full te
 7/150 sample rows affected; upstream re-extraction from live public sources recovered 7/7
 (median +468 chars) with **0/7 verdict flips** (`data/collection_report.md` §5.11) —
 detector numbers in this paper are floors over partially-cut evidence. (iii) *Dataset
-anomaly censuses*: **1,484/16,763** duplicate `server::tool` names (§5.10; mechanisms
-counted once by hand where they collide); **0 control/format Unicode codepoints** corpus
-(negative; NFKC+Cc/Cf byte-diff, `data/unicode_scan.csv`; §5.12); **2/16,763** rows match
-a confirmation-bypass trigger family, both benign-shaped (§5.13; `data/p7_bypass_scan.csv`).
+anomaly censuses*: **1,484/16,763** duplicate `server::tool` names (collection_report
+§5.10; mechanisms counted once by hand where they collide); **0 control/format Unicode
+codepoints** corpus (negative; NFKC+Cc/Cf byte-diff, `data/unicode_scan.csv`; §5.12);
+**2/16,763** rows match
+a confirmation-bypass trigger family, both benign-shaped (`data/collection_report.md`
+§5.13; `data/p7_bypass_scan.csv`).
 
 **Reliability.** A blind second rater (ChatGPT web UI, not version-pinned; disclosed per
 `prompts/06-second-opinion.md`) relabeled a 30-item seed-shuffled packet served full-text,
@@ -178,7 +181,7 @@ with no access to human labels, notes, or the row map. Details and limits in Sec
 
 **Ethics & scope of collection.** Public registry metadata and public repository source
 only; no third-party server endpoint was contacted; no third-party code was executed
-(Section 9).
+(Section 10).
 
 ## 6. Results
 
@@ -263,7 +266,7 @@ fallbacks (row 32); fail-closed evidence posture ("missing evidence never counts
 safe" — row 29); idempotency discipline (row 23); and disclosure guards that instruct the
 agent to surface the tool's own reliability caveat (row 30). These rows are the seed of
 the defense-vocabulary filter (P2) — and the observation that a guard and an attack share
-one surface is central to Section 8's Discussion.
+one surface is central to Section 9's Discussion.
 
 ### 6.6 Population-null findings (AgentsID Taxonomy mirrors)
 
@@ -405,6 +408,21 @@ regulation — that scores text shape alone will punish hygiene as hard as malic
 only in-text discriminator we found is scope and conditionality (universal vs. scoped,
 unconditional vs. gated), which P5's qualifiers begin to encode.
 
+**Model variance breaks the silver-bullet hope — in both directions.** The live matrix
+(§8) adds a wrinkle the calibration alone cannot show: the same description that
+deepseek-v4.1-flash and glm-5.3 obeyed unconditionally (WF 3/3 each) was ignored by
+gemini-3.8-flash in all three replications, which answered the user's task directly —
+weather lookup first, note saved, the "ALWAYS CALL THIS TOOL FIRST" preamble never
+honored — while the same model adopted exec-priming without hesitation (FL 3/3).
+Priority capture is therefore model-variant at n=3, exec-priming (so far) universal:
+no detector threshold, and no single hardening heuristic, transfers uniformly across
+consumers of the same poisoned text. This strengthens the calibration's conclusion —
+since models disagree about which text steers them, the only defensible measurement
+layer sits below the model, at the description surface, with per-model live probes
+(§8) as the complement — and it echoes the §7 disagreement pattern: the residual
+uncertainty is interpretive, concentrated on scope and audience judgments, not
+perception.
+
 **The ecosystem is already adapting around the channel** (`docs/FINDINGS_DISCUSSION.md`
 §d): pay-per-call agent economics where the agent's wallet is the abuse boundary (rows
 30/31); agents as first-class account-holders with embedded human consent steps (row
@@ -434,10 +452,10 @@ extrapolation, and gateway-dependent model routing means results characterize th
 three deployed models, not model families in general. (vii-a) `gpt-6-astra` was probe-
 qualified but held out as reserve and is untested.
 
-**Data & code availability.** Code, raw registry snapshots, the enriched corpus, labels,
-audit trails, and all reports are in the companion repository
+**Data & code availability.** All artifacts are in the companion repository
 (`<repo-url placeholder>`); the dataset will be archived with a Zenodo DOI
-(`DOI placeholder`).
+(`DOI placeholder`) under CC BY 4.0. See Appendix A for the artifact index and
+reproduction chain.
 
 ## 10. Ethics & Disclosure
 
@@ -448,3 +466,49 @@ confirmed mechanisms are latent-surface findings — instruction-shaped text, no
 code paths — and the 90-day coordinated-disclosure rule (AGENTS.md §2.2) is reserved for
 any future finding that meets a confirmed-exploitability bar. The blind second-rater
 provenance (consumer LLM web UI) is disclosed in Section 7 and Methods.
+
+## Appendix A — Data & code availability
+
+**Artifacts (all in the companion repository, `<repo-url placeholder>`; Zenodo DOI
+`DOI placeholder` at submission):**
+
+| Artifact | Path | Role |
+|---|---|---|
+| Raw registry snapshots | `data/raw/registry/20260921T*/` | three crawl runs, verbatim pages + probes (§5) |
+| Enriched corpus | `data/github_tools.jsonl` | 16,763 tool descriptions / 4,725 repos; fixture-text source of truth |
+| Frozen sample | `data/analysis_toollevel.csv` | 150 rows, seed 42, sha256 `ae1aff9f…8f77`; `row_id` anchor |
+| Human labels | `data/labels.jsonl` (+ `.superseded`, `.audit`) | 150/150 last-wins labels + rationale notes; full mutation audit |
+| Validation report | `data/validation_report.md` | per-class precision (§6.2), truncation validity, FP taxonomy |
+| Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B protocol, verbatim rater verdicts, κ computation (§7) |
+| Unicode scan | `data/unicode_scan.csv` + §5.12 | Type V mirror (0 Cc/Cf) |
+| P7 bypass scan | `data/p7_bypass_scan.csv` + §5.13 | Type III mirror (2/16,763) |
+| Live-matrix protocol | `docs/BRIEF04_PROTOCOL.md` | arms, criteria A–G, infra taxonomy, stage gates |
+| Trial ledger + transcripts | `data/live_tests/trials_ledger.jsonl`, `data/live_tests/*.jsonl` | 54 records; per-round redacted transcripts (§8) |
+| Harness + mocks + selftest | `experiments/` | offline-replayable harness; fixture sha-gate; ASR summarizer |
+| Reports | `data/collection_report.md`, `docs/FINDINGS_DISCUSSION.md`, `docs/RELATED_WORK_MAP.md`, `docs/DETECTOR_FIX_PROPOSAL.md` | collection, findings backlog, related-work map, P1–P7 |
+
+**Reproduction chain:**
+
+```bash
+# collection (PI-authorised page caps; raw snapshots committed)
+python3 pilot/crawl_registry.py --max-pages 600 --probe-pages 1
+python3 pilot/fetch_github.py
+# detector + frozen sample
+python3 pilot/analyze.py --inp data/servers.jsonl --out data/analysis.csv
+python3 pilot/analyze.py --toollevel --out data/analysis_toollevel.csv
+# validation + reliability (human-in-the-terminal; labels.jsonl is human-owned)
+python3 pilot/label_sample.py --report
+python3 pilot/kappa_report.py
+# data-quality censuses (producing commands embedded in collection_report §5.10–§5.13)
+# live matrix: offline verification first; live runs are stage-gated (protocol §9)
+python3 experiments/selftest.py
+python3 experiments/run_matrix.py --dry-plan
+python3 experiments/summarize.py          # regenerates the §8 ASR table from the ledger
+python3 experiments/run_matrix.py --live --go --skip-done   # requires PI authorization
+```
+
+**Key-handling policy.** API tokens are read from the environment at runtime only and
+are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-var
+*names* (`"<set>"`), Authorization headers are never logged, exception text is reduced
+to status classes, and every artifact is scrubbed recursively before persistence. The
+live panel was accessed through the AvalAI gateway via a PI-held environment key.
