@@ -43,7 +43,7 @@
 |---|---|---|---|---|---|---|---|
 | **AgentsID — Weaponized-by-Design** (Apr 2026, vendor; verified) | npm/PyPI MCP packages | tool manifest / server | 15,982 packages (6,526 npm + 9,456 PyPI) · 40,081 tools · 3,789 tool-bearing servers | Yes (Toxic Flow types I–V live in tool descriptions) | **No** (static analysis only; own §3.3 concedes possible FPs) | **No** | No (package registries, not the MCP registry) |
 | **Hasan et al.** (arXiv 2506.13538, cs.SE, 2025-06, v5 2026-04; PI-verified) | MCP servers (1,899) | server | 1,899 servers (as reported by authors) | No (code-health / quality metrics) | No | No | Partial (per PI summary; extent not re-verified here) |
-| **MCPTox** (arXiv 2508.14925, cs.CR, 2025-08; PI-verified) | synthetic benchmark over real servers | tool (description) | 45 servers / 353 tools / 1,312 cases (v1) (as reported by authors) | Yes (poisoned tool descriptions) | No | No | No (benchmark construction) |
+| **MCPTox** (arXiv 2508.14925, cs.CR, 2025-08; PI-verified) | synthetic benchmark over real servers | tool (description) | 45 servers / 353 tools / 1,348 cases (v2) (as reported by authors) | Yes (poisoned tool descriptions) | No | No | No (benchmark construction) |
 | **MSB** (arXiv 2510.15994, cs.CR, 2025-10; ICLR 2026; PI-verified) | synthetic benchmark | tool (attack case) | 405 tools / 2,000 attack instances (as reported by authors) | Yes (attack cases incl. description channel) | No | No | No (benchmark construction) |
 | **Breaking the Protocol** (arXiv 2601.17549, cs.CR, 2026-01; PI-verified) | protocol specification | spec mechanism | spec analysis | No (design/spec level) | No | No | No |
 | **Hou et al. — MCP Landscape** (arXiv 2503.23278, cs.CR, 2025-03; PI-verified) | MCP ecosystem (survey/landscape) | ecosystem survey | taxonomy / landscape survey (as reported by authors) | No (survey level) | No | No | No (survey) |
@@ -58,7 +58,13 @@
 **Ours is the only row with YES on the last three columns** (human validation, reliability
 artifact, registry-grounded).
 
-## 2. Cite-as lines (PI-verified 2026-09-28; four 2026 works added + agent-verified 2026-09-29, R2)
+## 2. Cite-as lines
+
+> **R4 update (2026-09-29):** the MCPTox case count was corrected from 1,312 to **1,348**
+> against the current arXiv abstract (v2, last revised 2026-09-29), which states
+> "45 live, real-world MCP servers and 353 authentic tools … a comprehensive suite of
+> 1348 malicious test cases". Propagated to `paper/main.md` §4. Same v1->v2 note applies
+> to the *as reported* qualifier: the number tracks the latest published version. (PI-verified 2026-09-28; four 2026 works added + agent-verified 2026-09-29, R2)
 
 - **2506.13538** — Hasan et al., *MCP at First Glance* — cs.SE, 2025-06 (v5 2026-04) — <https://arxiv.org/abs/2506.13538>
 - **2508.14925** — *MCPTox* — cs.CR, 2025-08 — <https://arxiv.org/abs/2508.14925>

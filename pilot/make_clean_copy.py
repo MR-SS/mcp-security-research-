@@ -100,18 +100,26 @@ the blind second-opinion protocol (§E)) relabeled a 30-item seed-shuffled packe
 full-text,"""),
 
     # --- results ---------------------------------------------------------
-    ("""instances on labeled rows, 15 supported → **flag-instance precision 5.6%**
-(`data/validation_report.md`). Every heuristic class, run over this population, is""",
-     """instances on labeled rows, 15 supported → **flag-instance precision 5.6%**
-(validation report, §G). Every heuristic class, run over this population, is"""),
+    ("""268 flag instances on labeled rows,
+15 supported → **flag-instance precision 5.6%** (`data/validation_report.md`). Every
+heuristic class, run over this population, is dominated by false positives.""",
+     """268 flag instances on labeled rows,
+15 supported → **flag-instance precision 5.6%** (validation report, §G). Every
+heuristic class, run over this population, is dominated by false positives."""),
     ("""are in the row notes, `data/labels.jsonl`
 (mechanisms also cataloged in `docs/FINDINGS_DISCUSSION.md` §a):""",
      """are in the row notes of the frozen label set
 (mechanisms also cataloged in the findings backlog, §B.1):"""),
-    ("""From the FP-reason table and the semantic grouping in `docs/FINDINGS_DISCUSSION.md` §c
-(one bucket per row, first match wins; 145 FP rows):""",
-     """From the FP-reason table and the semantic grouping in the findings backlog (§B.3)
-(one bucket per row, first match wins; 145 FP rows):"""),
+    ("""This taxonomy covers the **95 flagged-but-benign rows only** — the stratum in which the
+detector actually fired and the human judge disagreed. The 50 zero-flag controls are
+excluded by construction: a row the detector never flagged cannot be a false positive.
+One bucket per row, first match wins, assigned by keyword rule over the human rationale
+note stored with each label (`pilot/derive_r4_numbers.py`, re-runnable):""",
+     """This taxonomy covers the **95 flagged-but-benign rows only** — the stratum in which the
+detector actually fired and the human judge disagreed. The 50 zero-flag controls are
+excluded by construction: a row the detector never flagged cannot be a false positive.
+One bucket per row, first match wins, assigned by keyword rule over the human rationale
+note stored with each label (re-runnable; see Appendix A):"""),
     ("""(`docs/FINDINGS_DISCUSSION.md` §b): anti-IPI data/instruction splits""",
      """(the findings backlog, §B.2): anti-IPI data/instruction splits"""),
     ("""(NFKC + Cc/Cf byte-diff; `data/unicode_scan.csv`; §5.12); **Type III confirmation
