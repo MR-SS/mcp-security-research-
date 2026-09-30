@@ -1,3 +1,4 @@
+*Publication version lives in `main_clean.md` — keep both in sync on numbers only.*
 # Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions
 
 *Preprint — 2026-09-29 — Sajjad Rahim Nouri, Islamic Azad University, Ramsar Branch —

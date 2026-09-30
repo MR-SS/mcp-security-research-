@@ -203,10 +203,17 @@ def build(text):
     appendix = COMMENT_RE.sub("", appendix)
 
     # 2. Replace the front-matter block with the v1 endorsement header.
-    title_line, _, _rest = head.partition("\n")
-    assert title_line.startswith("# Calibrating the Alarms"), title_line
+    # locate the H1 rather than assuming it is line 1 (main.md may carry a
+    # one-line publication pointer above the title)
+    lines = head.split("\n")
+    ti = next(i for i, l in enumerate(lines) if l.startswith("# Calibrating the Alarms"))
+    title_line = lines[ti]
+    pre = "\n".join(lines[:ti])          # any pointer line(s) above the title
+    head = "\n".join(lines[ti:])
     m = re.search(r"\n---\n", head)
     assert m, "front-matter rule not found"
+    # any pointer line above the title is a main.md-only note; the clean copy
+    # carries its own header instead
     head = title_line + "\n\n" + HEADER + "\n---\n\n" + head[m.end():]
 
     # 3. Apply the citation-style replacements; every one must match exactly.
