@@ -56,14 +56,14 @@ def load_llm_verdicts():
 def cohen_kappa(pairs):
     n = len(pairs)
     if n == 0:
-        return (None, None, 0, 0)
+        return (None, None, 0, 0, None)
     po = sum(1 for a, b in pairs if a == b) / n
     a_tp = sum(1 for a, _ in pairs if a == "tp") / n
     b_tp = sum(1 for _, b in pairs if b == "tp") / n
     pe = a_tp * b_tp + (1 - a_tp) * (1 - b_tp)
     kappa = 1.0 if pe == 1 else (po - pe) / (1 - pe)
     dis = sum(1 for a, b in pairs if a != b)
-    return (round(kappa, 3), round(po, 4), n, dis)
+    return (round(kappa, 3), round(po, 4), n, dis, round(pe, 4))
 
 
 def q2row_map():
@@ -110,8 +110,12 @@ def main():
             pairs_fp.append((h, l))
     for label, prs in (("full packet (5 TP + 25 FP)", pairs_all),
                        ("FP-only subset", pairs_fp)):
-        k, po, n, dis = cohen_kappa(prs)
-        print(f"  {label:<30} n={n:<3} po={po}  kappa={k}  disagreements={dis}")
+        k, po, n, dis, pe = cohen_kappa(prs)
+        print(f"  {label:<30} n={n:<3} po={po}  pe={pe}  kappa={k}  "
+              f"disagreements={dis}")
+        if abs(po - pe) < 1e-9:
+            print(f"      -> pe collapses onto po: degenerate kappa "
+                  f"(prevalence paradox, standard)")
 
     print()
     print("=" * 70)

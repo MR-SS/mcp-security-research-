@@ -425,6 +425,13 @@ figure with a stated reproducibility check.
 | 3-class (tp/fp/unclear) | 30 | 0.9333 | 0.7222 | **+0.760** |
 | 2-class (tp / not-tp) | 30 | 0.9333 | 0.7222 | +0.760 |
 | POI-flag-carrying only | 21 | 0.9048 | 0.6372 | +0.738 |
+| FP-only subset | 25 | 0.9600 | 0.9600 | 0.000 |
+
+On the FP-only subset (25/25 human false-positive), κ is degenerate — κ = 0.00 despite
+po = 0.96 — because with prevalence at a boundary a single rater flip exactly offsets
+chance-adjusted expected agreement, collapsing pe onto po (prevalence paradox, standard).
+We therefore report po alongside κ at both strata: the full-packet κ = +0.760 remains the
+primary consistency figure, and neither stratum uses κ to estimate prevalence.
 
 Per-stratum: TP stratum 4/5 (80.0%), FP stratum 24/25 (96.0%). Landis–Koch: substantial —
 a descriptor applied here to a *rubric-application consistency check*, not to agreement
