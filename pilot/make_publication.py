@@ -126,10 +126,12 @@ is unchanged since v1.""",
      """poisoning statistics. Version 1 is frozen; the suspicion-score definition is unchanged
 since that version."""),
     ("""**Sample construction (frozen).** Stratified: the top-100 rows by `suspicion_score` plus
-50 uniform-random zero-flag control rows, seed 42 (the frozen sample file, sha256 `ae1aff9f…8f77`); row order
+50 zero-flag control rows — zero capability + zero poison flags, addressing-only rows allowed,
+uniform-random with seed 42 (the frozen sample file, sha256 `ae1aff9f…8f77`); row order
 immutable — every label anchors to a stable row identifier.""",
      """**Sample construction (frozen).** Stratified: the top-100 rows by suspicion score plus
-50 uniform-random zero-flag control rows, drawn with seed 42; row order is immutable and
+50 zero-flag control rows — zero capability + zero poison flags, addressing-only rows allowed,
+uniform-random drawn with seed 42; row order is immutable and
 every label anchors to a stable row identifier, so the frozen sample and its checksum are
 fixed artifacts (Appendix A)."""),
     ("""**Registry collection.** Official registry API (`registry.modelcontextprotocol.io/v0/servers`),
@@ -151,12 +153,30 @@ that tells the model what to do, hide, prefer, or ignore (`POI` classes).""",
 text that tells the model what to do, hide, prefer, or ignore (the poison classes)."""),
     ("""**Human labeling protocol.** Human-in-the-terminal via the released labeling script with
 per-class TP rules;""",
-     """**Human labeling protocol.** A labeling aid was used interactively, in the analyst's
-terminal, with per-class true-positive rules;"""),
+     """**Human labeling protocol.** Primary labels were assigned by the principal investigator
+(the author) — a single-rater design — working interactively in the terminal with per-class
+true-positive rules;"""),
+    ("""**Human labeling protocol.** Human-in-the-terminal via `pilot/label_sample.py` with
+per-class TP rules;""",
+     """**Human labeling protocol.** Primary labels were assigned by the principal investigator
+(the author) — a single-rater design — working interactively in the terminal with per-class
+true-positive rules;"""),
     ("""row. Every mutation goes through supersede/audit rails (a superseded-label archive
-and a label-mutation audit trail); the script never picks verdicts;""",
+and a label-mutation audit trail); the aid never assigns verdicts on its own;""",
      """row. Every mutation goes through supersede/audit rails (a superseded-label archive and
 a label-mutation audit trail); the aid never assigns verdicts on its own;"""),
+    ("""row. Every mutation goes through supersede/audit rails (a superseded-label archive
+and a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows
+carry a rationale note; unclear rate 0%; zero-flag control stratum: 0/50 rows labeled
+positive (no positive-case evidence of misses in this stratum; validation report, §G).
+The complete labeling rulebook, with positive and negative examples per class, is in the
+replication package (Appendix A).""",
+     """row. Every mutation goes through supersede/audit rails (a superseded-label archive and
+a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows
+carry a rationale note; unclear rate 0%; zero-flag control stratum: 0/50 rows labeled
+positive (no positive-case evidence of misses in this stratum; validation report, §G).
+The complete labeling rulebook, with positive and negative examples per class, is in the
+replication package (Appendix A)."""),
     ("""**Design.** Blind Mode B (the second-opinion protocol, §E): 30-item packet (all 5 TP
 rows + 25 FP rows, fixed seed 20260927), full texts, no access to human labels or notes; the rater is an LLM (ChatGPT web UI, consumer tier, not version-pinned — a
 disclosed limitation, not a benchmark claim); rater output never touches the frozen

@@ -119,3 +119,38 @@
   rules §2.12–§2.15. Abstract **180/180** words (R3 qualifications offset by four
   compressions), whole paper **6,360** words. LaTeX mirror `paper/latex/main.tex` re-synced
   and recompiles clean (10 pages, 0 undefined references, 6 minor overfull boxes).
+- **2026-10-03 R5 review integrated** — 14-point external audit, PI-approved; two phases.
+  **Phase 1 (new computed numbers, reproducible):** `pilot/derive_family_split.py` →
+  `data/validation_family_split.csv` regroups the frozen 13 classes into poison (5),
+  capability (6), channel (2) — **primary metric: poison-family text-support 6/124 = 4.8%**
+  (capability 5/102 = 4.9%, channel 4/42 = 9.5%, all-family 15/268 = 5.6%; script asserts
+  268 instances / 15 supported); `pilot/derive_candidate_rate.py` →
+  `data/candidate_rate_scan.csv` full-corpus RQ1 scan — **4,128/16,763 rows any-flag
+  (24.6%), 698 rows poison-flag (4.2%), 1,892 capability / 2,183 channel rows, 4,926 flag
+  instances**; both persisted with producing commands in `data/collection_report.md` §5.14.
+  **Phase 2 (wording/scope, no new data):** abstract rewritten to **179/180** words carrying
+  the family split, sample-bounded phrasing, mocked-trial scope (54 trials across three model
+  versions; no real shell execution or network calls), row-level 5/150, κ, and the
+  control-trial accounting (2/18 infra-excluded); §2/§5 RQ1 stated as a corpus **candidate
+  rate** with the row↔server distinction (one row = one `(server, tool-name)` registration
+  entry; 16,763 rows ≠ 17,167 servers); §6.1 primary metric re-anchored to the poison family
+  and labelled a **sample-bounded descriptive quantity** (bias direction unknown, no
+  lower-bound claim anywhere — sweep verified); §5 zero-flag control stratum (seed 42,
+  addressing-only rows allowed) + single-rater / keyword-rulebook labeling disclosures
+  (FIX 9/10); §8 explicit no-real-shell scope statement and intent-neutral "models expressed
+  intent" phrasing; §4/§9 MCPZoo 45.53% phrased "average over scanners, as reported";
+  intro novelty hedged ("to our knowledge, based on a literature search conducted 2026-09");
+  **OWASP ASI titles unverifiable from the official page → "OWASP-adjacent mapping (see
+  note)"** downgrade with a dated retrieval note (genai.owasp.org, fetched 2026-02-17
+  capture); 94.4%/95.2% reframed as unsupported-flag rates ("statement about the
+  instrument"); our-metric "precision" → "text-support rate" in §4/§6/§8, §9 Q1, and
+  `docs/RELATED_WORK_MAP.md` (incl. removing "even wider" from the positioning paragraph);
+  "Detector precision (§6.2)" → "Per-class text-support (§6.2)". Footer word-count comment
+  re-verified: whole paper **8,030** words (comments stripped). Builder gates: BOTH
+  `pilot/make_publication.py --check` and `pilot/make_clean_copy.py --check` pass — stage1's
+  `numbers()` gained a `derive_r\d+` normalization (the citation rewrite removes the
+  `derive_r4_numbers.py` filename, and the embedded id was counted as data; the drift
+  pre-existed R4 and is now closed). New rules: none; the existing binding rules govern the
+  new phrasing (§2.10 κ wording, §2.11 calibration-only, §2.12–§2.15 from R3 incl.
+  sample-bounded). Open at R5: `paper/latex/main.tex`
+  mirror NOT yet re-synced (format-only; flagged as a risk in `PLAN.md` §5).

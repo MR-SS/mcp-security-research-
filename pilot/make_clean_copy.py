@@ -58,22 +58,30 @@ corpus; the collection report, §A.2)."""),
     # --- detector / sample ------------------------------------------------
     ("""**Detector (frozen v2).** `pilot/analyze.py` scans the full stored text.""",
      """**Detector (frozen v2).** The frozen detector script scans the full stored text."""),
-    ("""50 uniform-random zero-flag control rows, seed 42 (`data/analysis_toollevel.csv`,
+    ("""50 zero-flag control rows — zero capability + zero poison flags, addressing-only rows allowed,
+uniform-random with seed 42 (`data/analysis_toollevel.csv`,
 sha256 `ae1aff9f…8f77`); row order immutable — every label anchors to a `row_id`.""",
-     """50 uniform-random zero-flag control rows, seed 42 (the frozen sample file, sha256 `ae1aff9f…8f77`); row order
+     """50 zero-flag control rows — zero capability + zero poison flags, addressing-only rows allowed,
+uniform-random with seed 42 (the frozen sample file, sha256 `ae1aff9f…8f77`); row order
 immutable — every label anchors to a stable row identifier."""),
 
     # --- labeling protocol ----------------------------------------------
-    ("""**Human labeling protocol.** Human-in-the-terminal via `pilot/label_sample.py` with
+    ("""**Human labeling protocol.** Primary labels by the PI (the author) — a single-rater design —
+human-in-the-terminal via `pilot/label_sample.py` with
 per-class TP rules;""",
-     """**Human labeling protocol.** Human-in-the-terminal via the released labeling script with
-per-class TP rules;"""),
+     """**Human labeling protocol.** Primary labels were assigned by the principal investigator
+(the author) — a single-rater design — working interactively in the terminal with per-class
+true-positive rules;"""),
     ("""row. Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,
 `labels.audit.jsonl`); the script never picks verdicts; 150/150 rows carry a rationale
-note; unclear rate 0%; zero-flag false-negative rate 0/50 (`data/validation_report.md`).""",
+note; unclear rate 0%; zero-flag control stratum: 0/50 rows labeled positive
+(no positive-case evidence of misses in this stratum; `data/validation_report.md`).""",
      """row. Every mutation goes through supersede/audit rails (a superseded-label archive
-and a label-mutation audit trail); the script never picks verdicts; 150/150 rows carry a
-rationale note; unclear rate 0%; zero-flag false-negative rate 0/50 (validation report, §G)."""),
+and a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows
+carry a rationale note; unclear rate 0%; zero-flag control stratum: 0/50 rows labeled
+positive (no positive-case evidence of misses in this stratum; validation report, §G).
+The complete labeling rulebook, with positive and negative examples per class, is in the
+replication package (Appendix A)."""),
     ("""43/150 sample rows sit on the cap; a full-text re-review produced **7 verdict flips**
 (`data/validation_report.md`).""",
      """43/150 sample rows sit on the cap; a full-text re-review produced **7 verdict flips**
@@ -100,12 +108,18 @@ the blind second-opinion protocol (§E)) relabeled a 30-item seed-shuffled packe
 full-text,"""),
 
     # --- results ---------------------------------------------------------
-    ("""268 flag instances on labeled rows,
-15 supported → **flag-instance precision 5.6%** (`data/validation_report.md`). Every
-heuristic class, run over this population, is dominated by false positives.""",
-     """268 flag instances on labeled rows,
-15 supported → **flag-instance precision 5.6%** (validation report, §G). Every
-heuristic class, run over this population, is dominated by false positives."""),
+    ("""holds **5 TP and 145 non-TP rows** (row-level TP 3.3%). Splitting the 268 flag instances by
+detector family (`data/validation_family_split.csv`), the primary metric is the **poison-family
+text-support rate: 6 of 124 instances (4.84%)**; capability-family 5/102 (4.90%), channel-family
+4/42 (9.52%). The all-family figure remains as the headline **text-support rate, 15 of 268
+(5.60%)** — labelled as such, not as "precision". Every heuristic class, run over this
+population, is dominated by unsupported flags.""",
+     """holds **5 TP and 145 non-TP rows** (row-level TP 3.3%). Splitting the 268 flag instances by
+detector family (the family-split table, §G), the primary metric is the **poison-family
+text-support rate: 6 of 124 instances (4.84%)**; capability-family 5/102 (4.90%), channel-family
+4/42 (9.52%). The all-family figure remains as the headline **text-support rate, 15 of 268
+(5.60%)** — labelled as such, not as "precision". Every heuristic class, run over this
+population, is dominated by unsupported flags."""),
     ("""are in the row notes, `data/labels.jsonl`
 (mechanisms also cataloged in `docs/FINDINGS_DISCUSSION.md` §a):""",
      """are in the row notes of the frozen label set
@@ -149,6 +163,14 @@ label set);"""),
 `data/collection_report.md` §5.11).""",
      """the source-level re-examination flipped **0/7** (the validation report, §G;
 the collection report, §A.3)."""),
+
+    # --- intro RQs ---------------------------------------------------------
+    ("""We answer RQ1 compositionally with a frozen v2 detector over 16,763 descriptions (4,128 rows
+with any flag, 24.6%; 698 rows with a poison-family flag, 4.2%; 4,926 flag instances corpus-wide;
+`data/candidate_rate_scan.csv`, collection report §5.14); RQ2 with a 150-row stratified human validation""",
+     """"We answer RQ1 compositionally with a frozen v2 detector over 16,763 descriptions (4,128 rows
+with any flag, 24.6%; 698 rows with a poison-family flag, 4.2%; 4,926 flag instances corpus-wide;
+the candidate-rate scan, the collection report); RQ2 with a 150-row stratified human validation"""),
 
     # --- section 8 -------------------------------------------------------
     ("""mocked harness (`docs/BRIEF04_PROTOCOL.md`): each trial registers the case tool — its
@@ -261,6 +283,7 @@ def numbers(text):
     t = re.sub(r"\u00a7\s*[A-Z]?\.?\d+(\.\d+)*", "\u00a7", text)   # section refs
     t = re.sub(r"(?:prompts/\d+|BRIEF\d+|BRIEF04)[-A-Za-z0-9_]*", "", t)  # prompt/protocol ids
     t = re.sub(r"(?:python|p)\d+", "", t)  # interpreter version / proposal id in filenames
+    t = re.sub(r"derive_r\d+", "derive", t)  # repo script version id in a filename
     return re.findall(r"\d[\d,\.]*", t)
 
 

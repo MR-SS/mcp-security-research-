@@ -1,0 +1,17 @@
+class,family,rows_flagged,instances
+addressing:model_addressed,addressing,2068,3077
+addressing:second_person_imperative,addressing,132,132
+capability:database_write,capability,99,105
+capability:file_read_sensitive,capability,67,69
+capability:file_write_delete,capability,37,38
+capability:network_egress,capability,582,594
+capability:package_install,capability,11,11
+capability:secret_env_access,capability,1013,1065
+capability:shell_execution,capability,195,200
+poison:cross_tool_shadowing,poison,35,36
+poison:exfiltration_language,poison,199,200
+poison:fake_system_role,poison,17,17
+poison:imperative_to_model,poison,436,464
+poison:sensitive_file_target,poison,7,7
+poison:stealth_concealment,poison,28,28
+__TOTAL__,all,4128,4926

@@ -535,6 +535,33 @@ print('p7_bypass_scan_csv_sha256', sha)
 PY
 ```
 
+### 5.14 RQ1 candidate rate of the frozen detector (full corpus)
+
+Producing command (frozen detector imported unchanged, stdlib only):
+
+```bash
+python3 pilot/derive_candidate_rate.py
+```
+
+The frozen v2 detector was re-run over **all 16,763 stored tool descriptions** (4,725
+repositories) — the same population the 150-row validation sample was drawn from — to
+answer RQ1's candidate-rate half directly. Headline results (persisted to
+`data/candidate_rate_scan.csv`):
+
+| Quantity | Value | Share of corpus |
+|---|---|---|
+| Rows with >=1 flag, any family | 4,128 | 24.63% |
+| Rows with >=1 poison-family flag | 698 | 4.16% |
+| Rows with >=1 capability-family flag | 1,892 | 11.29% |
+| Rows with >=1 channel-family flag | 2,183 | 13.02% |
+| Total flag instances (row, class) | 4,926 | — |
+
+Largest classes by rows flagged: `model_addressed` 2,068 · `secret_env_access` 1,013 ·
+`network_egress` 582 · `imperative_to_model` 436 · `exfiltration_language` 199. These are
+the **candidate rate** the detector emits — an upper bound on triage work, not a claim
+about poisoning prevalence. The validated text-support rate on the sampled candidates is
+reported separately (`data/validation_family_split.csv`).
+
 ## 6. Reproducing these numbers
 
 ```bash

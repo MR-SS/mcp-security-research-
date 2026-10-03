@@ -53,7 +53,7 @@
 | **MCP-TDP — When the Manual Lies** (arXiv 2605.24069, cs.CR; cs.AI, 2026-05-22; verified 2026-09-29) | synthetic sandbox benchmark over MCP tool descriptions | tool (attack case) | 32 realistic test cases / 6 risk categories / 8 LLMs (as reported by authors) | Yes (TDP injects malicious instructions into descriptive metadata — the "manual", not the code) | No (attack-success evaluation, no detector-precision validation) | No | No (benchmark construction) |
 | **Stein — How are AI agents used?** (arXiv 2603.23802, cs.CY, 2026-03-25; verified 2026-09-29) | public MCP server repositories monitored over time | tool | 177,436 agent tools, 11/2024–02/2026 (as reported by authors) | Partial (tool text/metadata categorized by impact class + O\*NET task domain; not a poisoning detector) | No | No | Partial (monitors public MCP server repositories, not the official registry) |
 | **Song et al. — Beyond the Protocol** (IEEE TSE 52(8):2410–2426, 2026-08; DOI 10.1109/TSE.2026.3694876; verified 2026-09-29 via Crossref + Semantic Scholar; preprint arXiv 2506.02040) | MCP ecosystem attack vectors (malicious-server attacks on aggregator platforms) | attack vector / server | 4 attack classes (tool poisoning, puppet, rug pull, malicious external resources); malicious servers uploaded to 3 aggregator platforms; user study n = 20 (as reported by authors) | Yes (tool poisoning is the description channel) | Partial (20-participant user study + interviews; no detector-precision validation) | No | No (aggregator platforms, not the official registry) |
-| **Ours** (this study) | **official MCP Registry** (`registry.modelcontextprotocol.io`, 17,167 servers after `isLatest` dedupe) + GitHub tool-registration source | **tool description** | **16,763 tool-description rows / 4,725 repos** | **Yes** (the entire detector surface is description text) | **Yes** (150/150 rows human-labeled; 5 TP / 145 FP; flag-instance precision **5.6%**) | **Yes** (rubric-application consistency check, n=30, **κ = +0.760** — second rater an *unversioned consumer LLM*, a methodological limitation, paper §7; `data/kappa_report.md`) | **Yes** (official registry crawl, raw snapshots committed) |
+| **Ours** (this study) | **official MCP Registry** (`registry.modelcontextprotocol.io`, 17,167 servers after `isLatest` dedupe) + GitHub tool-registration source | **tool description** | **16,763 tool-description rows / 4,725 repos** | **Yes** (the entire detector surface is description text) | **Yes** (150/150 rows human-labeled; 5 TP / 95 flagged-benign FP / 50 zero-flag TN; flag-instance text-support **5.6% (15/268)**, poison-family **4.8% (6/124)**) | **Yes** (rubric-application consistency check, n=30, **κ = +0.760** — second rater an *unversioned consumer LLM*, a methodological limitation, paper §7; `data/kappa_report.md`) | **Yes** (official registry crawl, raw snapshots committed) |
 
 **Ours is the only row with YES on the last three columns** (human validation, reliability
 artifact, registry-grounded).
@@ -89,7 +89,7 @@ forward unverified.)
 
 AgentsID headline counts, for the contrast: **954 servers exhibiting Toxic Flow behavior
 across five types** (incl. 145 hidden-character findings), unvalidated; on our evidence an
-unvalidated count at this population's base rate carries ~94% false positives.
+unvalidated count at this population's base rate carries ~94% unsupported flags.
 
 ## 3. Positioning paragraph (paper-facing)
 
@@ -100,11 +100,11 @@ the code-health and audit studies sample servers without a description-level det
 protocol. **We calibrated detection WITHIN the official registry population**: the same
 pattern classes others report as raw counts are here measured against the full registry
 crawl, human-labeled row by row (150/150), with the detector's **measured flag-instance
-precision of 5.6% (15/268)** and a **rubric-application consistency check of κ = +0.760**
+text-support rate of 5.6% (15/268; poison-family 4.8%, 6/124)** and a **rubric-application consistency check of κ = +0.760**
 (second rater an *unversioned consumer LLM* — a methodological limitation, not a human-
 annotation gold standard; paper §7). Where
 AgentsID-style censuses report unvalidated counts — numbers that would, on our evidence,
-carry ~94% false positives at this population's base rate — every rate we publish is
+carry ~94% unsupported flags at this population's base rate — every rate we publish is
 calibrated. The two results are **complementary, not competing**: their (vendor, non-peer-
 reviewed) census provides breadth and the Type I–V taxonomy; ours provides the registry-
 grounded, human-validated calibration that turns such counts into measurable prevalence.
@@ -124,10 +124,11 @@ scanner, while manually validated overall average precision is 45.53%** (per-sca
 reviewers. **We** measure a different instrument at a different unit: the **tool-description
 poisoning-pattern detector**, at the **description** level, on the official-registry +
 GitHub population, under a **stricter, text-bound rubric** (a row counts as a true positive
-only when the stored text adds a behavioral instruction to the model), and find **5.6%
-flag-instance precision, reported per class**. Framed as what it is — **convergent
-evidence**: *independent work at a different unit reports the same calibration gap, and
-ours shows the gap is even wider for poisoning-pattern detection*. The two studies differ
+only when the stored text adds a behavioral instruction to the model), and find a
+**text-support rate — 5.6% (15/268) all-family, 4.8% (6/124) poison-family —
+reported per class**. Framed as what it is — **convergent
+evidence**: *independent work at a different unit reports the same calibration gap;
+convergent pattern, different magnitudes, not directly comparable*. The two studies differ
 in unit (server-level alert vs. description row), population (multi-market repos vs.
 official registry + GitHub), and ontology (runtime vulnerability alerts vs. instruction-
 shaped steering text), and agree on the operative conclusion: unvalidated scanner or regex

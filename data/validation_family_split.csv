@@ -1,0 +1,5 @@
+family,classes_in_family,n_classes,supported_instances,unsupported_instances,total_instances,text_support_rate
+poison,cross_tool_shadowing;exfiltration_language;fake_system_role;imperative_to_model;stealth_concealment,5,6,118,124,0.0484
+capability,database_write;file_read_sensitive;file_write_delete;network_egress;secret_env_access;shell_execution,6,5,97,102,0.0490
+channel,model_addressed;second_person_imperative,2,4,38,42,0.0952
+ALL,cross_tool_shadowing;database_write;exfiltration_language;fake_system_role;file_read_sensitive;file_write_delete;imperative_to_model;model_addressed;network_egress;second_person_imperative;secret_env_access;shell_execution;stealth_concealment,13,15,253,268,0.0560

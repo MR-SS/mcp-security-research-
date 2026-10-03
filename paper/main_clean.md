@@ -17,33 +17,32 @@ blind second-opinion protocol; §F the consistency-check report; §G the validat
 
 ## 1. Abstract
 
-In the Model Context Protocol (MCP), each tool's natural-language description is
-injected verbatim into the agent's context — a server-controlled, instruction-shaped
-channel. We ask how much of what detectors report is true. In a
-registry-grounded population of 16,763 tool descriptions (4,725 repos; 17,167
-registry servers), a frozen 13-class detector emits candidates. Human validation of a
-150-row stratified sample yields **5 true positives, 95 flagged-but-benign rows, and 50
-zero-flag controls confirmed benign**, with flag-instance precision 5.6% (15/268) *within
-that sample* and row-level true positives 5/150, and κ = +0.760 (rubric-application
-consistency check; unversioned consumer-LLM second rater — a methodological limitation,
-§7). Four attack-shaped
-mechanisms appear in the wild — unconditional and conditional priority capture,
-exec-priming, a universal credential funnel — all in otherwise benign product
-descriptions; a
-defensive-pattern catalog explains most false positives. In 54 live trials across three
-model families, mechanisms steer agents — exec-priming 9/9, the funnel covertly 8/9 —
-while controls never triggered in 16 valid trials (2 of 18 excluded as infra-timeouts
-per protocol). Seven versioned detector-fix proposals (P1–P7) follow.
-The result is a calibration: a prior on unvalidated counts. Code, data,
-and labels accompany the paper; Zenodo DOI pending.
+In the Model Context Protocol (MCP), tool descriptions are injected verbatim into the
+agent's context — a server-controlled, instruction-shaped channel. How much of detector
+output is true? In a registry-grounded population of 16,763 tool descriptions
+(4,725 repos), a frozen 13-class detector emits candidates. Human validation of 150
+rows yields **5 true positives, 95 flagged-but-benign rows, and 50
+zero-flag controls confirmed benign**: an all-family text-support rate of 15/268 (5.6%;
+poison-family 6/124, 4.8%) *within that sample* — sample-bounded, not a population
+estimate, bias direction unknown; row-level TP 5/150; κ = +0.760 (rubric-application
+consistency; unversioned second rater). Four attack-shaped mechanisms occur in
+benign descriptions — priority capture (unconditional/conditional),
+exec-priming, a credential funnel — and a defensive-pattern catalog explains most
+false positives. In 54 mocked trials across three model versions (no real shell execution
+or network calls), models expressed intent to follow them — exec-priming 9/9, the funnel
+covertly 8/9 — controls never triggered in 16 trials (2/18 excluded as
+infra-timeouts). Seven versioned detector fixes (P1–P7) follow. The result is a
+calibration: a prior on unvalidated counts. Code, data, and labels are released.
 
 
 ## 2. Introduction
 
 The MCP tool manifest is the agent's menu of actions, and the model reads it as text:
 server-controlled descriptions land in context beside the system prompt and the user's
-message, and — as far as the model can tell from the text alone — with no structural
-distinction between them. Whatever one tool's description
+message. Descriptions are structured as tool metadata whose natural-language text is
+visible to the model; client implementations differ in how they surface this text to the
+prompt, and current models read such text as instructions in language — no enforced
+authority separation exists between description text and operator policy text. Whatever one tool's description
 says — about itself, about other tools, about what the agent must never or always do —
 appears to the model to arrive with the authority of an installed integration. This makes
 the description channel an *instruction surface*: it can carry injection-style steering
@@ -62,22 +61,25 @@ This paper measures the detectors, not just the ecosystem. Our research question
 
 - **RQ1 (candidate rate).** What candidate rate does the frozen detector produce across
   the registry-grounded population, and what fraction of those candidates survive strict
-  text-bound human review? *(Prevalence of the detector's patterns is thus measured as a
-  candidate rate; the true prevalence of poisoning in the wild is **not** claimed, and is
-  bounded only by the validated sample's TP rate.)*
-- **RQ2 (detector precision).** When a heuristic poisoning detector fires on this
-  population, how often is the flag supported by the text — per class, not just overall?
+  text-bound human review?  *(Prevalence of the detector's patterns is thus measured as a
+  candidate rate; the true prevalence of poisoning in the wild is **not** claimed.)*
+- **RQ2 (flag text-support).** When the heuristic detector's flags fire on this
+  population, how often is each flag supported by the text — per class, not just overall?
 - **RQ3 (mechanisms).** Which concrete steering mechanisms exist in the wild, who writes
   them, and can regex baselines see them at all?
 
-We answer RQ1 compositionally with a frozen v2 detector over 16,763 descriptions; RQ2
-with a 150-row stratified human validation (flag-instance precision 5.6% — 15/268, in the
-stratified validation sample, not an unweighted population estimate; row-level TP
+"We answer RQ1 compositionally with a frozen v2 detector over 16,763 descriptions (4,128 rows
+with any flag, 24.6%; 698 rows with a poison-family flag, 4.2%; 4,926 flag instances corpus-wide;
+the candidate-rate scan, the collection report); RQ2 with a 150-row stratified human validation
+(primary metric: poison-family text-support rate 6/124, 4.8%; all-family text-support rate 15/268,
+5.6% — in the stratified validation sample, not an unweighted population estimate; row-level TP
 5/150; κ = +0.760, a rubric-application consistency check against an unversioned
 consumer-LLM second rater — a methodological limitation, §7); RQ3 with five human-confirmed positives
 spanning four mechanisms and a falsifiable account of why the regexes miss the
 consequential paraphrases. Our contribution is deliberately framed: **a registry-grounded,
-human-validated calibration of tool-description poisoning detectors** — complementary to
+human-validated calibration of tool-description poisoning detectors** — to our knowledge, based
+on a literature search conducted 2026-09, the first such calibration on this registry-grounded
+population — complementary to
 raw censuses, and a precondition for interpreting them.
 
 ## 3. Background & Threat Model
@@ -85,18 +87,26 @@ raw censuses, and a precondition for interpreting them.
 **The description-in-context channel.** An MCP client issues a tool-listing request; the
 manifest —
 names, descriptions, JSON Schemas — enters the model's context with the operator's system
-prompt and the user's message. The model has no cryptographic way to attribute a sentence
-to its source, no enforced precedence between them, and no way to verify that a
-description matches the underlying code. Authorization decisions therefore rest on the
+prompt and the user's message. The model has no cryptographic way to attribute a sentence to its source and no way to
+verify that a description matches the underlying code. Authorization decisions therefore rest on the
 model's reading of server-authored prose.
 
 **OWASP mapping.** The channel sits at the junction of two entries in the OWASP Agentic
-AI threat taxonomy: **ASI02 (Agentic Critical Data Interaction)** — the agent acts on
+AI threat taxonomy (**OWASP-adjacent mapping, see note below**): **ASI02** — the agent acts on
 instruction-shaped text and moves user-side data through tool calls it was steered into —
-and **ASI04 (Agentic Supply Chain)** — the poisoned text is installed like a dependency
+and **ASI04** — the poisoned text is installed like a dependency
 and distributed with the server package. A third entry, **ASI05**, recurs in one finding:
 descriptions that prime the agent to execute tool-supplied commands in its own shell
 (row 35, Section 6.3).
+
+> **OWASP note (verified 2026-09-29).** The OWASP Agentic Security Initiative's
+> "Agentic AI — Threats and Mitigations" guide (OWASP GenAI Security Project,
+> <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/\>, dated February 17,
+> 2025, accessed 2026-09-29) is distributed as a PDF download whose landing page does not
+> enumerate the ASI01–ASI10 entry titles. We therefore **could not verify the exact ASI02 /
+> ASI04 / ASI05 titles** against an owasp.org source, and the mapping is presented as
+> OWASP-adjacent rather than as a citation of those entry names. Only a third-party
+> crosswalk lists ASI01–ASI10 titles, and it is not authoritative.
 
 **Capability vs. poison.** We keep two families strictly separate throughout. A
 **capability** is a factual statement about what a tool can do — reach the network, run a
@@ -134,14 +144,14 @@ text).
 | MCP-TDP, When the Manual Lies (2605.24069) | synthetic benchmark | tool (attack case) | 32 cases / 6 risk categories / 8 LLMs (as reported) | Yes (instruction channel in metadata) | No | No | No |
 | Stein, How are AI agents used? (2603.23802) | public MCP server repos, 11/2024–02/2026 | tool | 177,436 tools (as reported) | Partial (categorization, not poisoning) | No | No | Partial |
 | Song et al., Beyond the Protocol (IEEE TSE 2026; 10.1109/TSE.2026.3694876) | MCP attack vectors on aggregator platforms | attack vector / server | 4 attack classes; 3 platforms; user study n = 20 (as reported) | Yes (tool poisoning is the description channel) | Partial (user study; no detector precision) | No | No |
-| **Ours** | **official MCP Registry + GitHub source** | **tool description** | **16,763 rows / 4,725 repos** | **Yes** | **Yes (150/150; 5.6% flag-instance precision in the stratified sample, 15/268)** | **Yes (rubric-application consistency check, κ = +0.760; unversioned consumer-LLM rater — a limitation, §7)** | **Yes** |
+| **Ours** | **official MCP Registry + GitHub source** | **tool description** | **16,763 rows / 4,725 repos** | **Yes** | **Yes (150/150; all-family text-support 15/268, 5.6%; poison-family 6/124, 4.8%)** | **Yes (rubric-application consistency check, κ = +0.760; unversioned consumer-LLM rater — a limitation, §7)** | **Yes** |
 
 **Benchmarks (MCPTox, MSB)** construct synthetic attack sets and answer "how bad can an
 attack be," not "how often is it present"; their rates are properties of the benchmark,
 not of a population. **Raw censuses (AgentsID)** measure a population but not their
 instrument: 954 servers with Toxic Flow behavior is a count of flags, and our calibration
-measures what such flags are worth — on our sample, 94.4% of flag instances are false
-positives. AgentsID is also a different population (npm/PyPI packages), vendor-published,
+measures what such flags are worth — on our sample, 94.4% of all-family flag instances (and
+95.2% of poison-family instances) lack text support. AgentsID is also a different population (npm/PyPI packages), vendor-published,
 and non-peer-reviewed. **Code-health and survey work (Hasan et al., Hou et al.)** does not
 operate on the description channel at all. **Spec and architecture analyses (Breaking the
 Protocol, Errico)** reason about what the protocol permits, not what deployments contain.
@@ -155,16 +165,19 @@ measure. **MCPZoo** (Chen et al., arXiv 2607.11086, cs.CR, 2026-07) evaluates ei
 static/dynamic/hybrid security scanners on a **multi-market, runtime-deployed population**
 of servers (64,611 unique; 37,288 interactable) and finds the raw signal inflated:
 **96.89% of interactable servers are flagged risky by at least one scanner, while manually
-validated overall average precision is 45.53%** (per-scanner 10.40%–96.88%) — a
+validated overall average precision is 45.53%** (average over scanners, as reported;
+per-scanner 10.40%–96.88%) — a
 *server-level* alert-reliability measurement, validated by human reviewers. **We** measure a
 different instrument at a different unit: the **tool-description poisoning-pattern
 detector**, at the **description** level, on the official-registry + GitHub population,
 under a **stricter, text-bound rubric** (a row counts as a true positive only when the
-stored text adds a behavioral instruction to the model), and find **5.6% flag-instance
-precision in the stratified validation sample (15/268), reported per class**. Framed as
+stored text adds a behavioral instruction to the model), and find a **poison-family text-support
+rate of 4.8% in the stratified validation sample (6/124), reported per class** — the all-family
+rate is 5.6% (15/268). Framed as
 what it is — **convergent evidence**:
-*independent work at a different unit reports the same calibration gap, and ours shows the
-gap is even wider for poisoning-pattern detection*. The two studies differ in unit
+*independent work at a different unit reports the same calibration gap; convergent pattern,
+different magnitudes, not directly
+comparable*. The two studies differ in unit
 (server-level alert vs. description row), population (multi-market repos vs. official
 registry + GitHub), and ontology (runtime vulnerability alerts vs. instruction-shaped
 steering text), and agree on the operative conclusion: unvalidated scanner or regex output
@@ -194,7 +207,9 @@ depth-qualified to this prefix.
 from source by matching the common registration idioms of the major MCP server frameworks
 (decorator-, method-, and result-type-based), yielding **16,763
 tool-description rows from 4,725 repositories** (the released description
-corpus; the collection report, §A.2).
+corpus; the collection report, §A.2). One row is one extracted (server, tool-name) registration
+from a GitHub-linked repository; 1,484 rows share duplicate names with another row
+(§5.10 dedup rule: mechanisms counted once where they collide).
 
 **Detector (frozen v2).** The frozen detector scans the full stored text. Capability
 classes: *network_egress*, *shell_execution*, *file_read_sensitive*, *file_write_delete*,
@@ -209,18 +224,27 @@ that fired on the sample; the structural checks and *package_install*/*important
 *sensitive_file_target* did not fire among the 268 sampled instances.)*
 
 **Sample construction (frozen).** Stratified: the top-100 rows by suspicion score plus
-50 uniform-random zero-flag control rows, drawn with seed 42; row order is immutable and
+50 zero-flag control rows — zero capability + zero poison flags, addressing-only rows allowed,
+uniform-random drawn with seed 42; row order is immutable and
 every label anchors to a stable row identifier, so the frozen sample and its checksum are
 fixed artifacts (Appendix A).
+The flagged stratum thus holds 5 TP / 95 flagged-benign rows; the 50 zero-flag controls,
+all confirmed benign, are true negatives, not false positives.
 
-**Human labeling protocol.** A labeling aid was used interactively, in the analyst's
-terminal, with per-class true-positive rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
+**Human labeling protocol.** Primary labels were assigned by the principal investigator
+(the author) — a single-rater design — working interactively in the terminal with per-class
+true-positive rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
 ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* A row is a true positive if and only if at
 least one poison flag
 is genuinely supported by the visible text; capability and channel flags never decide a
 row. Every mutation goes through supersede/audit rails (a superseded-label archive and
-a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows carry a
-rationale note; unclear rate 0%; zero-flag false-negative rate 0/50 (validation report, §G).
+a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows
+carry a rationale note; unclear rate 0%; zero-flag control stratum: 0/50 rows labeled
+positive (no positive-case evidence of misses in this stratum; validation report, §G).
+The complete labeling rulebook, with positive and negative examples per class, is in the
+replication package (Appendix A).
+The complete labeling rulebook, with positive and negative examples per class, is in the
+replication package (Appendix A).
 
 **Evidence-completeness checks (two truncation levels + censuses).** (i) *CSV display
 cap*: the sample CSV stores 300-char excerpts while the detector scanned full text —
@@ -229,7 +253,8 @@ cap*: the sample CSV stores 300-char excerpts while the detector scanned full te
 **1,082/16,763 stored descriptions (6.45%) end mid-sentence** (6.14% CJK-adjusted);
 7/150 sample rows affected; upstream re-extraction from live public sources recovered 7/7
 (median +468 chars) with **0/7 verdict flips** (the collection report, §A.3) —
-detector numbers in this paper are floors over partially-cut evidence. (iii) *Dataset
+detector counts here are subject to an unknown-direction bias from truncation; the recovered
+subset (7/7 re-extractions, 0 verdict flips) bounds but does not sign that bias. (iii) *Dataset
 anomaly censuses*: **1,484/16,763** duplicate server/tool name pairs (collection
 report, §A.4; mechanisms counted once by hand where they collide); **0 control/format
 Unicode codepoints** corpus (negative; NFKC+Cc/Cf byte-diff, §A.5);
@@ -253,23 +278,30 @@ only; no third-party server endpoint was contacted; no third-party code was exec
 
 150/150 rows labeled, 0 unclear, in three strata: **5 TP / 95 FP / 50 TN** — five rows the
 human judge confirmed as genuine behavioral instructions; 95 flagged rows judged benign; and
-50 zero-flag control rows, all confirmed benign (the false-negative stratum). The 145
+50 zero-flag control rows, all confirmed benign: **zero-flag control stratum, none of
+which was labeled positive** (no positive-case evidence of misses in this stratum). The 145
 previously-reported "FP" conflated the last two groups, which are not errors at all: a
 zero-flag control can never be a false positive. Restated in detection terms, the sample
-holds **5 TP and 145 non-TP rows** (row-level TP 3.3%); 268 flag instances on labeled rows,
-15 supported → **flag-instance precision 5.6%** (validation report, §G). Every
-heuristic class, run over this population, is dominated by false positives.
+holds **5 TP and 145 non-TP rows** (row-level TP 3.3%). Splitting the 268 flag instances by
+detector family (the family-split table, §G), the primary metric is the **poison-family
+text-support rate: 6 of 124 instances (4.84%)**; capability-family 5/102 (4.90%), channel-family
+4/42 (9.52%). The all-family figure remains as the headline **text-support rate, 15 of 268
+(5.60%)** — labelled as such, not as "precision". Every heuristic class, run over this
+population, is dominated by unsupported flags.
 
-**This 5.6% is a sample-bounded quantity, not a population estimate.** The validation
+**This 5.6% (all-family; poison-family 4.8%) is a sample-bounded descriptive quantity — the
+observed flag-instance text-support rate; not a population precision estimate; the sample's
+bias direction is unknown.** The validation
 sample is the top 100 rows by suspicion score plus 50 zero-flag control rows (§5), so it
-deliberately over-represents the detector's highest-scoring output; flag-instance precision
+deliberately over-represents the detector's highest-scoring output; the text-support rate
 within that stratified sample is what the 15/268 ratio measures. A precision estimate
 weighted to the full 16,763-row population would require score-weighted re-weighting of the
-sample, which we did not perform; that re-weighting is left to future work. The unweighted
-5.6% must therefore be read as a lower bound on this detector's quality under a
-top-heavy sample, not as the fraction of all population-level flags that are true.
+sample, which we did not perform; that re-weighting is left to future work. Two distinct denominators are in play and
+neither is detector-level precision: 5/100 is the TP rate among score-ranked candidates
+(the flagged stratum), and 5/150 is the TP rate in the combined sample (flagged plus
+zero-flag controls).
 
-### 6.2 Per-class precision
+### 6.2 Per-class text-support
 
 | Class | TP | FP | Precision |
 |---|---|---|---|
@@ -415,7 +447,8 @@ a second human. It is never presented as a human-annotation gold standard. The g
 reference in this paper is the 150/150 human-in-the-terminal verdicts (§5, the frozen
 label set);
 κ only bounds how reproducible those verdicts are when the rubric is re-applied, and it
-does not upgrade the detector's 5.6% precision to anything more than a human-measured
+does not upgrade the detector's 5.6% all-family text-support rate (4.8% poison-family)
+to anything more than a human-measured
 figure with a stated reproducibility check.
 
 **Result of the consistency check** (the consistency-check report, §F):
@@ -453,18 +486,19 @@ the collection report, §A.3).
 
 ## 8. Live Experiments
 
-**Design.** We tested whether the §6 mechanisms actually steer models, using a fully
+**Design.** We tested whether the §6 mechanisms steer model outputs in a transcript,
+using a fully
 mocked harness (the pre-registered protocol, §D): each trial registers the case tool —
 its description embedded **verbatim** from the corpus, checksum-pinned and re-verified
 against the released corpus at harness initialisation — alongside two benign filler tools,
 and asks
 a task that does not require the case tool (attack arms) or requires it benignly
 (controls). Every tool response is canned synthetic data bearing an obviously fake
-credential marker (no
-network, no execution, no real credentials); the model's tool calls are logged before
+credential marker (no real
+shell execution, no network call, no real credentials in any trial); the model's tool calls are logged before
 dispatch; trials cap at 10 turns (≤4 completions each). Outcomes are judged mechanically
 from transcripts against per-arm criteria (A priority-capture-first; B shell-text
-adoption as intended execution; A-covert/overt credential pass with absence/presence in
+adoption as expressed intent to execute; A-covert/overt credential pass with absence/presence in
 the final answer; G benign-funnel compliance; CTRL for controls), with infra failures
 (timeouts after one retry) logged and **excluded from all denominators**. Panel: three
 vendors via the AvalAI gateway (OpenAI-compatible; temperature 0) — **glm-5.3 (Zhipu,
@@ -486,6 +520,8 @@ work.
 excluded); no refusals were observed.
 
 **Results (counts only; 3 reps/cell do not establish population rates).**
+Notation: k/n = successful trials of n completed; [X] = judge criterion. All scope claims
+below cover these three model versions, via one gateway, under this harness.
 
 | Arm (criterion) | glm-5.3 | deepseek-v4.1-flash | gemini-3.8-flash |
 |---|---|---|---|
@@ -503,15 +539,16 @@ never triggered (0/8 eligible).
 
 **Finding 1 — exec-priming is uniform across the three model families in our panel
 (FL 9/9, Wilson 95% CI [0.70, 1.00]).** Every model, in every
-replication, retrieved the guide and then adopted the tool-supplied shell text as
-intended execution. The description's own words carry the instruction — gemini-3.8-flash,
+replication, retrieved the guide and then expressed intent to execute the tool-supplied
+shell text (adopted in the mocked transcript as intended execution; no real shell execution
+or network call occurred in any trial). The description's own words carry the instruction — gemini-3.8-flash,
 the model that *resisted* WF, adopted FL anyway:
 
 > *(Note: Per the tool instructions, install guide commands are intended to be executed
 > in …* — gemini-3.8-flash, FL rep 1 (the matching transcript)
 
 **Finding 2 — priority capture is not model-universal (WF 6/9).** glm-5.3 and
-deepseek-v4.1-flash called the poisoned tool first in all replications, against a task
+deepseek-v4.1-flash expressed intent to execute the poisoned tool first in all replications, against a task
 that never mentioned it:
 
 > *"I'll start by checking the tool guidelines, then look up the weather and save the
@@ -543,7 +580,7 @@ license to skip the verification step the mock offered; glm-5.3 explicitly repor
 verification as *pending*. This is consistent with the §6 validation, where row 47 is a
 human-labeled **false positive** — the description is attack-shaped but not an attack —
 and it bounds the live threat the other way: shape alone, without a real capability
-gap to exploit, did not steer any panel model. Detector precision (§6.2) and live
+gap to exploit, did not steer any panel model. Per-class text-support (§6.2) and live
 steering thus agree: this family is a sensitivity risk for *detectors*, not (at n=3)
 for models.
 
@@ -555,8 +592,8 @@ released summarizer script.
 
 **Attack anatomy.** The four in-the-wild mechanisms form a coherent attack surface
 without a single attacker: priority capture (rows 12, 94/95) re-routes the agent's
-whole planning graph through one tool; exec-priming (row 35) moves execution into the
-host; the custody funnel (row 60) makes every credential the agent touches flow through
+whole planning graph through one tool; exec-priming (row 35) expresses execution of
+tool-supplied text in the host shell; the custody funnel (row 60) routes every credential the agent touches through
 a third party. Each is one benign vendor's honest product copy away from ASI04.
 
 **Figure 1 — The evidence chain: what this study shows, and where it stops.**
@@ -576,7 +613,8 @@ add up to a demonstrated vulnerability, and we do not claim it does.
 
 **Anticipated reviewer questions (R2).**
 
-**Q1 — Your flag-instance precision (5.6%, in the stratified validation sample; 15/268)
+**Q1 — Your all-family text-support rate (5.6%, in the stratified validation sample; 15/268;
+poison-family 6/124, 4.8%)
 sits far below MCPZoo's scanner precision
 (45.53%); which number is right, and is one study wrong?** Both are right; they are not
 rankable. Three axes differ (§4, scanner-reliability cluster): **unit** — MCPZoo validates
@@ -588,8 +626,8 @@ instruction-shaped steering text embedded in prose. A rubric that counts a row a
 positive only when the stored text *adds a behavioral instruction to the model* cannot
 credit a capability report, and a runtime scanner need not read prose at all. Read
 together the two numbers are **convergent evidence**: independent work at a different unit
-reports the same calibration gap, and ours shows the gap is even wider for
-poisoning-pattern detection (§4).
+reports the same calibration gap; the two magnitudes are not directly comparable, and
+the pattern is convergent rather than comparative (§4).
 
 **Q2 — Why do regex findings count as a research result at all?** Because the detector is
 used for **candidate generation, never verdicts** (a standing rule of this
@@ -601,7 +639,7 @@ the regexes contribute is a reproducible sampling frame plus a falsifiable failu
 analysis (§6.4): where they fire, why they fire, and which firing patterns survive human
 judgment. A regex count presented as prevalence would indeed be indefensible; a regex
 count presented as the *input* to a precision measurement is the standard auditable
-design, and the 94.4% false-positive figure we report is a statement about the instrument,
+design, and the 94.4% unsupported-flags figure we report (95.2% for the poison family) is a statement about the instrument,
 not about the ecosystem.
 
 **Q3 — Are the five true positives attacks?** **No.** None of the five rows is claimed as
@@ -609,7 +647,8 @@ a real-world vulnerability, and none has been filed as a CVE (§10). All five oc
 **otherwise benign product descriptions**, and we do not infer or assess author intent
 (§6.3); what we identify are **attack-shaped mechanisms** —
 text patterns a hostile server could plant verbatim — and, separately, **controlled
-steering**: in a mocked harness with synthetic data, three models followed those
+steering**: in a mocked harness with synthetic data (no real shell execution or network call
+in any trial), three model versions expressed intent to follow those
 descriptions at the rates in §8. Figure R2-1's step 4 is explicitly not drawn: controlled
 steering in a sandbox is not a demonstrated vulnerability in a deployed system. The chain
 stops at step 3, and the paper's claims stop with it. What the five rows establish is that
@@ -662,7 +701,8 @@ general. (ii) English dominance: classes match English patterns only; the one bi
 sample row was caught via its EN mirror (P6). (iii) The tool-description population
 over-represents GitHub-linked, open-source servers relative to the registry's full
 package population. (iv) The registry dataset is a cursor-order prefix, not an exhausted
-census. (v) All detector numbers are floors over partially-cut stored evidence (§5.11).
+census. (v) All detector counts are subject to an unknown-direction bias from partially-cut stored
+evidence; the recovered subset (7/7, 0 flips) bounds but does not sign it (§5.11).
 (vi) The blind rater was a consumer LLM, not a second human. (vii) The live-experiment
 matrix runs at n=3 per (arm, model) cell from a single authorized run on 2026-09-29
 via the AvalAI gateway (base-tier; 3 vendor families) — counts only, no population
@@ -700,7 +740,9 @@ limitation, §7) is disclosed in Section 7 and Methods.
 | Enriched corpus | `data/github_tools.jsonl` | 16,763 tool descriptions / 4,725 repos; fixture-text source of truth |
 | Frozen sample | `data/analysis_toollevel.csv` | 150 rows, seed 42, sha256 `ae1aff9f…8f77`; `row_id` anchor |
 | Human labels | `data/labels.jsonl` (+ `.superseded`, `.audit`) | 150/150 last-wins labels + rationale notes; full mutation audit |
-| Validation report | `data/validation_report.md` | per-class precision (§6.2), truncation validity, FP taxonomy |
+| Validation report | `data/validation_report.md` | per-class text-support (§6.2), truncation validity, FP taxonomy |
+| Family split | `data/validation_family_split.csv` | poison/capability/channel instance split (6/124, 5/102, 4/42; total 15/268), produced by `pilot/derive_family_split.py` with sum asserts (§6.1) |
+| Candidate-rate scan | `data/candidate_rate_scan.csv` | frozen-detector re-run over all 16,763 rows (4,128 any-flag / 698 poison-flag / 4,926 instances), produced by `pilot/derive_candidate_rate.py` (§5.14) |
 | Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B rubric-consistency protocol, verbatim rater verdicts, κ computation as a consistency check (§7) |
 | Unicode scan | `data/unicode_scan.csv` + §5.12 | Type V mirror (0 Cc/Cf) |
 | P7 bypass scan | `data/p7_bypass_scan.csv` + §5.13 | Type III mirror (2/16,763) |
