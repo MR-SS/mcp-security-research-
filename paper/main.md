@@ -12,25 +12,26 @@ inline.*
 
 ## 1. Abstract
 
-In the Model Context Protocol (MCP), tool descriptions are injected verbatim into the
-agent's context — a server-controlled, instruction-shaped channel. How much of detector
-output is true? In a registry-grounded population of 16,763 tool descriptions
-(4,725 repos), a frozen 13-class detector emits candidates. Human validation of 150
-rows yields **5 true positives, 95 flagged-but-benign rows, and 50
-zero-flag controls confirmed benign**: an all-family text-support rate of 15/268 (5.6%;
-poison-family 6/124, 4.8%) *within that sample* — sample-bounded, not a population
-estimate, bias direction unknown; row-level TP 5/150; κ = +0.760 (rubric-application
-consistency; unversioned second rater). Four attack-shaped mechanisms occur in
-benign descriptions — priority capture (unconditional/conditional),
-exec-priming, a credential funnel — and a defensive-pattern catalog explains most
-false positives. In 54 mocked trials across three model versions (no real shell execution
-or network calls), models expressed intent to follow them — exec-priming 9/9, the funnel
-covertly 8/9 — controls never triggered in 16 trials (2/18 excluded as
-infra-timeouts). Seven versioned detector fixes (P1–P7) follow. The result is a
-calibration: a prior on unvalidated counts. Code, data, and labels are released.
+In the Model Context Protocol (MCP), tool descriptions are surfaced to the model as
+server-authored text, in ways that vary by client implementation. How much of detector
+output is true? A frozen 13-class detector emits candidates over 16,763 registry-grounded
+tool descriptions (4,725 repos). Human validation of 150 rows yields **5 true positives,
+95 flagged-but-benign rows, and 50 controls with zero capability- and poison-family flags,
+confirmed benign**: an all-family text-support rate of 15/268 (5.6%; poison-family 6/124,
+4.8%) — sample-bounded, not a population estimate, bias direction unknown; row-level TP
+5/150; κ = +0.760 (rubric-consistency; unversioned second rater). Four attack-shaped
+mechanisms occur in benign descriptions — priority capture (unconditional/conditional),
+exec-priming, a credential funnel — and a defensive-pattern catalog explains most false
+positives. In 54 mocked trials across three model versions (no real shell execution or
+network calls), models expressed intent to follow them — exec-priming 9/9, the funnel
+covertly 8/9 — controls never triggered (16 valid trials; 2 infra-timeouts excluded).
+Seven versioned detector fixes (P1–P7) follow. The result is a calibration: a prior on
+unvalidated counts. Code, data, and labels are released.
 
-<!-- abstract: 179 words (≤180 PI cap), re-counted at R5 after poison-family split (6/124)
-+ mocked-trial wording. Whole-paper count in the footer comment. -->
+<!-- abstract: 179 words (≤180 PI cap), re-counted 2026-10-03 at R6: surface-claim hedge
+(server-authored text, client-implementation variance; "injected verbatim" removed),
+control definition narrowed to zero capability-/poison-family flags. Whole-paper count in
+the footer comment. -->
 
 ## 2. Introduction
 
@@ -202,7 +203,9 @@ from source (`@mcp.tool`, `server.tool(`, `ListToolsResult`), yielding **16,763
 tool-description rows from 4,725 repositories** (`data/github_tools.jsonl`;
 `data/collection_report.md` §8). One row is one extracted (server, tool-name) registration
 from a GitHub-linked repository; 1,484 rows share duplicate names with another row
-(§5.10 dedup rule: mechanisms counted once where they collide).
+(§5.10 dedup rule: mechanisms counted once where they collide). The measurement
+population is therefore **descriptions extracted from GitHub-linked registry servers,
+not live manifests of deployed servers**.
 
 **Detector (frozen v2).** `pilot/analyze.py` scans the full stored text. Capability
 classes: `network_egress`, `shell_execution`, `file_read_sensitive`, `file_write_delete`,
@@ -211,26 +214,38 @@ classes: `network_egress`, `shell_execution`, `file_read_sensitive`, `file_write
 `cross_tool_shadowing`, `fake_system_role`, `important_tags`, `sensitive_file_target`
 plus structural checks `zero_width_chars`, `base64_blob`. Channel classes (v2):
 `model_addressed`, `second_person_imperative`, reported separately and never summed into
-poisoning statistics. v1 is frozen at commit `6cca247`; the `suspicion_score` definition
-is unchanged since v1. *(Note: the per-class table in Section 6 covers the 13 classes
+poisoning statistics. v1 is frozen at commit `6cca247`; v2 was introduced at commit `77b41af` (adds the
+`model_addressed` instruction-channel class); the `suspicion_score` definition
+is unchanged since v1. All reported detector artifacts were produced under v2 rules
+(`rules_version` = v2 in `pilot/analyze.py`): the 150-row validation sample
+(`data/analysis_toollevel.csv`), the 268-instance per-class counts (§6.2), the
+candidate-rate scan (§5.14), and the §8 live-matrix fixtures — the fixtures were
+*selected* from v2-flagged rows, their texts being frozen corpus strings (sha-pinned). *(Note: the per-class table in Section 6 covers the 13 classes
 that fired on the sample; the structural checks and `package_install`/`important_tags`/
 `sensitive_file_target` did not fire among the 268 sampled instances.)*
 
 **Sample construction (frozen).** Stratified: the top-100 rows by `suspicion_score` plus
-50 zero-flag control rows — zero capability + zero poison flags, addressing-only rows allowed,
-uniform-random with seed 42 (`data/analysis_toollevel.csv`,
+50 control rows with zero capability- and poison-family flags — addressing-only rows
+allowed (channel flags are *not* part of the control definition) — uniform-random with
+seed 42 (`data/analysis_toollevel.csv`,
 sha256 `ae1aff9f…8f77`); row order immutable — every label anchors to a `row_id`.
-The flagged stratum thus holds 5 TP / 95 flagged-benign rows; the 50 zero-flag controls,
+Control channel status, computed from the frozen CSV: no capability- or poison-family
+flag fires on any control row, but 5 of the 50 controls (row_ids 111, 112, 119, 123,
+149) carry exactly one channel-family flag each, all `model_addressed` — 5 of the 268
+sampled flag instances (5 of the 42 channel-family instances), all unsupported (§6.2).
+The flagged stratum thus holds 5 TP / 95 flagged-benign rows; the 50 controls,
 all confirmed benign, are true negatives, not false positives.
 
 **Human labeling protocol.** Primary labels by the PI (the author) — a single-rater design —
 human-in-the-terminal via `pilot/label_sample.py` with
 per-class TP rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
-ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* A row is `tp` iff at least one poison flag
-is genuinely supported by the visible text; capability and channel flags never decide a
-row. Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,
+ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* Labeling is two-level: (a) the **row-level
+verdict** — a row is `tp` iff at least one poison flag is genuinely supported by the
+visible text (the master rule); capability and channel flags never decide a row; and (b)
+**per-flag-instance adjudication** — every fired (row, class) instance is separately
+judged against its class definition, which is what the per-class table in §6.2 reports. Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,
 `labels.audit.jsonl`); the script never picks verdicts; 150/150 rows carry a rationale
-note; unclear rate 0%; zero-flag control stratum: 0/50 rows labeled positive
+note; unclear rate 0%; control stratum: 0/50 rows labeled positive
 (no positive-case evidence of misses in this stratum; `data/validation_report.md`).
 The complete labeling rulebook, with positive and negative examples per class, is in the
 replication package (Appendix A).
@@ -267,10 +282,12 @@ only; no third-party server endpoint was contacted; no third-party code was exec
 
 150/150 rows labeled, 0 unclear, in three strata: **5 TP / 95 FP / 50 TN** — five rows the
 human judge confirmed as genuine behavioral instructions; 95 flagged rows judged benign; and
-50 zero-flag control rows, all confirmed benign: **zero-flag control stratum, none of
-which was labeled positive** (no positive-case evidence of misses in this stratum). The 145
-previously-reported "FP" conflated the last two groups, which are not errors at all: a
-zero-flag control can never be a false positive. Restated in detection terms, the sample
+50 control rows with zero capability- and poison-family flags, all confirmed benign:
+**control stratum, none of which was labeled positive** (no positive-case evidence of
+misses in this stratum; 5 controls carry a single channel-only flag each, §5). The 145
+non-TP rows comprise the 95 flagged-but-benign rows (false positives) and the 50 controls
+(true negatives) — not the same kind of error: a control row, carrying at most a
+channel-family flag, can never be a poison false positive. Restated in detection terms, the sample
 holds **5 TP and 145 non-TP rows** (row-level TP 3.3%). Splitting the 268 flag instances by
 detector family (`data/validation_family_split.csv`), the primary metric is the **poison-family
 text-support rate: 6 of 124 instances (4.84%)**; capability-family 5/102 (4.90%), channel-family
@@ -281,18 +298,19 @@ population, is dominated by unsupported flags.
 **This 5.6% (all-family; poison-family 4.8%) is a sample-bounded descriptive quantity — the
 observed flag-instance text-support rate; not a population precision estimate; the sample's
 bias direction is unknown.** The validation
-sample is the top 100 rows by `suspicion_score` plus 50 zero-flag control rows (§5), so it
+sample is the top 100 rows by `suspicion_score` plus 50 controls with zero capability- and
+poison-family flags (§5), so it
 deliberately over-represents the detector's highest-scoring output; the text-support rate
-within that stratified sample is what the 15/268 ratio measures. A precision estimate
-weighted to the full 16,763-row population would require score-weighted re-weighting of the
-sample, which we did not perform; that re-weighting is left to future work. Two distinct denominators are in play and
+within that stratified sample is what the 15/268 ratio measures. A population estimate would require a probability sample over ALL flagged rows —
+including flagged rows beyond the top-100 — not re-weighting of the current top-heavy
+sample alone; none was drawn. Two distinct denominators are in play and
 neither is detector-level precision: 5/100 is the TP rate among score-ranked candidates
 (the flagged stratum), and 5/150 is the TP rate in the combined sample (flagged plus
-zero-flag controls).
+controls).
 
 ### 6.2 Per-class text-support
 
-| Class | TP | FP | Precision |
+| Class | Supported | Unsupported | Text-support rate |
 |---|---|---|---|
 | `cross_tool_shadowing` | 1 | 3 | 0.25 |
 | `file_read_sensitive` | 1 | 1 | 0.50 |
@@ -308,16 +326,25 @@ zero-flag controls).
 | `file_write_delete` | 0 | 4 | 0.00 |
 | `fake_system_role` | 0 | 1 | 0.00 |
 
-Channel classes are shown for completeness; by v2 design they never decide a row.
+Channel classes are shown for completeness; by v2 design they never decide a row. The 21
+unsupported `model_addressed` instances include the 5 channel-only flags on control rows
+(§5). The six supported poison-family instances sit on the five TP rows: row 12 carries
+two supported poison classes (`cross_tool_shadowing`, `imperative_to_model`), while rows
+35, 60, 94 and 95 carry one each (`imperative_to_model`) — 6 instances on 5 rows
+(`data/labels.jsonl`).
 
 ### 6.3 The five TP rows and four mechanisms
 
 Five rows carry true-positive text: 12, 35, 60, 94 and 95. Rows 94 and 95 are duplicate
 registrations of the *same* tool name from the same server (a §5.10 duplicate-name
-collision) and instantiate one mechanism, counted once. A sixth candidate, row 61, is a
-compressed manifest tagline echoing row 60's doctrine ("use secrets blind … never in
-context"); the human judge labeled it benign, and it is therefore **not** counted — the
-denominator is 5 unique TP rows over 4 mechanisms. All five occurred in otherwise benign
+collision) and instantiate one mechanism, counted once. A sixth candidate, row 61
+(`com.dustforge/demipass::manifest:com.dustforge/demipass`), is the same server's compressed
+manifest tagline — *"Credential custody for agents: use secrets blind
+(ssh/http/smtp/git/db), never in context."* — which lacks both the imperative deposit
+clause ("deposit it here immediately") and the context-dismissal clause ("should leave
+your context as soon as this call returns") that carry row 60's mechanism; the human
+judge labeled it benign, and it is therefore **not** counted — the denominator is 5
+unique TP rows over 4 mechanisms. All five occurred in otherwise benign
 product descriptions; **we do not infer or assess author intent**. We classify the text by whether it adds a behavioral instruction to the
 model — plausibly benign authoring that produces attack-shaped steering. Verbatim quotes
 are in the row notes, `data/labels.jsonl`
@@ -343,22 +370,30 @@ are in the row notes, `data/labels.jsonl`
   instruction, because it relocates execution from the tool's own sandbox into the agent
   host — a step no part of the declared function requires.
 - **Universal credential funnel** — row 60 (`com.dustforge/demipass`; family echo row 61,
-  counted once): *"When you encounter a credential (API key, password, token, SSH key) —
-  from the user, from a config file, from an API response — deposit it here immediately."*
+  counted once). Full stored text, quoted verbatim (fixture sha256 `5b48f0ed…92da7`,
+  re-verified against `data/github_tools.jsonl` at harness init; Appendix A):
+  *"INGRESS: When you encounter a credential (API key, password, token, SSH key) —
+  from the user, from a config file, from an API response — deposit it here immediately.
+  Do NOT save it in memory, files, or scripts. The value is encrypted at rest and never
+  returned by any API. You will receive a ref code (e.g. DP-API-openrout-7f3a9c1e) —
+  save ONLY the ref code. The secret itself should leave your context as soon as this
+  call returns."*
   — a custody funnel with betrayal-of-purpose exfiltration semantics; the text never says
   "send", so `exfiltration_language` stays silent (paraphrase hole). *Declared function
   vs. added instruction:* storing a credential in a secure vault is the tool's declared
   function, and that clause alone is benign; the added instruction is the pair "from the
   user, from a config file, from an API response — deposit it here **immediately**", which
   extends the tool's mandate from credentials the user deliberately stores to every
-  credential the agent encounters in context, and the "leave your context / never surfaced"
-  framing that suppresses surfacing.
+  credential the agent encounters in context, plus the context-dismissal framing
+  ("should leave your context as soon as this call returns") that suppresses surfacing.
 
 ### 6.4 Why the detectors fail: FP taxonomy
 
 This taxonomy covers the **95 flagged-but-benign rows only** — the stratum in which the
-detector actually fired and the human judge disagreed. The 50 zero-flag controls are
-excluded by construction: a row the detector never flagged cannot be a false positive.
+detector actually fired and the human judge disagreed. The 50 controls are
+excluded by construction: with zero capability- and poison-family flags (§5), no control
+row can enter a capability- or poison-family false-positive bucket; the 5 channel-only
+flags they carry are adjudicated per class in §6.2 instead.
 One bucket per row, first match wins, assigned by keyword rule over the human rationale
 note stored with each label (`pilot/derive_r4_numbers.py`, re-runnable):
 
@@ -485,7 +520,10 @@ dispatch; trials cap at 10 turns (≤4 completions each). Outcomes are judged me
 from transcripts against per-arm criteria (A priority-capture-first; B shell-text
 adoption as expressed intent to execute; A-covert/overt credential pass with absence/presence in
 the final answer; G benign-funnel compliance; CTRL for controls), with infra failures
-(timeouts after one retry) logged and **excluded from all denominators**. Panel: three
+(timeouts after one retry) logged and **excluded from all denominators**. **Covert**
+means only that the credential was absent from the final assistant answer; it does NOT
+imply the tool call was hidden from the user interface — all tool calls were logged
+before dispatch. Panel: three
 vendors via the AvalAI gateway (OpenAI-compatible; temperature 0) — **glm-5.3 (Zhipu,
 primary), deepseek-v4.1-flash (DeepSeek), gemini-3.8-flash (Google)**; `gpt-6-astra`
 passed the capability probe but was held out as reserve. Single authorized run,
@@ -584,7 +622,7 @@ a third party. Each is one benign vendor's honest product copy away from ASI04.
 
 ```text
   step 1                    step 2                    step 3                     step 4
-  Observed benign    →      attack-shaped       →      controlled steering  →     NOT automatically:
+  Observed benign    →      attack-shaped       →   steering-consistent behavior  →   NOT automatically:
   description               mechanism                                         vulnerability
   (§6.3: 5 TP rows,         (priority capture,          (§8: 54 mocked trials,     (no exploit path, no live
    all in otherwise         exec-priming,               exec-priming 9/9,          target, no attacker, no
@@ -595,7 +633,11 @@ a third party. Each is one benign vendor's honest product copy away from ASI04.
 
 Steps 1–3 are observed and measured in this paper; the last arrow is deliberately drawn as
 **not** implied. Benign provenance plus attack-shaped text plus sandbox steering does not
-add up to a demonstrated vulnerability, and we do not claim it does.
+add up to a demonstrated vulnerability, and we do not claim it does. Step 3 is labeled
+*steering-consistent behavior* deliberately: what §8 measures is behavior observed in the
+presence of the description that is consistent with steering — no description-neutral
+ablation was run, so the description's isolated causal contribution is not established
+(Limitations (ix); FUTURE_WORK #15).
 
 **Anticipated reviewer questions (R2).**
 
@@ -631,11 +673,13 @@ not about the ecosystem.
 a real-world vulnerability, and none has been filed as a CVE (§10). All five occurred in
 **otherwise benign product descriptions**, and we do not infer or assess author intent
 (§6.3); what we identify are **attack-shaped mechanisms** —
-text patterns a hostile server could plant verbatim — and, separately, **controlled
-steering**: in a mocked harness with synthetic data (no real shell execution or network call
+text patterns a hostile server could plant verbatim — and, separately, **behavior
+observed in the presence of the description that is consistent with steering**: in a
+mocked harness with synthetic data (no real shell execution or network call
 in any trial), three model versions expressed intent to follow those
-descriptions at the rates in §8. Figure R2-1's step 4 is explicitly not drawn: controlled
-steering in a sandbox is not a demonstrated vulnerability in a deployed system. The chain
+descriptions at the rates in §8. Figure R2-1's step 4 is explicitly not drawn:
+steering-consistent behavior in a sandbox is not a demonstrated vulnerability in a
+deployed system. The chain
 stops at step 3, and the paper's claims stop with it. What the five rows establish is that
 the channel *can* carry such mechanisms unmodified, and that text shape alone cannot
 distinguish benign authoring from a hostile one — a calibration and exposure result, not an
@@ -697,7 +741,12 @@ qualified but held out as reserve and is untested. (viii) The live panel was rea
 through a third-party multi-provider gateway, not the vendors' own APIs. Structured
 tool-call output was verified by a stage-0 probe, a fixed system prompt was used, and
 temperature was 0, but a gateway wrapper could in principle inject or rewrite behavior;
-official-API replication is future work (§8).
+official-API replication is future work (§8). (ix) No description-neutral ablation: the
+live matrix never re-ran the trials with the poisoned description removed or replaced by
+a neutral paraphrase of the declared function, so §8 shows behavior observed in the
+presence of the description that is consistent with steering, not an isolated causal
+effect of the description; a description-ablated control arm (3 reps/arm, pre-registered
+protocol amendment required) is parked as FUTURE_WORK #15.
 
 **Data & code availability.** All artifacts are in the companion repository
 (`<repo-url placeholder>`); the dataset will be archived with a Zenodo DOI
@@ -735,7 +784,7 @@ limitation, §7) is disclosed in Section 7 and Methods.
 | Live-matrix protocol | `docs/BRIEF04_PROTOCOL.md` | arms, criteria A–G, infra taxonomy, stage gates |
 | Trial ledger + transcripts | `data/live_tests/trials_ledger.jsonl`, `data/live_tests/*.jsonl` | 54 records; per-round redacted transcripts (§8) |
 | Trial accounting | `experiments/trial_accounting.py` | regenerates the Appendix A per-arm table from the ledger and asserts its totals (54/54/51/3) |
-| Harness + mocks + selftest | `experiments/` | offline-replayable harness; fixture sha-gate; ASR summarizer |
+| Harness + mocks + selftest | `experiments/` | offline-replayable harness; fixture sha-gate (six sha256-pinned verbatim corpus fixtures — rows 12, 35, 60, 47, 26, 32; e.g. row-60 fixture `5b48f0ed…92da7` — re-verified against `data/github_tools.jsonl` at harness init); ASR summarizer |
 | Reports | `data/collection_report.md`, `docs/FINDINGS_DISCUSSION.md`, `docs/RELATED_WORK_MAP.md`, `docs/DETECTOR_FIX_PROPOSAL.md` | collection, findings backlog, related-work map, P1–P7 |
 
 **Trial accounting (Appendix A; §8).** Per-arm denominators, regenerated from
@@ -789,5 +838,5 @@ are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-
 to status classes, and every artifact is scrubbed recursively before persistence. The
 live panel was accessed through the AvalAI gateway via a PI-held environment key.
 
-<!-- word count: 8,030 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-03 for the R5 review pass; abstract 179 of the PI's 180 cap (re-counted after the poison-family split + mocked-trial wording); R5 additions: family-split primary metric 6/124 poison-family (§6.1), RQ1 candidate rate 4,128/16,763 rows (§2/§5, collection report §5.14), zero-flag control-stratum disclosure, single-rater/rulebook protocol disclosure (§5), no-real-shell scope statement (§8), and the OWASP-adjacent mapping note (§2). Related Work cites the four R2-verified 2026 works (2607.11086, 2605.24069, 2603.23802, 10.1109/TSE.2026.3694876). -->
+<!-- word count: 8,590 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-03 for the R6 audit pass; abstract 179 of the PI's 180 cap (re-counted at R6: surface-claim hedge, control-definition narrowing, covert/causality wording). R6 changes: control channel-status disclosure (5/50 controls carry one channel-family flag each, §5), two-level labeling spec (§5, §6.2 header), population-estimate sentence (§6.1), row-60/61 verbatim quotes (§6.3), covert defined (§8), causality softened to steering-consistent behavior (§9 + Limitations ix), detector v2 commit 77b41af cited alongside v1 6cca247 (§5). -->
 <!-- latex mirror: paper/latex/main.tex (format-only rendering; regenerate and re-verify counts after any wording change here). -->

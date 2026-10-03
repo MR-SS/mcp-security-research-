@@ -232,6 +232,25 @@ same evidence-gate discipline (stored-text cue must match the tested framing).
 
 ---
 
+**15. Description-ablated control arm for the live matrix — deferred 2026-10-03 (R6 external audit).**
+*Situation:* the R6 audit flagged that the §8 steering evidence is observational: trials ran
+only in the *presence* of the poisoned description, with no description-neutral comparison,
+so the results show behavior consistent with steering, not an isolated causal effect of the
+description (paper §9, Limitations (ix)).
+*Idea:* for each attack fixture (WF/FL/DP), run a description-ablated twin — same tool name,
+schema, fillers, and task, but with the description replaced by a capability-neutral
+paraphrase of the tool's declared function (poison clauses removed) — 3 reps per arm per
+model, judged by the same per-arm criteria. The within-fixture contrast isolates the
+description's causal contribution and quantifies how much §8-style behavior survives
+without it.
+*Deferred:* the frozen 54-trial matrix is closed and committed (`e7acc07`); adding arms
+mid-paper changes the denominators and invalidates the §8 ASR table as published.
+*Unblocked by:* a pre-registered protocol amendment (BRIEF04 §9 stage-gate discipline:
+arm definitions, ablation texts, and success criteria frozen before any live run), plus PI
+authorization for the trial increment.
+
+---
+
 Before pushing these artifacts, tracked files were scanned for credential patterns
 (`ghp_/gho_/github_pat_`, `AKIA…`, `sk-…`, `xox[baprs]-`, PEM headers, JWTs, `AIza…`). Two
 regex hits were investigated and both are **documentation prose, not secrets**:
