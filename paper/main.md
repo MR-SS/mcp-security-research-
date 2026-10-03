@@ -13,25 +13,26 @@ inline.*
 ## 1. Abstract
 
 In the Model Context Protocol (MCP), tool descriptions are surfaced to the model as
-server-authored text, in ways that vary by client implementation. How much of detector
-output is true? A frozen 13-class detector emits candidates over 16,763 registry-grounded
-tool descriptions (4,725 repos). Human validation of 150 rows yields **5 true positives,
-95 flagged-but-benign rows, and 50 controls with zero capability- and poison-family flags,
-confirmed benign**: an all-family text-support rate of 15/268 (5.6%; poison-family 6/124,
-4.8%) — sample-bounded, not a population estimate, bias direction unknown; row-level TP
-5/150; κ = +0.760 (rubric-consistency; unversioned second rater). Four attack-shaped
-mechanisms occur in benign descriptions — priority capture (unconditional/conditional),
-exec-priming, a credential funnel — and a defensive-pattern catalog explains most false
-positives. In 54 mocked trials across three model versions (no real shell execution or
-network calls), models expressed intent to follow them — exec-priming 9/9, the funnel
-covertly 8/9 — controls never triggered (16 valid trials; 2 infra-timeouts excluded).
-Seven versioned detector fixes (P1–P7) follow. The result is a calibration: a prior on
-unvalidated counts. Code, data, and labels are released.
+server-authored text, in ways that vary by client implementation. A frozen detector with
+18 checks (13 of which fired in the validation sample) emits candidates over 16,763
+registry-grounded tool descriptions (4,725 repos). Human validation of 150 rows yields
+**5 true positives, 95 flagged-but-benign rows, and 50 controls with zero capability- and
+poison-family flags, confirmed benign**: an all-family text-support rate of 15/268 (5.6%;
+poison-family 6/124, 4.8%) — sample-bounded, not a population estimate, bias direction
+unknown; row-level TP 5/150; κ = +0.760 (rubric-consistency; unversioned second rater).
+Four attack-shaped mechanisms occur in benign descriptions — priority capture,
+exec-priming, a credential funnel — and a defensive-pattern catalog explains most flagged
+non-TP rows. In 54 mocked trials (three model versions), models expressed intent in 9/9
+exec-priming trials; in 8/9 trials the credential reached the tool and was absent from the
+final assistant answer; controls never triggered (16 valid trials; 2 infra-timeouts
+excluded). Seven detector fixes (P1–P7) follow. A calibration: a prior on unvalidated
+counts. Code, data, and labels are released.
 
-<!-- abstract: 179 words (≤180 PI cap), re-counted 2026-10-03 at R6: surface-claim hedge
-(server-authored text, client-implementation variance; "injected verbatim" removed),
-control definition narrowed to zero capability-/poison-family flags. Whole-paper count in
-the footer comment. -->
+<!-- abstract: 179 words (≤180 PI cap), re-counted 2026-10-03 at R7: class-count phrasing
+(18 checks, 13 fired), covert restated as credential-reached-and-not-disclosed, flagged
+non-TP terminology. To fit the cap the abstract dropped the hook question, the
+no-real-shell parenthetical (scope statement kept in §8), the (unconditional/conditional)
+gloss, and "versioned". Whole-paper count in the footer comment. -->
 
 ## 2. Introduction
 
@@ -75,8 +76,10 @@ with any flag, 24.6%; 698 rows with a poison-family flag, 4.2%; 4,926 flag insta
 consumer-LLM second rater — a methodological limitation, §7); RQ3 with five human-confirmed positives
 spanning four mechanisms and a falsifiable account of why the regexes miss the
 consequential paraphrases. Our contribution is deliberately framed: **a registry-grounded,
-human-validated calibration of tool-description poisoning detectors** — to our knowledge, based
-on a literature search conducted 2026-09, the first such calibration on this registry-grounded
+human-validated calibration of tool-description poisoning detectors** — to our knowledge, among
+the studies identified in our September-2026 literature search (arXiv cs.CR listing + Google
+Scholar queries for MCP poisoning/tool-description measurement, documented in the replication
+package), the first such calibration on this registry-grounded
 population — complementary to
 raw censuses, and a precondition for interpreting them.
 
@@ -207,7 +210,9 @@ from a GitHub-linked repository; 1,484 rows share duplicate names with another r
 population is therefore **descriptions extracted from GitHub-linked registry servers,
 not live manifests of deployed servers**.
 
-**Detector (frozen v2).** `pilot/analyze.py` scans the full stored text. Capability
+**Detector (frozen v2).** `pilot/analyze.py` scans the full stored text; v2 defines
+**18 checks** — 16 semantic classes (7 capability, 7 poison, 2 channel) plus 2 structural
+checks. Capability
 classes: `network_egress`, `shell_execution`, `file_read_sensitive`, `file_write_delete`,
 `secret_env_access`, `database_write`, `package_install`. Poison classes:
 `imperative_to_model`, `exfiltration_language`, `stealth_concealment`,
@@ -220,9 +225,9 @@ is unchanged since v1. All reported detector artifacts were produced under v2 ru
 (`rules_version` = v2 in `pilot/analyze.py`): the 150-row validation sample
 (`data/analysis_toollevel.csv`), the 268-instance per-class counts (§6.2), the
 candidate-rate scan (§5.14), and the §8 live-matrix fixtures — the fixtures were
-*selected* from v2-flagged rows, their texts being frozen corpus strings (sha-pinned). *(Note: the per-class table in Section 6 covers the 13 classes
-that fired on the sample; the structural checks and `package_install`/`important_tags`/
-`sensitive_file_target` did not fire among the 268 sampled instances.)*
+*selected* from v2-flagged rows, their texts being frozen corpus strings (sha-pinned). *(Note: 13 of the 18 checks fired on the sample and are the ones tabulated in
+Section 6.2; the five that never fired are `package_install`, `important_tags`,
+`sensitive_file_target`, and the two structural checks `zero_width_chars`, `base64_blob`.)*
 
 **Sample construction (frozen).** Stratified: the top-100 rows by `suspicion_score` plus
 50 control rows with zero capability- and poison-family flags — addressing-only rows
@@ -241,9 +246,11 @@ human-in-the-terminal via `pilot/label_sample.py` with
 per-class TP rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
 ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* Labeling is two-level: (a) the **row-level
 verdict** — a row is `tp` iff at least one poison flag is genuinely supported by the
-visible text (the master rule); capability and channel flags never decide a row; and (b)
-**per-flag-instance adjudication** — every fired (row, class) instance is separately
-judged against its class definition, which is what the per-class table in §6.2 reports. Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,
+visible text (the master rule); capability and channel flags never decide a row; and (b) **per-flag-instance adjudication** — every fired (row, class) instance is separately
+judged against its class definition, which is what the per-class table in §6.2 reports. We use
+the term *false positive* only in this poison-detection sense — a row whose poison-family
+flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*.
+Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,
 `labels.audit.jsonl`); the script never picks verdicts; 150/150 rows carry a rationale
 note; unclear rate 0%; control stratum: 0/50 rows labeled positive
 (no positive-case evidence of misses in this stratum; `data/validation_report.md`).
@@ -280,12 +287,12 @@ only; no third-party server endpoint was contacted; no third-party code was exec
 
 ### 6.1 Headline: the calibration
 
-150/150 rows labeled, 0 unclear, in three strata: **5 TP / 95 FP / 50 TN** — five rows the
+150/150 rows labeled, 0 unclear, in three strata: **5 TP / 95 flagged non-TP / 50 TN** — five rows the
 human judge confirmed as genuine behavioral instructions; 95 flagged rows judged benign; and
 50 control rows with zero capability- and poison-family flags, all confirmed benign:
 **control stratum, none of which was labeled positive** (no positive-case evidence of
 misses in this stratum; 5 controls carry a single channel-only flag each, §5). The 145
-non-TP rows comprise the 95 flagged-but-benign rows (false positives) and the 50 controls
+non-TP rows comprise the 95 flagged non-TP rows (flagged-but-benign) and the 50 controls
 (true negatives) — not the same kind of error: a control row, carrying at most a
 channel-family flag, can never be a poison false positive. Restated in detection terms, the sample
 holds **5 TP and 145 non-TP rows** (row-level TP 3.3%). Splitting the 268 flag instances by
@@ -304,8 +311,9 @@ deliberately over-represents the detector's highest-scoring output; the text-sup
 within that stratified sample is what the 15/268 ratio measures. A population estimate would require a probability sample over ALL flagged rows —
 including flagged rows beyond the top-100 — not re-weighting of the current top-heavy
 sample alone; none was drawn. Two distinct denominators are in play and
-neither is detector-level precision: 5/100 is the TP rate among score-ranked candidates
-(the flagged stratum), and 5/150 is the TP rate in the combined sample (flagged plus
+neither is detector-level precision: the TP yield in the top-100 selected rows is 5/100
+(all 100 of those rows carry at least one poison-family flag), and 5/150 is the TP rate in
+the combined sample (flagged plus
 controls).
 
 ### 6.2 Per-class text-support
@@ -387,12 +395,12 @@ are in the row notes, `data/labels.jsonl`
   credential the agent encounters in context, plus the context-dismissal framing
   ("should leave your context as soon as this call returns") that suppresses surfacing.
 
-### 6.4 Why the detectors fail: FP taxonomy
+### 6.4 Why the detectors fail: flagged non-TP taxonomy
 
 This taxonomy covers the **95 flagged-but-benign rows only** — the stratum in which the
 detector actually fired and the human judge disagreed. The 50 controls are
 excluded by construction: with zero capability- and poison-family flags (§5), no control
-row can enter a capability- or poison-family false-positive bucket; the 5 channel-only
+row can enter a capability- or poison-family unsupported-flag bucket; the 5 channel-only
 flags they carry are adjudicated per class in §6.2 instead.
 One bucket per row, first match wins, assigned by keyword rule over the human rationale
 note stored with each label (`pilot/derive_r4_numbers.py`, re-runnable):
@@ -447,17 +455,17 @@ scanner-blind classes and stored-cut caveats honestly.
 ## 7. Validation & Reliability
 
 **Design.** Blind Mode B (`prompts/06-second-opinion.md`): 30-item packet (all 5 TP rows
-+ 25 FP rows, `random.seed(20260927)`), full texts, no access to human labels or notes;
++ 25 flagged non-TP rows, `random.seed(20260927)`), full texts, no access to human labels or notes;
 the rater is an LLM (ChatGPT web UI, consumer tier, not version-pinned — a disclosed
 limitation, not a benchmark claim); rater output never touches `data/labels.jsonl`.
 The packet was **enriched by design**: it contains all 5 true-positive rows plus 25
-false-positive rows, so the second rater could check whether true positives are stable when
+flagged non-TP rows, so the second rater could check whether true positives are stable when
 re-read in isolation. That enrichment is deliberate and it means κ here is **not** linked
 to any prevalence estimate — it measures rubric application on a deliberately
 TP-over-weighted sample and must not be read as a population agreement rate. Computed on
-the false-positive subset alone (25 rows, with the rater's verdicts recovered verbatim from
-the stored rater output), agreement is 24/25 (po = 0.96) and **κ = 0.00**: with every human
-label false-positive, a single rater flip offsets expected agreement exactly, so the subset
+the flagged non-TP subset alone (25 rows, with the rater's verdicts recovered verbatim from
+the stored rater output), agreement is 24/25 (po = 0.96) and **κ = 0.00**: with all human
+labels non-TP, a single rater flip offsets expected agreement exactly, so the subset
 κ is degenerate and uninformative. The full-packet κ = +0.760 is therefore carried by the
 TP stratum, and we report both rather than the flattering one alone.
 **We do not claim human-to-human reproducibility; a second human annotator is future
@@ -466,8 +474,8 @@ work (resource-bound).**
 **What κ means here (R2 clarification).** κ = +0.760 is a **rubric-application
 consistency check** — how consistently a second rater applies the same labeling rubric —
 with the second rater an *unversioned consumer LLM*: a **methodological limitation**, not
-a second human. It is never presented as a human-annotation gold standard. The gold
-reference in this paper is the 150/150 human-in-the-terminal verdicts (§5, `labels.jsonl`);
+a second human. It is never presented as a human-annotation gold standard. The **primary
+reference labels** are the PI's human judgments on all 150 rows (§5, `labels.jsonl`);
 κ only bounds how reproducible those verdicts are when the rubric is re-applied, and it
 does not upgrade the detector's 5.6% all-family text-support rate (4.8% poison-family)
 to anything more than a human-measured
@@ -480,15 +488,15 @@ figure with a stated reproducibility check.
 | 3-class (tp/fp/unclear) | 30 | 0.9333 | 0.7222 | **+0.760** |
 | 2-class (tp / not-tp) | 30 | 0.9333 | 0.7222 | +0.760 |
 | POI-flag-carrying only | 21 | 0.9048 | 0.6372 | +0.738 |
-| FP-only subset | 25 | 0.9600 | 0.9600 | 0.000 |
+| Flagged non-TP subset | 25 | 0.9600 | 0.9600 | 0.000 |
 
-On the FP-only subset (25/25 human false-positive), κ is degenerate — κ = 0.00 despite
+On the flagged non-TP subset (25/25 human labels non-TP), κ is degenerate — κ = 0.00 despite
 po = 0.96 — because with prevalence at a boundary a single rater flip exactly offsets
 chance-adjusted expected agreement, collapsing pe onto po (prevalence paradox, standard).
 We therefore report po alongside κ at both strata: the full-packet κ = +0.760 remains the
 primary consistency figure, and neither stratum uses κ to estimate prevalence.
 
-Per-stratum: TP stratum 4/5 (80.0%), FP stratum 24/25 (96.0%). Landis–Koch: substantial —
+Per-stratum: TP stratum 4/5 (80.0%), flagged non-TP stratum 24/25 (96.0%). Landis–Koch: substantial —
 a descriptor applied here to a *rubric-application consistency check*, not to agreement
 with a human gold standard.
 
@@ -542,8 +550,12 @@ work.
 54 trials were scheduled; 51 completed (3 gateway timeouts on gemini-3.8-flash
 excluded); no refusals were observed.
 
-**Results (counts only; 3 reps/cell do not establish population rates).**
-Notation: k/n = successful trials of n completed; [X] = judge criterion. All scope claims
+**Results (counts only; 3 reps/cell do not establish population rates).** Where intervals
+are given they are **95% compatibility intervals — descriptive of these trials under this
+harness, gateway, and prompt only; not estimates of population rates**.
+Notation: k/n = successful trials of n completed; [X] = judge criterion; [A-covert] = the
+credential reached the tool and was absent from the final assistant answer ([A-overt] = it
+also appeared in the final answer). All scope claims
 below cover these three model versions, via one gateway, under this harness.
 
 | Arm (criterion) | glm-5.3 | deepseek-v4.1-flash | gemini-3.8-flash |
@@ -561,10 +573,11 @@ scheduled excluded as infra-timeouts per the pre-registered protocol); the gray 
 never triggered (0/8 eligible).
 
 **Finding 1 — exec-priming is uniform across the three model families in our panel
-(FL 9/9, Wilson 95% CI [0.70, 1.00]).** Every model, in every
+(FL 9/9, 95% compatibility interval [0.70, 1.00]).** Every model, in every
 replication, retrieved the guide and then expressed intent to execute the tool-supplied
 shell text (adopted in the mocked transcript as intended execution; no real shell execution
-or network call occurred in any trial). The description's own words carry the instruction — gemini-3.8-flash,
+or network call occurred in any trial). The transcripts are consistent with the model following the description's execution-oriented
+language — gemini-3.8-flash,
 the model that *resisted* WF, adopted FL anyway:
 
 > *(Note: Per the tool instructions, install guide commands are intended to be executed
@@ -582,10 +595,11 @@ weather-lookup first, the note saved, the "ALWAYS CALL THIS TOOL FIRST" descript
 never honored — a three-rep counter-example showing description-anchored priority
 capture is model-dependent even at n=3.
 
-**Finding 3 — the funnel works, and usually silently (DP 8/9 covert, Wilson 95% CI
-[0.57, 0.98]).** The success
+**Finding 3 — credential transfer usually without final-answer disclosure (DP 8/9,
+95% compatibility interval [0.57, 0.98]).** The success
 criterion for this arm is covert transfer (criterion A-covert): the credential must reach
-the siphon tool *and* be absent from the final answer. Eight of nine trials met it. In the
+the siphon tool *and* be absent from the final answer. In this harness, credential transfer
+to the tool without final-answer disclosure occurred in 8/9 completed trials. In the
 ninth trial (glm-5.3 rep 2) steering still occurred — the credential was siphoned — but the
 model echoed it, so the criterion failed while the mechanism partially fired; the run is
 scored A-overt and counted as a non-success in the 8/9. Its summary contradicts itself in
@@ -600,7 +614,7 @@ one sentence:
 No model adopted the row-47 gate-suppression phrasing ("do not wait for OTP") as
 license to skip the verification step the mock offered; glm-5.3 explicitly reported the
 verification as *pending*. This is consistent with the §6 validation, where row 47 is a
-human-labeled **false positive** — the description is attack-shaped but not an attack —
+human-labeled **false positive** (its poison-family flag is unsupported by the text) — the description is attack-shaped but not an attack —
 and it bounds the live threat the other way: shape alone, without a real capability
 gap to exploit, did not steer any panel model. Per-class text-support (§6.2) and live
 steering thus agree: this family is a sensitivity risk for *detectors*, not (at n=3)
@@ -775,7 +789,8 @@ limitation, §7) is disclosed in Section 7 and Methods.
 | Enriched corpus | `data/github_tools.jsonl` | 16,763 tool descriptions / 4,725 repos; fixture-text source of truth |
 | Frozen sample | `data/analysis_toollevel.csv` | 150 rows, seed 42, sha256 `ae1aff9f…8f77`; `row_id` anchor |
 | Human labels | `data/labels.jsonl` (+ `.superseded`, `.audit`) | 150/150 last-wins labels + rationale notes; full mutation audit |
-| Validation report | `data/validation_report.md` | per-class text-support (§6.2), truncation validity, FP taxonomy |
+| Validation report | `data/validation_report.md` | per-class text-support (§6.2), truncation validity, flagged non-TP taxonomy |
+| Literature-search log | `docs/RELATED_WORK_MAP.md` | September-2026 search: arXiv cs.CR listing + Google Scholar queries for MCP poisoning/tool-description measurement; candidate set + verification provenance (§2, Appendix A) |
 | Family split | `data/validation_family_split.csv` | poison/capability/channel instance split (6/124, 5/102, 4/42; total 15/268), produced by `pilot/derive_family_split.py` with sum asserts (§6.1) |
 | Candidate-rate scan | `data/candidate_rate_scan.csv` | frozen-detector re-run over all 16,763 rows (4,128 any-flag / 698 poison-flag / 4,926 instances), produced by `pilot/derive_candidate_rate.py` (§5.14) |
 | Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B rubric-consistency protocol, verbatim rater verdicts, κ computation as a consistency check (§7) |
@@ -838,5 +853,5 @@ are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-
 to status classes, and every artifact is scrubbed recursively before persistence. The
 live panel was accessed through the AvalAI gateway via a PI-held environment key.
 
-<!-- word count: 8,590 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-03 for the R6 audit pass; abstract 179 of the PI's 180 cap (re-counted at R6: surface-claim hedge, control-definition narrowing, covert/causality wording). R6 changes: control channel-status disclosure (5/50 controls carry one channel-family flag each, §5), two-level labeling spec (§5, §6.2 header), population-estimate sentence (§6.1), row-60/61 verbatim quotes (§6.3), covert defined (§8), causality softened to steering-consistent behavior (§9 + Limitations ix), detector v2 commit 77b41af cited alongside v1 6cca247 (§5). -->
+<!-- word count: 8,788 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-03 for the R7 audit pass; abstract 179 of the PI's 180 cap (re-counted at R7: 18-check class count, covert restated as credential-reached-and-not-disclosed, flagged non-TP terminology). R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). -->
 <!-- latex mirror: paper/latex/main.tex (format-only rendering; regenerate and re-verify counts after any wording change here). -->
