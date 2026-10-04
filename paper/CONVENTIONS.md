@@ -154,3 +154,10 @@
   new phrasing (§2.10 κ wording, §2.11 calibration-only, §2.12–§2.15 from R3 incl.
   sample-bounded). Open at R5: `paper/latex/main.tex`
   mirror NOT yet re-synced (format-only; flagged as a risk in `PLAN.md` §5).
+- **2026-10-04: clean-copy builders retired post-R7; main_clean.md authoritative;
+  number-parity must henceforth be checked manually per CONVENTIONS rule 4.**
+  `pilot/make_publication.py` and `pilot/make_clean_copy.py` moved to `pilot/legacy/`
+  (kept for history; both had been red since R6 — stale `REPLACEMENTS`/`PROSE_REWRITES`
+  tables could no longer rebuild `main_clean.md`, which has been hand-maintained and
+  authoritative since). No code imports them; the historical log entries above (R5 gate
+  record) stay as written.
