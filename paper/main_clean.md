@@ -209,8 +209,9 @@ from source by matching the common registration idioms of the major MCP server f
 (decorator-, method-, and result-type-based), yielding **16,763
 tool-description rows from 4,725 repositories** (the released description
 corpus; the collection report, §A.2). One row is one extracted (server, tool-name) registration
-from a GitHub-linked repository; 1,484 rows share duplicate names with another row
-(§5.10 dedup rule: mechanisms counted once where they collide). The measurement
+from a GitHub-linked repository; 1,484 tool names appear in multiple rows
+(6,740 rows share one of these names; §5.10 dedup rule: mechanisms counted once
+where they collide). The measurement
 population is therefore **descriptions extracted from GitHub-linked registry servers,
 not live manifests of deployed servers**.
 

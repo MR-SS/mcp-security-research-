@@ -205,8 +205,9 @@ depth-qualified to this prefix.
 from source (`@mcp.tool`, `server.tool(`, `ListToolsResult`), yielding **16,763
 tool-description rows from 4,725 repositories** (`data/github_tools.jsonl`;
 `data/collection_report.md` §8). One row is one extracted (server, tool-name) registration
-from a GitHub-linked repository; 1,484 rows share duplicate names with another row
-(§5.10 dedup rule: mechanisms counted once where they collide). The measurement
+from a GitHub-linked repository; 1,484 tool names appear in multiple rows
+(6,740 rows share one of these names; §5.10 dedup rule: mechanisms counted once
+where they collide). The measurement
 population is therefore **descriptions extracted from GitHub-linked registry servers,
 not live manifests of deployed servers**.
 
@@ -854,5 +855,5 @@ are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-
 to status classes, and every artifact is scrubbed recursively before persistence. The
 live panel was accessed through the AvalAI gateway via a PI-held environment key.
 
-<!-- word count: 8,793 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-04 for the WF-CI pass; abstract 179 of the PI's 180 cap (unchanged this pass). WF-CI changes: pilot/derive_r4_numbers.py WF entry corrected 8/9 → 6/9 (ledger-verified: glm 3/3, deepseek 3/3, gemini 0/3) with pooled (23/27), trial_accounting, and per-arm ledger asserts; Finding 2 gained its 95% compatibility interval [0.35, 0.88] for symmetry with Findings 1/3. Earlier: R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). -->
+<!-- word count: 8,799 words (markdown source with HTML comments stripped, whitespace split) — updated 2026-10-04 for the FACTS-driven micro-fixes (dup-names noun corrected in the §5 census sentence: 1,484 distinct tool names / 6,740 rows, per FACTS_VERIFIED §10.3; truncation unit re-verified as stored descriptions, not flag instances, per §10.1); previously re-verified 2026-10-04 for the WF-CI pass; abstract 179 of the PI's 180 cap (unchanged this pass). WF-CI changes: pilot/derive_r4_numbers.py WF entry corrected 8/9 → 6/9 (ledger-verified: glm 3/3, deepseek 3/3, gemini 0/3) with pooled (23/27), trial_accounting, and per-arm ledger asserts; Finding 2 gained its 95% compatibility interval [0.35, 0.88] for symmetry with Findings 1/3. Earlier: R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). -->
 <!-- latex mirror: paper/latex/main.tex (format-only rendering; regenerate and re-verify counts after any wording change here). -->
