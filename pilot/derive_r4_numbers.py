@@ -7,6 +7,7 @@ Covers:
     subset (FIX 7)
   * Per-arm trial accounting and the DP overt/covert split (FIX 1)
 """
+import importlib.util
 import json
 import math
 import os
@@ -77,13 +78,44 @@ def main():
     print("=" * 70)
     print("FIX 5 - Wilson 95% CI for live-trial success counts")
     print("=" * 70)
-    for name, k, n in [("FL exec-priming", 9, 9),
-                       ("DP credential funnel (A-covert)", 8, 9),
-                       ("WF priority capture, pooled", 8, 9),
-                       ("Controls (CTRL pooled)", 0, 16),
-                       ("NV gate-suppression (gray)", 0, 8)]:
+    # (name, ledger case, successes, trials); None case = not an attack arm.
+    # WF is ledger-verified 6/9 (glm-5.3 3/3, deepseek-v4.1-flash 3/3,
+    # gemini-3.8-flash 0/3) from data/live_tests/trials_ledger.jsonl.
+    ci_rows = [("FL exec-priming", "fl", 9, 9),
+               ("DP credential funnel (A-covert)", "dp", 8, 9),
+               ("WF priority capture, pooled", "wf", 6, 9),
+               ("Controls (CTRL pooled)", None, 0, 16),
+               ("NV gate-suppression (gray)", None, 0, 8)]
+    for name, _case, k, n in ci_rows:
         lo, hi = wilson(k, n)
         print(f"  {name:<34} {k}/{n}  CI [{lo:.2f}, {hi:.2f}]")
+
+    # Consistency assert 1: FL + DP + WF successes must sum to the pooled
+    # attack ASR quoted in the paper (23/27 = 9 + 8 + 6 over 9 + 9 + 9).
+    ci_by_case = {case: (k, n) for _name, case, k, n in ci_rows if case}
+    pooled_k = sum(k for k, _n in ci_by_case.values())
+    pooled_n = sum(n for _k, n in ci_by_case.values())
+    assert (pooled_k, pooled_n) == (23, 27), (
+        f"pooled attack ASR drift: FL+DP+WF = {pooled_k}/{pooled_n}, "
+        f"paper quotes 23/27")
+    print(f"  pooled attack (FL+DP+WF)     {pooled_k}/{pooled_n}  "
+          f"matches the paper's 23/27  OK")
+
+    # Consistency assert 2: the CI denominators must equal the per-arm valid
+    # counts that experiments/trial_accounting.py derives from the same ledger
+    # (whose 54/54/51/3 totals it also asserts).
+    spec = importlib.util.spec_from_file_location(
+        "trial_accounting", os.path.join(REPO, "experiments",
+                                         "trial_accounting.py"))
+    ta = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ta)
+    per = ta.account(ta.load_ledger())
+    assert ta.check(per), "trial_accounting --check failed"
+    for case, (_k, n) in ci_by_case.items():
+        assert per[case]["valid"] == n, (
+            f"{case}: trial_accounting valid={per[case]['valid']} != CI n={n}")
+    print("  trial_accounting cross-check: per-arm valid counts + "
+          "54/54/51/3 totals  OK")
 
     print()
     print("=" * 70)
@@ -137,6 +169,17 @@ def main():
     succ = [r for r in attack if r["verdict"] == "success"]
     print(f"  pooled attack ASR (WF+FL+DP, success = A/B/A-covert): "
           f"{len(succ)}/{len(attack)}")
+    # Assert 3: the ledger must reproduce the CI table's pooled attack ASR,
+    # and each attack arm's own (successes, trials) pair.
+    assert (len(succ), len(attack)) == (pooled_k, pooled_n), (
+        f"ledger pooled attack {len(succ)}/{len(attack)} != "
+        f"CI table {pooled_k}/{pooled_n}")
+    for case, (k, n) in ci_by_case.items():
+        arm = [r for r in rows if r["case"] == case]
+        got = (sum(1 for r in arm if r["verdict"] == "success"), len(arm))
+        assert got == (k, n), f"ledger {case} {got} != CI table {(k, n)}"
+    print("  ledger cross-check: per-arm (successes, trials) match the CI "
+          "table  OK")
     for mdl in ("glm-5.3", "deepseek-v4.1-flash", "gemini-3.8-flash"):
         t = [r for r in attack if r["model"] == mdl]
         s = [r for r in t if r["verdict"] == "success"]

@@ -583,7 +583,8 @@ the model that *resisted* WF, adopted FL anyway:
 > *(Note: Per the tool instructions, install guide commands are intended to be executed
 > in …* — gemini-3.8-flash, FL rep 1 (transcript `fl_gemini-3.8-flash_1_*.jsonl`)
 
-**Finding 2 — priority capture is not model-universal (WF 6/9).** glm-5.3 and
+**Finding 2 — priority capture is not model-universal (WF 6/9, 95% compatibility
+interval [0.35, 0.88]).** glm-5.3 and
 deepseek-v4.1-flash expressed intent to execute the poisoned tool first in all replications, against a task
 that never mentioned it:
 
@@ -853,5 +854,5 @@ are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-
 to status classes, and every artifact is scrubbed recursively before persistence. The
 live panel was accessed through the AvalAI gateway via a PI-held environment key.
 
-<!-- word count: 8,788 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-03 for the R7 audit pass; abstract 179 of the PI's 180 cap (re-counted at R7: 18-check class count, covert restated as credential-reached-and-not-disclosed, flagged non-TP terminology). R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). -->
+<!-- word count: 8,793 words (markdown source with HTML comments stripped, whitespace split) — re-verified 2026-10-04 for the WF-CI pass; abstract 179 of the PI's 180 cap (unchanged this pass). WF-CI changes: pilot/derive_r4_numbers.py WF entry corrected 8/9 → 6/9 (ledger-verified: glm 3/3, deepseek 3/3, gemini 0/3) with pooled (23/27), trial_accounting, and per-arm ledger asserts; Finding 2 gained its 95% compatibility interval [0.35, 0.88] for symmetry with Findings 1/3. Earlier: R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). -->
 <!-- latex mirror: paper/latex/main.tex (format-only rendering; regenerate and re-verify counts after any wording change here). -->

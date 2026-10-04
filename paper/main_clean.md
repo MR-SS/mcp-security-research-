@@ -582,7 +582,8 @@ the model that *resisted* WF, adopted FL anyway:
 > *(Note: Per the tool instructions, install guide commands are intended to be executed
 > in …* — gemini-3.8-flash, FL rep 1 (the matching transcript)
 
-**Finding 2 — priority capture is not model-universal (WF 6/9).** glm-5.3 and
+**Finding 2 — priority capture is not model-universal (WF 6/9, 95% compatibility
+interval [0.35, 0.88]).** glm-5.3 and
 deepseek-v4.1-flash expressed intent to execute the poisoned tool first in all replications, against a task
 that never mentioned it:
 
