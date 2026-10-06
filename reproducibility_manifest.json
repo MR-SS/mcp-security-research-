@@ -1,0 +1,205 @@
+{
+  "schema": "mcp-measurement/reproducibility-manifest/1",
+  "generated_utc": "2026-10-06T06:27:41Z",
+  "baseline_commit": "769b7d968eb207d5b4e0fac46202e15945ebde75",
+  "note": "This manifest does not hash itself. 'unknown' means not established, not empty.",
+  "frozen_inputs": [
+    {
+      "path": "data/analysis_toollevel.csv",
+      "sha256": "ae1aff9fdccda9c88d77fbc605eb99d5327326e3e7931040ca1ade5b20e18f77",
+      "role": "150-row validation sample frame (authoritative sample identity)",
+      "status": "frozen",
+      "bytes": 57322
+    },
+    {
+      "path": "data/labels.jsonl",
+      "sha256": "be587210928db2424fb4a3ef2f789e23451bf857a56c9652f6a787ac453fafd1",
+      "role": "primary PI labels; append-only audit trail (244 records, 150 distinct row_ids)",
+      "status": "frozen",
+      "bytes": 120146
+    },
+    {
+      "path": "data/github_tools.jsonl",
+      "sha256": "327c0bbdbac8c74001202d5eba6169ad0ba126c7801b47a295432d20217085e1",
+      "role": "extracted tool-description corpus (16,763 rows)",
+      "status": "frozen",
+      "bytes": 7752196
+    },
+    {
+      "path": "data/validation_report.md",
+      "sha256": "51682bf1a67e34aab6f6e34c71384142e756b1b7980c74627ab49825b79f352b",
+      "role": "per-class support, truncation-validity check, taxonomy rationale",
+      "status": "frozen",
+      "bytes": 21863
+    },
+    {
+      "path": "data/collection_report.md",
+      "sha256": "dd0a0384d3f123cbbf9ac26e01d8416b9fc53377fd5ee6c793bcae8c90c38900",
+      "role": "crawl + enrichment + anomaly censuses",
+      "status": "frozen",
+      "bytes": 55427
+    },
+    {
+      "path": "data/validation_family_split.csv",
+      "sha256": "499abde620415fb3b5d0bf4f748e696da6fb0486c733776757006f1230646569",
+      "role": "family split (duplicate entry: same file listed once above)",
+      "status": "frozen",
+      "bytes": 707
+    },
+    {
+      "path": "data/candidate_rate_scan.csv",
+      "sha256": "6cf5283e180ca14f809e2c08e3a01678474bdb1fa84395484aa65d2ee29f7c8e",
+      "role": "corpus-wide per-class flag scan",
+      "status": "frozen",
+      "bytes": 747
+    },
+    {
+      "path": "data/unicode_scan.csv",
+      "sha256": "4f9eccbb202e1e16efdfde2b8b31152b3edbd114d9954aee90bc4e46813da110",
+      "role": "NFKC + Cc/Cf byte-diff scan",
+      "status": "frozen",
+      "bytes": 2048595
+    },
+    {
+      "path": "data/kappa_report.md",
+      "sha256": "81f5fbfb6bcb5fc86eda3c0995e4fc7439f755403acdc890ca37537403afe7c4",
+      "role": "second-rater agreement report",
+      "status": "frozen",
+      "bytes": 2057
+    },
+    {
+      "path": "data/kappa_sample_map.json",
+      "sha256": "41fa24a5bd99d4af152af2767e607128d91c74ef53216f04010c08d89952c7d9",
+      "role": "Q-id to row_id map for the 30-item packet",
+      "status": "frozen",
+      "bytes": 1054
+    },
+    {
+      "path": "data/live_tests/trials_ledger.jsonl",
+      "sha256": "efad854a2c2f25f7e26e399e8d50d2a30cf2fa80cc285e1ca06cfdbf5e971a85",
+      "role": "live mocked-harness trial ledger (54 records)",
+      "status": "frozen",
+      "bytes": 11642
+    }
+  ],
+  "derived_artifacts": [
+    {
+      "path": "paper/main.md",
+      "sha256": "f3f4982b3ad8b33cef1d0dc0e725c5c133c3b94e69452446decceaf2eb3c4332",
+      "role": "traceable manuscript record (edited this revision)",
+      "status": "derived"
+    },
+    {
+      "path": "paper/main_clean.md",
+      "sha256": "cf83cb8fec6dca8d73a17e6ec601562d3091df761b59fcbe36d0c8660bb740a6",
+      "role": "authoritative publication copy (edited this revision)",
+      "status": "derived"
+    },
+    {
+      "path": "claims_ledger.jsonl",
+      "sha256": "0cc5b196dac88e532d3a4d2f6eca3da98d989ca6ed8a8d6cf546168c41af0ad2",
+      "role": "machine-readable claim ledger (this revision)",
+      "status": "derived"
+    },
+    {
+      "path": "scripts/verify_claims.py",
+      "sha256": "74dc133509706056d10c04945311ed285eda74fa3ae9794d308eb66274ee41a4",
+      "role": "offline verification entry point (this revision)",
+      "status": "derived"
+    },
+    {
+      "path": "pilot/derive_r4_numbers.py",
+      "sha256": "cb4388990c7523f2dbae736483c108a2e8caa66cab052fe3ae83d931c62607f9",
+      "role": "assert-guarded derivation of headline numbers",
+      "status": "derived"
+    },
+    {
+      "path": "experiments/trial_accounting.py",
+      "sha256": "8a5972ead782358a883aaf39876480915b632b2711e071ab3b44a0c3dfdb1464",
+      "role": "trial accounting gate",
+      "status": "derived"
+    },
+    {
+      "path": "paper/preview/build_preview.py",
+      "sha256": "d30c35ef0ed6d0434b41a7a75a8a45a5b016f207abf314e065aea418341a7562",
+      "role": "HTML builder for the reviewer package",
+      "status": "derived"
+    },
+    {
+      "path": "paper/preview/make_figures.py",
+      "sha256": "f710e893e1f63b3b5bcf12c7151dbbb870f579022df255423b6a15fd92906e22",
+      "role": "figure generator; fails loud on value mismatch",
+      "status": "derived"
+    },
+    {
+      "path": "paper/preview/paper-reviewer-copy.pdf",
+      "sha256": "86a4950964ec845fbae22d1dc49e1555216805e36d15bb3ef8e3f07db6a9db39",
+      "role": "built reviewer PDF",
+      "status": "derived"
+    },
+    {
+      "path": "REVISION_AUDIT.md",
+      "sha256": "70fc775650010e81cef5ab70753940c9f96a0c1b8859e4b5e9c07ddfa5ed8e76",
+      "role": "revision audit",
+      "status": "derived"
+    },
+    {
+      "path": "AUTHOR_ACTION_REQUIRED.md",
+      "sha256": "876a9fb79a7e839028a5e9823cd5fb67dac870d077dee16fc8f5a26c13728e98",
+      "role": "human-dependency list",
+      "status": "derived"
+    },
+    {
+      "path": "REVISION_REPORT.md",
+      "sha256": null,
+      "role": "revision report",
+      "status": "derived"
+    }
+  ],
+  "sample_identity": {
+    "frame": "data/analysis_toollevel.csv",
+    "sha256": "ae1aff9fdccda9c88d77fbc605eb99d5327326e3e7931040ca1ade5b20e18f77",
+    "sample_rows": 150,
+    "join_key": "labels.jsonl.row_id == positional index into the frame (0..149)",
+    "join_integrity": "244/244 label records satisfy frame[row_id].name == labels.name",
+    "name_join_unsafe": true,
+    "distinct_names_in_frame": 142,
+    "selection_rule": "top 100 rows by suspicion_score (= capability flags + 3 x poison flags, v1 definition) plus 50 zero-capability/zero-poison controls",
+    "tie_break": "stable sort on equal score; original corpus row order",
+    "seed": {
+      "controls": 42,
+      "kappa_packet": 20260927,
+      "second_rater_pack": 2026
+    }
+  },
+  "preregistration": {
+    "status": "unknown",
+    "note": "No preregistration record located in this workspace; the protocol documents are retrospective-to-this-revision. Do not assert preregistration."
+  },
+  "software": {
+    "python": "Python 3.11.11",
+    "pandoc": "pandoc 3.7.0.2",
+    "matplotlib": "matplotlib 3.11.2",
+    "chromium": "Chromium 153.0.8010.47 snap",
+    "git": "git version 2.53.0"
+  },
+  "commands": {
+    "gates": [
+      "python3 pilot/derive_r4_numbers.py",
+      "python3 experiments/trial_accounting.py --check"
+    ],
+    "verification": "python3 scripts/verify_claims.py",
+    "figures": "python3 paper/preview/make_figures.py",
+    "preview_html": "python3 paper/preview/build_preview.py",
+    "preview_pdf": "chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=20000 --print-to-pdf=<out>.pdf 'http://127.0.0.1:8231/paper.html'"
+  },
+  "unknowns": [
+    "gateway deployment boundary and model/backend identity behind the proxy",
+    "whether absent Cc/Cf codepoints upstream (only stored-representation absence was scanned)",
+    "public release location and Zenodo DOI (placeholders remain in the manuscript)",
+    "disclosure status (no filing record located)",
+    "independent human annotation (not performed)",
+    "full-text re-review outcome for sample rows 58, 70, 72 (pending PI pass)",
+    "exact upstream extraction truncation rate after recovery (1,082/16,763 pre-recovery)"
+  ]
+}

@@ -588,9 +588,12 @@ on any control row, but 5 of the 50 controls (row ids 111, 112, 119,
 model-addressed — 5 of the 268 sampled flag instances (5 of the 42
 channel-family instances), all unsupported (§6.2). The flagged stratum
 thus holds 5 TP / 95 flagged-benign rows; the 50 controls, all confirmed
-benign, are true negatives, not false positives. Detector recall is
-unmeasured by design; the zero-flag controls are structurally
-uninformative about it.</p>
+benign by the same single-PI read, are the detector’s negative calls,
+not false positives. Recall is not assessed by this design: the controls
+were selected <em>for</em> zero flags, no content standard beyond the
+PI’s read was applied, and detector-negative rows outside the sample
+were never examined — so the study yields no false-negative rate and no
+recall estimate.</p>
 <p><strong>Human labeling protocol.</strong> Primary labels were
 assigned by the principal investigator (the author) — a single-rater
 design — working interactively in the terminal with per-class
@@ -631,12 +634,16 @@ flips</strong> (the collection report, §A.3) — detector counts here are
 subject to an unknown-direction bias from truncation; the recovered
 subset is an observed sensitivity check (7/7 re-extractions, 0 verdict
 flips) and cannot quantify the bias. (iii) <em>Dataset anomaly
-censuses</em>: <strong>1,484/16,763</strong> duplicate server/tool name
-pairs (collection report, §A.4; mechanisms counted once by hand where
-they collide); <strong>0 control/format Unicode codepoints</strong>
-corpus (negative; NFKC+Cc/Cf byte-diff, §A.5); <strong>2/16,763</strong>
-rows match a confirmation-bypass trigger family, both benign-shaped
-(collection report, §A.6).</p>
+censuses</em>: <strong>1,484 of the 16,763 rows carry a tool name shared
+with at least one other row</strong> (6,740 rows share one of these
+1,484 names; collection report, §A.4; mechanisms counted once by hand
+where they collide); <strong>0 control/format Unicode codepoints in the
+stored text</strong> (negative; NFKC + Cc/Cf byte-diff over stored
+descriptions, §A.5) — a scanner- and representation-scoped null: the
+extractor already collapses newlines, so the one trivially-expected Cc
+class is absent by extraction, not by absence upstream;
+<strong>2/16,763</strong> rows match a confirmation-bypass trigger
+family, both benign-shaped (collection report, §A.6).</p>
 <p><strong>Reliability (rubric-application consistency check — not a
 human-annotation gold standard).</strong> A blind second rater (ChatGPT
 web UI, an <em>unversioned consumer LLM</em>, not version-pinned; a
@@ -687,10 +694,13 @@ rows by suspicion score plus 50 controls with zero capability- and
 poison-family flags (§5) — two selection groups (top-score review +
 zero-flag controls), deliberately over-represents the detector’s
 highest-scoring output; the text-support rate within that purposive
-top-score review is what the 15/268 ratio measures. A population
-estimate would require a probability sample over ALL flagged rows —
-including flagged rows beyond the top-100 — not re-weighting of the
-current top-heavy sample alone; none was drawn. Two distinct
+top-score review is what the 15/268 ratio measures — 263 of those 268
+instances fall in the top-score stratum, the other 5 being
+channel-family instances that fire on the zero-flag controls (all
+unsupported), so the stratum-specific rate is 15/263 = 5.70%. A
+population estimate would require a probability sample over ALL flagged
+rows — including flagged rows beyond the top-100 — not re-weighting of
+the current top-heavy sample alone; none was drawn. Two distinct
 denominators are in play and neither is detector-level precision: the TP
 yield in the top-100 selected rows is 5/100 (all 100 of those rows carry
 at least one poison-family flag), and 5/150 is the TP rate in the
@@ -920,13 +930,14 @@ class</td>
 <td>sending via the user’s own SMTP is the shipped function</td>
 </tr>
 <tr>
-<td>Truncation artifact (trigger withdrew on full text)</td>
+<td>Truncation artifact (adjudicated from the 300-char excerpt)</td>
 <td>3</td>
-<td>rows 58, 70, 72 — flagged on the truncated 300-char view; full-text
-re-review confirmed benign</td>
+<td>rows 58, 70, 72 — the detector read the full stored text; these rows
+were adjudicated from the 300-char excerpt and their full-text re-review
+is still pending: unresolved, not confirmed benign</td>
 </tr>
 <tr>
-<td>Capability only (no model-addressed instruction)</td>
+<td>Capability-only reading (poison flags fired but unsupported)</td>
 <td>3</td>
 <td>telemetry channel that is real but never addresses the model</td>
 </tr>
@@ -1026,12 +1037,13 @@ the stored rater output), agreement is 24/25 (po = 0.96) and <strong>κ =
 expected agreement exactly, so the subset κ is degenerate and
 uninformative. The full-packet κ = +0.760 is therefore carried by the TP
 stratum, and we report both rather than the flattering one alone.
-<strong>We do not claim human-to-human reproducibility.</strong>
-Detector recall is unmeasured by design; the zero-flag controls are
-structurally uninformative about it. A second blinded human annotation
-of a random 40-row subset is specified in the replication package
-(protocol, rulebook, and scoring script included) and remains future
-work.</p>
+<strong>We do not claim human-to-human reproducibility.</strong> Recall
+is not assessed by this design — the controls are detector-negative by
+construction and no independent content standard covers the
+detector-negative corpus — so no false-negative rate is reported. A
+second blinded human annotation of a random 40-row subset is specified
+in the replication package (protocol, rulebook, and scoring script
+included) and remains future work.</p>
 <p><strong>What κ means here.</strong> κ = +0.760 is a
 <strong>rubric-application consistency check</strong> — how consistently
 a second rater applies the same labeling rubric — with the second rater
@@ -1046,6 +1058,13 @@ a human-measured figure with a stated reproducibility check.</p>
 <p><strong>Result of the consistency check</strong> (the
 consistency-check report, §F):</p>
 <table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
 <thead>
 <tr>
 <th>Variant</th>
@@ -1078,7 +1097,7 @@ consistency-check report, §F):</p>
 <td>+0.738</td>
 </tr>
 <tr>
-<td>Flagged non-TP subset</td>
+<td>Packet non-positive subset (9 of 25 are zero-flag controls)</td>
 <td>25</td>
 <td>0.9600</td>
 <td>0.9600</td>
@@ -1091,7 +1110,11 @@ consistency-check report, §F):</p>
 21)</strong> = the 5 TP rows + the 16 flagged non-TP items — the
 packet’s 9 zero-flag control items carry no poison-family flags and are
 excluded from this variant (sampling frame: 5 + 25 = 30 items, of which
-21 carry at least one poison-family flag).</em></p>
+21 carry at least one poison-family flag). The 25 non-positive items
+include 9 zero-flag control rows, so the n = 25 row is a
+packet-composition statistic, not a flagged-stratum rate; the legacy
+packet code fp means “not a positive” and is applied to the control rows
+too.</em></p>
 <p>The packet’s 2×2 (human × rater; both disagreements annotated):</p>
 <table>
 <thead>

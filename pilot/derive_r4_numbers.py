@@ -303,7 +303,7 @@ FP_BUCKETS = [
     ("Regex accident (class words as parameter/API names)", (
         "regex-accident", "regex accident", "regex noise", "api parameter",
         "supported api parameter", "as parameter names", "keyword noise")),
-    ("Capability only (no model-addressed instruction)", (
+    ("Capability-only reading (poison flags fired but unsupported)", (
         "capability is real by design", "capability only", "as capability only",
         "structurally identical to exfil channel but benign",
         "no model-directed", "telemetry tool")),
@@ -321,8 +321,12 @@ FP_BUCKETS = [
         "returned url", "is returned url")),
     ("Template / duplicate-name inflation", (
         "template", "duplicate", "same-server", "sibling")),
-    ("Truncation artifact (trigger withdrew on full text)", (
-        "truncat", "excerpt==full", "withdrew")),
+    # Membership is keyword-matched only ("truncat"). The former "withdrew" keyword
+    # encoded a causal claim — that the trigger went away on full text — which the
+    # artifacts do not support: rows 58/70/72 retain excerpt-based notes and their
+    # full-text pass is still pending. Dropping the keyword changes no membership.
+    ("Truncation artifact (adjudicated from the 300-char excerpt)", (
+        "truncat", "excerpt==full")),
     ("Marketing / feature prose", (
         "marketing", "feature prose", "only marketing copy",
         "permission descriptions", "benign sequencing", "intra-server sequencing")),
