@@ -210,6 +210,24 @@ else:
     nv = [r["claim_id"] for r in led if r.get("status") == "VERIFIED" and not r.get("source_paths")]
     check("no VERIFIED claim lacks artifact backing", nv, [])
 
+# ------------------------------------------------- C11 manifest freshness
+print("C11 reproducibility_manifest.json freshness")
+mp = p("reproducibility_manifest.json")
+if not os.path.exists(mp):
+    check("reproducibility_manifest.json exists", False, True)
+else:
+    man = json.load(open(mp, encoding="utf-8"))
+    check("manifest lists frozen inputs", len(man["frozen_inputs"]) > 0, True)
+    check("manifest lists derived artifacts", len(man["derived_artifacts"]) > 0, True)
+    nulls = [e["path"] for e in man["frozen_inputs"] + man["derived_artifacts"]
+             if e.get("sha256") is None]
+    check("no entry with a null hash (a stale/missing hash is a defect)", nulls, [])
+    bad = [(e["path"], e["sha256"][:12], sha256(p(*e["path"].split("/")))[:12])
+           for e in man["frozen_inputs"] + man["derived_artifacts"]
+           if e.get("sha256") and os.path.exists(p(*e["path"].split("/")))
+           and e["sha256"] != sha256(p(*e["path"].split("/")))]
+    check("every manifest hash matches the file on disk", bad, [])
+
 # ------------------------------------------------------------------- verdict
 print()
 if FAILS:

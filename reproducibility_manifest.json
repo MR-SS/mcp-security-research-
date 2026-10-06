@@ -96,27 +96,15 @@
       "status": "derived"
     },
     {
-      "path": "claims_ledger.jsonl",
-      "sha256": "0cc5b196dac88e532d3a4d2f6eca3da98d989ca6ed8a8d6cf546168c41af0ad2",
-      "role": "machine-readable claim ledger (this revision)",
+      "path": "paper/preview/paper.html",
+      "sha256": "0e38af0ac42388b950e2bcbe452222433000fe1cf6ca006c2e5eb4e1d5e0a678",
+      "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived"
     },
     {
-      "path": "scripts/verify_claims.py",
-      "sha256": "74dc133509706056d10c04945311ed285eda74fa3ae9794d308eb66274ee41a4",
-      "role": "offline verification entry point (this revision)",
-      "status": "derived"
-    },
-    {
-      "path": "pilot/derive_r4_numbers.py",
-      "sha256": "cb4388990c7523f2dbae736483c108a2e8caa66cab052fe3ae83d931c62607f9",
-      "role": "assert-guarded derivation of headline numbers",
-      "status": "derived"
-    },
-    {
-      "path": "experiments/trial_accounting.py",
-      "sha256": "8a5972ead782358a883aaf39876480915b632b2711e071ab3b44a0c3dfdb1464",
-      "role": "trial accounting gate",
+      "path": "paper/preview/paper-reviewer-copy.pdf",
+      "sha256": "de5347f1fec2a79e0082ae51423cc04baa37f8fb3d55d6a1ec00c3d341464e03",
+      "role": "built reviewer PDF",
       "status": "derived"
     },
     {
@@ -132,26 +120,62 @@
       "status": "derived"
     },
     {
-      "path": "paper/preview/paper-reviewer-copy.pdf",
-      "sha256": "86a4950964ec845fbae22d1dc49e1555216805e36d15bb3ef8e3f07db6a9db39",
-      "role": "built reviewer PDF",
+      "path": "paper/preview/figs/fig-1-funnel.png",
+      "sha256": "beedda4b5feed68a9f16051a5561b82c6f9c692e4709b51ebad6ff134b2d2509",
+      "role": "funnel figure (denominator funnel)",
+      "status": "derived"
+    },
+    {
+      "path": "paper/preview/figs/fig-2-perclass.png",
+      "sha256": "6c0f6c4f65dc1cdb4675c30fe132324b48124264f96bc620120bf540b90e6f21",
+      "role": "per-class text-support figure",
+      "status": "derived"
+    },
+    {
+      "path": "paper/preview/figs/fig-3-trials.png",
+      "sha256": "552ae8672f32592b4fe8a3e687902c7e8b846e996c4c9fbf738f38fa9889f910",
+      "role": "mocked-harness grid figure",
+      "status": "derived"
+    },
+    {
+      "path": "claims_ledger.jsonl",
+      "sha256": "0cc5b196dac88e532d3a4d2f6eca3da98d989ca6ed8a8d6cf546168c41af0ad2",
+      "role": "machine-readable claim ledger (22 claims)",
+      "status": "derived"
+    },
+    {
+      "path": "pilot/derive_r4_numbers.py",
+      "sha256": "cb4388990c7523f2dbae736483c108a2e8caa66cab052fe3ae83d931c62607f9",
+      "role": "assert-guarded derivation of headline numbers",
+      "status": "derived"
+    },
+    {
+      "path": "experiments/trial_accounting.py",
+      "sha256": "8a5972ead782358a883aaf39876480915b632b2711e071ab3b44a0c3dfdb1464",
+      "role": "trial accounting gate",
+      "status": "derived"
+    },
+    {
+      "path": "scripts/verify_claims.py",
+      "sha256": "601d21ca7f0ca3efa44c6a6e5f5706e63a3d3dd9bafc5b3aa0f3a3cc3118393e",
+      "role": "offline verification entry point",
       "status": "derived"
     },
     {
       "path": "REVISION_AUDIT.md",
-      "sha256": "70fc775650010e81cef5ab70753940c9f96a0c1b8859e4b5e9c07ddfa5ed8e76",
-      "role": "revision audit",
+      "sha256": "e015fb92352767d826bfb6b24bd8887414246047dcccb3c270b0f520aab2d7b5",
+      "role": "revision audit (Phase 1 + applied record)",
       "status": "derived"
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "876a9fb79a7e839028a5e9823cd5fb67dac870d077dee16fc8f5a26c13728e98",
+      "sha256": "45151b378ad2d899b707729555ed3f9b14bfadcf0b73720584629d2de56ab262",
       "role": "human-dependency list",
       "status": "derived"
     },
     {
       "path": "REVISION_REPORT.md",
-      "sha256": null,
+      "sha256": "8ee81edaa1813dbdfb5d2939903d014ed08517b9c131cde88b01f0fa6d024c29",
       "role": "revision report",
       "status": "derived"
     }
@@ -201,5 +225,9 @@
     "independent human annotation (not performed)",
     "full-text re-review outcome for sample rows 58, 70, 72 (pending PI pass)",
     "exact upstream extraction truncation rate after recovery (1,082/16,763 pre-recovery)"
-  ]
+  ],
+  "self_check": {
+    "note": "No entry may have a null hash; scripts/verify_claims.py C11 asserts every entry matches the file on disk.",
+    "null_hashes": []
+  }
 }
