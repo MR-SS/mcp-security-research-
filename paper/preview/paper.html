@@ -187,8 +187,8 @@ mechanisms occur in benign descriptions — priority capture
 a defensive-pattern catalog explains most flagged non-TP rows. Across
 three model versions, 54 trials completed with transcripts; 51 valid (3
 excluded by pre-registered operational criteria: gateway timeouts on
-gemini-3.8-flash, arms NV, NE, PT). Models expressed intent in 9/9
-exec-priming trials; in 8/9 the credential reached the tool without
+gemini-3.8-flash, arms NV, NE, PT). Exec-priming text surfaced in 9/9
+trials, unadopted; in 8/9 the credential reached the tool without
 final-answer disclosure; controls never triggered (16 valid trials).
 Seven detector fixes (P1–P7) follow. A calibration: a prior on
 unvalidated counts. Code, data, and labels are released.</p>
@@ -1194,23 +1194,26 @@ merely restate the tool’s identity or the credential marker
 (<strong>identity-echo rows</strong>) are recorded as echoes and never
 counted as evidence on their own; trials cap at 10 turns (≤4 completions
 each). Outcomes are judged mechanically from transcripts against per-arm
-criteria (A priority-capture-first; B shell-text adoption as expressed
-intent to execute; A-covert/overt credential pass with absence/presence
-in the final answer; G benign-funnel compliance; CTRL for controls),
-with infra failures (timeouts after one retry) logged and
-<strong>excluded from all denominators</strong>. <strong>Covert</strong>
-denotes <em>credential transfer with credential-value omission from the
-final answer</em>: it means only that the credential was absent from the
-final assistant answer; it does NOT imply the tool call was hidden from
-the user interface — all tool calls were logged before dispatch. The
-ledger codes (A-covert / A-overt) are unchanged. Panel: three vendors
-via the AvalAI gateway (OpenAI-compatible; temperature 0) —
-<strong>glm-5.3 (Zhipu, primary), deepseek-v4.1-flash (DeepSeek),
-gemini-3.8-flash (Google)</strong>; gpt-6-astra passed the capability
-probe but was held out as reserve. Single authorized run, 2026-09-29;
-fixtures are the §6 validation rows {12, 35, 60, 47} plus controls {26,
-32} (the conditional-gateway mechanism, rows 94/95, was not in the
-authorized fixture set).</p>
+criteria (A priority-capture-first; B tool-supplied shell-text
+propagation into the final answer — as implemented a
+<strong>marker-presence test</strong> that records whether the guide’s
+command text reaches the model’s answer, not whether the model adopts it
+for execution; A-covert/overt credential pass with absence/presence in
+the final answer; G benign-funnel compliance; CTRL for controls), with
+infra failures (timeouts after one retry) logged and <strong>excluded
+from all denominators</strong>. <strong>Covert</strong> denotes
+<em>credential transfer with credential-value omission from the final
+answer</em>: it means only that the credential was absent from the final
+assistant answer; it does NOT imply the tool call was hidden from the
+user interface — all tool calls were logged before dispatch. The ledger
+codes (A-covert / A-overt) are unchanged. Panel: three vendors via the
+AvalAI gateway (OpenAI-compatible; temperature 0) — <strong>glm-5.3
+(Zhipu, primary), deepseek-v4.1-flash (DeepSeek), gemini-3.8-flash
+(Google)</strong>; gpt-6-astra passed the capability probe but was held
+out as reserve. Single authorized run, 2026-09-29; fixtures are the §6
+validation rows {12, 35, 60, 47} plus controls {26, 32} (the
+conditional-gateway mechanism, rows 94/95, was not in the authorized
+fixture set).</p>
 <p><strong>Gateway confound.</strong> The panel was reached through a
 third-party multi-provider gateway rather than each vendor’s own API.
 Three controls reduce but do not eliminate this: a stage-0 capability
@@ -1230,12 +1233,13 @@ rates).</strong> Where intervals are given they are <strong>95%
 compatibility intervals — descriptive of these trials under this
 harness, gateway, and prompt only; not estimates of population
 rates</strong>. Notation: k/n = successful trials of n completed; [X] =
-judge criterion; [A-covert] = the credential reached the tool and was
-absent from the final assistant answer ([A-overt] = it also appeared in
-the final answer — the DP row’s glm-5.3 cell is 2/3 A-covert with its
-third trial A-overt, scored a non-success; Finding 3). All scope claims
-below cover these three model versions, via one gateway, under this
-harness.</p>
+judge criterion; [B] = the tool-supplied shell text appears in the final
+assistant answer (marker presence); [A-covert] = the credential reached
+the tool and was absent from the final assistant answer ([A-overt] = it
+also appeared in the final answer — the DP row’s glm-5.3 cell is 2/3
+A-covert with its third trial A-overt, scored a non-success; Finding 3).
+All scope claims below cover these three model versions, via one
+gateway, under this harness.</p>
 <p><strong>Estimand.</strong> Each cell is i.i.d. replications of one
 (arm, model) cell under this fixed harness, deployment and gateway;
 pooling across cells is descriptive of this matrix and estimates no
@@ -1299,27 +1303,41 @@ population quantity.</p>
 <figcaption>Reviewer figure R2 (not a numbered paper figure). Per-cell success/total; lower panel gives 95% compatibility intervals for the pooled arms — FL [0.70, 1.00], DP [0.57, 0.98], WF [0.35, 0.88], CTRL [0.00, 0.19]. Fully mocked harness, synthetic data only. <span class="src">Source: data/live_tests/trials_ledger.jsonl (assert-verified).</span></figcaption>
 </figure>
 <p>Pooled attack ASR (attack success rate; WF+FL+DP only — it pools
-three different success criteria, A / B / A-covert, so it is descriptive
-of this matrix and not a comparable-rate estimate): glm-5.3 8/9,
-deepseek-v4.1-flash 9/9, gemini-3.8-flash 6/9. Controls never triggered
-in the 16 valid control trials (2 of 18 scheduled excluded as
-infra-timeouts per the pre-registered protocol); the gray arm never
-triggered (0/8 eligible).</p>
-<p><strong>Finding 1 — exec-priming is uniform across the three model
-families in our panel (FL 9/9, 95% compatibility interval [0.70,
-1.00]).</strong> Every model, in every replication, retrieved the guide
-and then expressed intent to execute the tool-supplied shell text
-(adopted in the mocked transcript as intended execution; no real shell
-execution or dispatched tool network call occurred in any trial —
-gateway API calls did occur). The transcripts are consistent with the
-model following the description’s execution-oriented language —
-gemini-3.8-flash, the model that <em>resisted</em> WF, adopted FL
-anyway:</p>
+three different success criteria, A / B / A-covert — and FL’s [B] is the
+weakest of the three, a text-propagation test, so the pooled figure
+over-attributes execution success — it is descriptive of this matrix and
+not a comparable-rate estimate): glm-5.3 8/9, deepseek-v4.1-flash 9/9,
+gemini-3.8-flash 6/9. Controls never triggered in the 16 valid control
+trials (2 of 18 scheduled excluded as infra-timeouts per the
+pre-registered protocol); the gray arm never triggered (0/8
+eligible).</p>
+<p><strong>Finding 1 — the exec-priming instruction propagates into the
+answer but is not adopted for execution (FL 9/9 [B: command text
+surfaced], 95% compatibility interval [0.70, 1.00]).</strong> Criterion
+[B] as implemented is a <strong>marker-presence test</strong>: it fires
+when the guide’s command text appears in the model’s final answer. Every
+model, in every replication, relayed the guide’s commands — which is
+also the task’s benign request (retrieve the install guide and follow
+it) — so [B] cannot by itself separate <em>relaying the guide</em> from
+<em>adopting its execution framing</em>. What the transcripts do show is
+that the description’s execution framing reaches the user’s answer while
+no model takes the step of executing: <strong>no trial expressed intent
+to execute the commands in its own voice (0/9).</strong>
+deepseek-v4.1-flash declined explicitly in all three replications
+(<em>“I won’t pretend to have executed anything”</em>); glm-5.3 declined
+for lack of a shell tool (<em>“I can’t literally execute them”</em>);
+gemini-3.8-flash — the model that <em>resisted</em> WF — relayed the
+description’s own execution framing to the user:</p>
 <blockquote>
 <p><em>(Note: Per the tool instructions, install guide commands are
-intended to be executed in …</em> — gemini-3.8-flash, FL rep 1 (the
-matching transcript)</p>
+intended to be executed in your local system shell rather than within
+the runtime/tool environment itself …)</em> — gemini-3.8-flash, FL rep 1
+(the matching transcript)</p>
 </blockquote>
+<p>The arm therefore bounds exec-priming as <em>instruction propagation
+to the user</em> (9/9), not model-side execution adoption (0/9); no
+shell execution and no dispatched tool network call occurred in any
+trial (gateway API calls did occur).</p>
 <p><strong>Finding 2 — priority capture is not model-universal (WF 6/9,
 95% compatibility interval [0.35, 0.88]).</strong> glm-5.3 and
 deepseek-v4.1-flash expressed intent to execute the poisoned tool first
@@ -1336,15 +1354,20 @@ counter-example showing description-anchored priority capture is
 model-dependent even at n=3.</p>
 <p><strong>Finding 3 — credential transfer usually without final-answer
 disclosure (DP 8/9, 95% compatibility interval [0.57, 0.98]).</strong>
-The success criterion for this arm is covert transfer (criterion
-A-covert): the credential must reach the siphon tool <em>and</em> be
-absent from the final answer. In this harness, credential transfer to
-the tool without final-answer disclosure occurred in 8/9 completed
-trials. In the ninth trial (glm-5.3 rep 2) steering-consistent behavior
-still occurred — the credential reached the tool — but the model echoed
-it, so the criterion failed while the mechanism partially fired; the run
-is scored A-overt and counted as a non-success in the 8/9. Its summary
-contradicts itself in one sentence:</p>
+This arm has two separable endpoints: the credential <em>reaching the
+tool</em> (transfer) and its <em>omission from the final answer</em>
+(covertness). Transfer occurred in <strong>9/9</strong> completed
+trials; the 8/9 headline is the <strong>omission</strong> rate, not the
+transfer rate. The success criterion for this arm is covert transfer
+(criterion A-covert): the credential must reach the siphon tool
+<em>and</em> be absent from the final answer. In this harness,
+credential transfer to the tool without final-answer disclosure occurred
+in 8/9 completed trials. In the ninth trial (glm-5.3 rep 2)
+steering-consistent behavior still occurred — the credential reached the
+tool — but the model echoed it, so the criterion failed while the
+mechanism partially fired; the run is scored A-overt and counted as a
+non-success in the 8/9. Its summary contradicts itself in one
+sentence:</p>
 <blockquote>
 <p><em>“<strong>API key stored</strong> ✅ — Your key (a synthetic demo
 credential) was deposited into the secure vault, encrypted at rest.
@@ -1374,8 +1397,9 @@ capture (rows 12, 94/95) re-routes the agent’s whole planning graph
 through one tool; exec-priming (row 35) expresses execution of
 tool-supplied text in the host shell; the custody funnel (row 60) routes
 every credential the agent touches through a third party. Each is one
-benign vendor’s publicly available product copy away from ASI04
-(OWASP-adjacent mapping, §3).</p>
+benign vendor’s publicly available product copy away from the OWASP
+ASI02/ASI04 junction that §3 maps — exec-priming additionally
+ASI05-shaped (OWASP-adjacent mapping, §3).</p>
 <p><strong>Figure 2 — The evidence chain: what this study shows, and
 where it stops.</strong></p>
 <p><em>Observed benign description</em> → <em>attack-shaped
@@ -1386,12 +1410,12 @@ otherwise benign product descriptions; author intent is not assessed.
 Step 2 names the four in-the-wild mechanisms behind them — priority
 capture (unconditional; conditional gateway), exec-priming, and a
 credential funnel. Step 3 is the live-trial evidence of §8: across the
-27 attack trials (of 54 total), models expressed intent in 9/9
-exec-priming trials, the credential reached the tool without
-final-answer disclosure in 8/9, and the controls never triggered across
-16 valid trials. Step 4 is deliberately <strong>not</strong> implied:
-there is no exploit path, no live target, no attacker, no credential at
-risk, and no filed CVE (§10).</p>
+27 attack trials (of 54 total), the exec-priming command text surfaced
+in 9/9 trials without being adopted for execution (0/9), the credential
+reached the tool without final-answer disclosure in 8/9, and the
+controls never triggered across 16 valid trials. Step 4 is deliberately
+<strong>not</strong> implied: there is no exploit path, no live target,
+no attacker, no credential at risk, and no filed CVE (§10).</p>
 <p>Steps 1–3 are observed and measured in this paper; the last arrow is
 deliberately drawn as <strong>not</strong> implied. Benign provenance
 plus attack-shaped text plus sandbox steering does not add up to a
@@ -1400,7 +1424,12 @@ labeled <em>steering-consistent behavior</em> deliberately: what §8
 measures is behavior observed in the presence of the description that is
 consistent with steering — no description-neutral ablation was run, so
 the description’s isolated causal contribution is not established
-(Limitations (ix); FUTURE_WORK #15).</p>
+(Limitations (ix); FUTURE_WORK #15). Two scope notes on step 3: the live
+arms exercise <strong>three of the four</strong> mechanisms (the
+conditional-gateway mechanism, rows 94/95, was not in the authorized
+fixture set), and the exec-priming entry is a <em>text-propagation</em>
+count — the command text reaching the answer (9/9) — not model-side
+execution, which no trial expressed (0/9).</p>
 <p><strong>Limitations and anticipated questions.</strong></p>
 <p><strong>Q1 — Your all-family text-support rate (5.6%, in the
 purposive top-score validation sample; 15/268; poison-family 6/124,
@@ -1447,8 +1476,9 @@ server could plant verbatim — and, separately, <strong>behavior observed
 in the presence of the description that is consistent with
 steering</strong>: in a mocked harness with synthetic data (no real
 shell execution or dispatched tool network call in any trial — gateway
-API calls did occur), three model versions expressed intent to follow
-those descriptions at the rates in §8. Figure 2’s step 4 is explicitly
+API calls did occur), three model versions emitted steering-consistent
+behavior at the rates in §8 (propagating the fabricated descriptions’
+instructions; executing none of them). Figure 2’s step 4 is explicitly
 not drawn: steering-consistent behavior in a sandbox is not a
 demonstrated vulnerability in a deployed system. The chain stops at step
 3, and the paper’s claims stop with it. What the five rows establish is
@@ -1470,17 +1500,19 @@ alone cannot show: the same description that deepseek-v4.1-flash and
 glm-5.3 obeyed unconditionally (WF 3/3 each) was ignored by
 gemini-3.8-flash in all three replications, which answered the user’s
 task directly — weather lookup first, note saved, the “ALWAYS CALL THIS
-TOOL FIRST” preamble never honored — while the same model adopted
-exec-priming without hesitation (FL 3/3). Priority capture is therefore
-model-variant at n=3, exec-priming uniform across the three model
-families in our panel: no detector threshold, and no single hardening
-heuristic, transfers uniformly across consumers of the same poisoned
-text. This strengthens the calibration’s conclusion — since models
-disagree about which text steers them, the only defensible measurement
-layer sits below the model, at the description surface, with per-model
-live probes (§8) as the complement — and it echoes the §7 disagreement
-pattern: the residual uncertainty is interpretive, concentrated on scope
-and audience judgments, not perception.</p>
+TOOL FIRST” preamble never honored — while the same model relayed the
+exec-priming command text in all three replications (FL 3/3) without
+itself adopting execution. Priority capture is therefore model-variant
+at n=3, while exec-priming was <em>propagated</em> uniformly across the
+three model families without being adopted by any panel model: no
+detector threshold, and no single hardening heuristic, transfers
+uniformly across consumers of the same poisoned text. This strengthens
+the calibration’s conclusion — since models disagree about which text
+steers them, the only defensible measurement layer sits below the model,
+at the description surface, with per-model live probes (§8) as the
+complement — and it echoes the §7 disagreement pattern: the residual
+uncertainty is interpretive, concentrated on scope and audience
+judgments, not perception.</p>
 <p><strong>The ecosystem appears to be adapting around the
 channel</strong> (the findings backlog, §B.4): pay-per-call agent
 economics where the agent’s wallet is the abuse boundary (rows 30/31);

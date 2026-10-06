@@ -1,6 +1,6 @@
 {
   "schema": "mcp-measurement/reproducibility-manifest/1",
-  "generated_utc": "2026-10-06T06:27:41Z",
+  "generated_utc": "2026-10-06T06:58:53Z",
   "baseline_commit": "769b7d968eb207d5b4e0fac46202e15945ebde75",
   "note": "This manifest does not hash itself. 'unknown' means not established, not empty.",
   "frozen_inputs": [
@@ -85,25 +85,25 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "1af7135e4bded5f2194b522d620fc3cb24626d1a7864f38648afa3faa9f61f8f",
+      "sha256": "a8721eaa6a92e5c723e935e12664fe75517821014e73647c2deed8fb21d4a264",
       "role": "traceable manuscript record (edited this revision)",
       "status": "derived"
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "304b2d7e024944331fdd6abc976cd8dcb6b8196cfdc9c73c00315a5281c358a0",
+      "sha256": "59260a57567f4975fb55e6ba3311803b35e85eeaa7ed362f966c0b1c7b8c4be7",
       "role": "authoritative publication copy (edited this revision)",
       "status": "derived"
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "843521557e2bed9b3bc23abb2fe87d2adc5b441d64ebb8f16e12b7f7d2c4a5b1",
+      "sha256": "cdc7901012d532c8b41b54790084d5e4bc68390d6af3023e3ea86e40abeeeeb9",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived"
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
-      "sha256": "aa05f4951e2a275949ada5f0c519e9eecc05231b51f9b75ecb902a7ff713f3af",
+      "sha256": "18035b3a7a3bf4404ee05c5a4c2381e8d091fe50c704c6115f8a4d8d916081f5",
       "role": "built reviewer PDF",
       "status": "derived"
     },
@@ -139,7 +139,7 @@
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "8cd992cf1e9fca2b53d997d381d841e9f3ca0f50964eb54f8bc34cc50e7bdf1f",
+      "sha256": "b47c2538bacf5d6153f9544dce3a3ac5ccce7380f62f687e03e572d9c0e12149",
       "role": "machine-readable claim ledger (22 claims)",
       "status": "derived"
     },
@@ -157,25 +157,25 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "791e7843a8f1eda3907af090ad1ca2b3ce6c30ff1b822c0e5d18eed0d4afcea8",
+      "sha256": "1d2e0c65936b1dbee67e35111bfd2ed438d4689ee601821f4d20073103c00549",
       "role": "offline verification entry point",
       "status": "derived"
     },
     {
       "path": "REVISION_AUDIT.md",
-      "sha256": "090f199023bf7afe869bc99fd8f102ed7e5f964e6f58c01e8448097f6c730f08",
+      "sha256": "aae6d9aee5ac3b80bbbc8349e92913a177ce826546ffce20fc76a00a8e727f4b",
       "role": "revision audit (Phase 1 + applied record)",
       "status": "derived"
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "79598dfeb843b4d13b65571b2ed760a9347c95a17331e00c06cb5168ba72232b",
+      "sha256": "2be2486edc949fb4b377f73f0d1ec1209a9a4de84b4a0f3cd2c0aee4a56df3a6",
       "role": "human-dependency list",
       "status": "derived"
     },
     {
       "path": "REVISION_REPORT.md",
-      "sha256": "8ee81edaa1813dbdfb5d2939903d014ed08517b9c131cde88b01f0fa6d024c29",
+      "sha256": "faad4825ecf58a0329ed7257c8ff1055536a9044c6507d18b24ef2879b3691ef",
       "role": "revision report",
       "status": "derived"
     },

@@ -60,9 +60,9 @@ sample membership was altered.
 
 | Path | What it is |
 |---|---|
-| `claims_ledger.jsonl` | 22 records, one per quantitative or consequential claim: id, location, exact claim, unit, numerator/denominator, scope/sampling frame, source paths, locator, derivation command, result, status, limitation. Statuses: VERIFIED 15, CORRECTED 3, QUALIFIED 4. |
+| `claims_ledger.jsonl` | 25 records, one per quantitative or consequential claim: id, location, exact claim, unit, numerator/denominator, scope/sampling frame, source paths, locator, derivation command, result, status, limitation. Statuses: VERIFIED 16, CORRECTED 5, QUALIFIED 4. |
 | `reproducibility_manifest.json` | 11 hashed frozen inputs with roles, 12 derived artifacts, sample identity and join key, seeds, software versions, commands, and **7 explicit unknowns**. Does not hash itself. |
-| `scripts/verify_claims.py` | Offline verification entry point: C1 frozen hashes, C2 sample identity, C3 join integrity, C4 strata, C5 instance counts, C6 family splits, C7 κ recomputation, C8 trial accounting, C9 manuscript wording, C10 ledger shape. |
+| `scripts/verify_claims.py` | Offline verification entry point: C1 frozen hashes, C2 sample identity, C3 join integrity, C4 strata, C5 instance counts, C6 family splits, C7 κ recomputation, C8 trial accounting, C9 manuscript wording, C10 ledger shape, C11 per-class apportionment, C12 manifest freshness, C13 FL criterion-`[B]` sub-branch accounting. |
 | `REVISION_AUDIT.md` | Extended with a §F applied-revision record (original audit preserved). |
 | `AUTHOR_ACTION_REQUIRED.md` | Updated: A1 narrowed, title-lock approval recorded. |
 | `REVISION_REPORT.md` | This file. |
@@ -78,7 +78,7 @@ not touched. Content edits were made in place in both canonical sources.
 |---|---|
 | `python3 pilot/derive_r4_numbers.py` | **0** |
 | `python3 experiments/trial_accounting.py --check` | **0** |
-| `python3 scripts/verify_claims.py` | **0** (all 10 check groups pass) |
+| `python3 scripts/verify_claims.py` | **0** (all 13 check groups pass) |
 | `python3 paper/preview/build_preview.py` | **0** — 802,955 B, 3 figures, 12 references |
 | `chromium --headless … --print-to-pdf` | **0** — 23 pages, A4 |
 
@@ -132,7 +132,22 @@ A5 (release location / DOI placeholders) and A6 (disclosure status) are unverifi
 this workspace. The paper is **not** described as submission-ready: scripts passing is not evidence
 of scientific completeness, and the manuscript still prints placeholder URLs and a placeholder DOI.
 
-## 7. Reproduction
+## 7. Phase-set B — live-experiment evidence audit (2026-10-06)
+
+A second pass audited the §8 live-matrix claims against the stored transcripts (`data/live_tests/*.jsonl`)
+and the judge that produced the frozen ledger (`experiments/harness.py`). **One headline-level defect
+was found and fixed in wording only**; the frozen ledger was not touched.
+
+| ID | Finding | Disposition |
+|---|---|---|
+| RA-21 | **HIGH.** Criterion `[B]`'s claim of execution intent was false. `judge()` fires `[B]` on `"TESTKEY-DEMO-INSTALL" in final`, i.e. whenever the guide's command text reaches the final answer — which every trial does, because relaying the guide *is* the benign task. Sub-branches: marker-in-final 9/9, execution-style fence 4/9, execution-verb 1/9 (on a declining sentence); **own-voice execution intent 0/9.** | **FIXED (wording).** `[B]` re-described as a marker-presence test; the arm reported as propagation (9/9), not adoption (0/9), in the abstract, §8 (design list, notation, pooled-ASR caveat, Finding 1), and §9 (Figure-2 note, Q3, model variance). §8 cell `FL 3/3 [B]` and the frozen ledger unchanged. |
+| RA-22 | **LOW.** (a) `DP 8/9` did not separate transfer from omission (actual: transfer 9/9, omission 8/9). (b) §9 mapped all mechanisms to ASI04 while §3 maps the ASI02/ASI04 junction and assigns ASI05 to row 35. (c) Capability adjudication checked against §5 — already consistent (RA-20). | **FIXED** where needed (a, b); (c) verified no-change and recorded. |
+
+**Verification added.** C13 re-derives the three `[B]` sub-branch counts from the transcripts;
+C9 now asserts the superseded execution-intent strings are absent and the propagation strings present.
+Gate battery: **4/4** (derive exit 0, trial-accounting exit 0, abstract 179/179 ≤ 180, number parity 5).
+
+## 8. Reproduction
 
 ```bash
 python3 pilot/derive_r4_numbers.py                                    # exit 0
