@@ -182,7 +182,26 @@ changed; gate battery 4/4 afterwards.
 `scripts/verify_claims.py` exit 0; reviewer package (HTML + PDF, 23 pp A4) rebuilt and the
 manifest re-hashed last.
 
-## 10. Reproduction
+## 10. Phase-set D — statistical caveats and taxonomy wording (2026-10-06)
+
+Wording-level qualifications from `REVISION_AUDIT.md` §D Phases 3.8–3.12 and 6. No number
+changed; the caveats are now stated where the intervals/pools are presented.
+
+| Item | Gap | Fix |
+|---|---|---|
+| 3.8 — Wilson assumption | Intervals quoted without the binomial model assumption. | §6.1 now states the intervals **assume independent Bernoulli draws** and that flag instances **cluster by `server::tool`**, so they are descriptive under that model, not exact under dependence. |
+| 3.9 — i.i.d. trials | §8 called the reps "i.i.d." flatly. | §8 Estimand now frames i.i.d. as a **modeling assumption** (deterministic decoding, no population draw), so intervals describe these trials only. |
+| 3.10 — pooled interchangeability | Pooled WF+DP read as a comparable rate. | §8 now says pooling **assumes an interchangeability we do not claim** (different fixtures/criteria) — a summary of heterogeneous arms. |
+| 3.11 — multiplicity | "No multiplicity adjustment" was one clause. | §6.1 now ties it to the **13 fired classes** and labels the per-class figures descriptive and uncorrected. |
+| 3.12 — selection-bias direction | "bias direction is unknown" without explanation. | §6.1 now explains selection is on the **detector's score** with an unmeasured score–support relationship outside the top stratum: a **directional hypothesis, not a bound**. |
+| 6 — OWASP identifier qualification | Already `OWASP-adjacent`, titles unverified (§3). | Verified already present and consistent (§3 note, §9 junction citation); no edit. |
+| 6 — client/runtime authority separation | "no enforced authority separation exists" read as a universal claim. | §2 now scopes it: "(in the models we evaluate) … we **found no standard mechanism** enforcing an authority separation." |
+| 6 — disclosure status | No time stamp on the "no CVEs filed" statement. | §10 now reads "No CVEs have been filed (**as of 2026-10-06**)". |
+
+**Verification.** `scripts/gate_battery.py` 4/4 (G3 abstract **178/178**; G4 parity 5);
+`scripts/verify_claims.py` exit 0 (C9 now requires the six new caveat strings in both files).
+
+## 11. Reproduction
 
 ```bash
 python3 pilot/derive_r4_numbers.py                                    # exit 0

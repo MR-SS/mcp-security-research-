@@ -199,7 +199,11 @@ REQUIRED = ["15/263", "ae1aff9f", "adjudicated from the 300-char excerpt",
             "marker-presence test", "text-propagation", "0/9",
             # A9 option C: FL is task-conflated; the live matrix tests two of four.
             "WF+DP only", "two of the four", "task-conflated",
-            "5/6, deepseek-v4.1-flash 6/6"]
+            "5/6, deepseek-v4.1-flash 6/6",
+            # Phase-set D statistical caveats (3.8-3.12) + §2/§10 wording.
+            "independent Bernoulli draws", "interchangeability we do not claim",
+            "modeling assumption", "directional hypothesis, not a bound",
+            "we found no standard mechanism", "No CVEs have been filed (as of"]
 for f in ("paper/main.md", "paper/main_clean.md"):
     raw = open(p(*f.split("/")), encoding="utf-8").read()
     # whitespace-insensitive: the prose is hard-wrapped, so a phrase may straddle

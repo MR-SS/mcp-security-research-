@@ -42,8 +42,9 @@ The MCP tool manifest is the agent's menu of actions, and the model reads it as 
 server-controlled descriptions land in context beside the system prompt and the user's
 message. Descriptions are structured as tool metadata whose natural-language text is
 visible to the model; client implementations differ in how they surface this text to the
-prompt, and current models read such text as instructions in language — no enforced
-authority separation exists between description text and operator policy text. Whatever one tool's description
+prompt, and (in the models we evaluate) such text is read as instructions in language — we
+found no standard mechanism enforcing an authority separation between description text and
+operator policy text. Whatever one tool's description
 says — about itself, about other tools, about what the agent must never or always do —
 appears to the model to arrive with the authority of an installed integration. This makes
 the description channel an *instruction surface*: it can carry injection-style steering
@@ -345,15 +346,21 @@ text-support rate: 6 of 124 instances (4.84%)**; capability-family 5/102 (4.90%)
 (5.60%)** — labelled as such, not as "precision". Of the 13 fired classes, 12 are
 unsupported-dominated; `file_read_sensitive` splits 1–1. Wilson 95% compatibility
 intervals for the four headline figures: 15/268 [0.03, 0.09], 6/124 [0.02, 0.10], 5/100
-[0.02, 0.11], 5/150 [0.01, 0.08] (assert-guarded in `pilot/derive_r4_numbers.py`); no
-multiplicity adjustment was applied, and the per-class figures in §6.2 are descriptive.
-Cluster sensitivity: collapsing flag instances that share the same `server::tool` (13
+[0.02, 0.11], 5/150 [0.01, 0.08] (assert-guarded in `pilot/derive_r4_numbers.py`). These
+Wilson intervals **assume the counts are independent Bernoulli draws** (a binomial model);
+flag instances instead **cluster by `server::tool`**, so the intervals are descriptive under
+that model rather than exact under dependence. **No multiplicity adjustment was applied**
+across the 13 fired classes; the per-class figures in §6.2 are descriptive and uncorrected.
+Cluster sensitivity: collapsing those clusters (13
 sample rows in 5 duplicate-name groups), the pooled text-support rate is 13/251 (5.18%)
 instead of 15/268 (5.60%) — the reading is unchanged.
 
 **This 5.6% (all-family; poison-family 4.8%) is a sample-bounded descriptive quantity — the
-observed flag-instance text-support rate; not a population precision estimate; the sample's
-bias direction is unknown.** The validation
+observed flag-instance text-support rate; not a population precision estimate.** The sample's
+bias direction is unknown: selection is on the *detector's* `suspicion_score` (top 100), and
+the score–support relationship outside that top stratum is unmeasured, so the direction of
+the selection effect on a population rate is not identifiable from this sample — a
+directional hypothesis, not a bound. The validation
 sample is the top 100 rows by `suspicion_score` plus 50 controls with zero capability- and
 poison-family flags (§5), so it
 deliberately over-represents the detector's highest-scoring output; the text-support rate
@@ -648,9 +655,11 @@ also appeared in the final answer — the DP row's glm-5.3 cell is 2/3 A-covert 
 third trial A-overt, scored a non-success; Finding 3). All scope claims
 below cover these three model versions, via one gateway, under this harness.
 
-**Estimand.** Each cell is i.i.d. replications of one (arm, model) cell under this fixed
-harness, deployment and gateway; pooling across cells is descriptive of this matrix and
-estimates no population quantity.
+**Estimand.** Each cell is three replications of one (arm, model) cell under this fixed
+harness, deployment and gateway; treating them as i.i.d. is a **modeling assumption** —
+decoding is deterministic (temperature 0) and the reps are not independent draws from any
+population — so the intervals describe these trials only. Pooling across cells is descriptive
+of this matrix and estimates no population quantity.
 
 | Arm (criterion) | glm-5.3 | deepseek-v4.1-flash | gemini-3.8-flash |
 |---|---|---|---|
@@ -667,8 +676,10 @@ guide, which the benign task also requires, so the arm is excluded from the pool
 ASR and from the live-mechanism count (§9).
 
 Pooled attack ASR (attack success rate; WF+DP only — FL is excluded as task-conflated, so
-the figure pools two criteria, A / A-covert; it is descriptive of this matrix and not a
-comparable-rate estimate): glm-5.3 5/6, deepseek-v4.1-flash 6/6, gemini-3.8-flash 3/6.
+the figure pools two criteria, A / A-covert, and, implicitly, two unlike arms; pooling
+assumes an interchangeability we do not claim, so it is a summary of heterogeneous arms,
+descriptive of this matrix and not a comparable-rate estimate): glm-5.3 5/6,
+deepseek-v4.1-flash 6/6, gemini-3.8-flash 3/6.
 Controls never triggered in the 16 valid control trials (2 of 18 scheduled excluded as
 infra-timeouts per the pre-registered protocol); the gray arm never triggered (0/8
 eligible).
@@ -909,8 +920,9 @@ reproduction chain.
 
 The study is analysis of public metadata and public source only: no third-party server
 endpoint was contacted, no third-party code was executed, and no payload usable against
-unpatched live servers is reproduced in any artifact. No CVEs have been filed: the five
-confirmed mechanisms are latent-surface findings — instruction-shaped text, not exploited
+unpatched live servers is reproduced in any artifact. No CVEs have been filed (as of
+2026-10-06): the five confirmed mechanisms are latent-surface findings — instruction-shaped
+text, not exploited
 code paths — and the 90-day coordinated-disclosure rule (AGENTS.md §2.2) is reserved for
 any future finding that meets a confirmed-exploitability bar. The rubric-consistency
 second-rater provenance (an unversioned consumer LLM web UI — a methodological

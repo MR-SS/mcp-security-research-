@@ -199,3 +199,10 @@
   etc. in `main.md`, and the Appendix-A mapping `§A.3`–`§A.6` in `main_clean.md`. **Version
   banners refreshed** (both papers dated `2026-09-29; revised 2026-10-06`; the stale "Skeleton"
   banner removed). Gates: abstract **178/178**, parity **5**, derive exit 0, accounting exit 0.
+- **2026-10-06: Phase-set D (statistical caveats + taxonomy wording).** §6.1 now states the
+  Wilson intervals' binomial assumption and the `server::tool` clustering, ties "no multiplicity
+  adjustment" to the 13 fired classes, and explains the top-score selection-bias direction as
+  non-identifiable from this sample (a directional hypothesis, not a bound). §8 frames i.i.d. as
+  a modeling assumption and states the pooled-AASR interchangeability it cannot assume. §2 scopes
+  the authority-separation claim to the evaluated models ("we found no standard mechanism"); §10
+  time-stamps the disclosure status. Gates: abstract **178/178**, parity **5**, derive/accounting exit 0.

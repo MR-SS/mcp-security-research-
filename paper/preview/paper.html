@@ -198,15 +198,15 @@ reads it as text: server-controlled descriptions land in context beside
 the system prompt and the user’s message. Descriptions are structured as
 tool metadata whose natural-language text is visible to the model;
 client implementations differ in how they surface this text to the
-prompt, and current models read such text as instructions in language —
-no enforced authority separation exists between description text and
-operator policy text. Whatever one tool’s description says — about
-itself, about other tools, about what the agent must never or always do
-— appears to the model to arrive with the authority of an installed
-integration. This makes the description channel an <em>instruction
-surface</em>: it can carry injection-style steering without any code
-execution, and it can be changed server-side for the majority of remote
-deployments.</p>
+prompt, and (in the models we evaluate) such text is read as
+instructions in language — we found no standard mechanism enforcing an
+authority separation between description text and operator policy text.
+Whatever one tool’s description says — about itself, about other tools,
+about what the agent must never or always do — appears to the model to
+arrive with the authority of an installed integration. This makes the
+description channel an <em>instruction surface</em>: it can carry
+injection-style steering without any code execution, and it can be
+changed server-side for the majority of remote deployments.</p>
 <p>Prior measurements of this surface report alarming counts — an
 inventory of what detectors emitted, not yet a verdict on the ecosystem
 itself. What those counts lack is a calibration: we found no prior study
@@ -687,22 +687,30 @@ labelled as such, not as “precision”. Of the 13 fired classes, 12 are
 unsupported-dominated; <em>file_read_sensitive</em> splits 1–1. Wilson
 95% compatibility intervals for the four headline figures: 15/268 [0.03,
 0.09], 6/124 [0.02, 0.10], 5/100 [0.02, 0.11], 5/150 [0.01, 0.08]
-(assert-guarded in the replication package’s number-derivation script);
-no multiplicity adjustment was applied, and the per-class figures in
-§6.2 are descriptive. Cluster sensitivity: collapsing flag instances
-that share the same server::tool (13 sample rows in 5 duplicate-name
-groups), the pooled text-support rate is 13/251 (5.18%) instead of
-15/268 (5.60%) — the reading is unchanged.</p>
+(assert-guarded in the replication package’s number-derivation script).
+These Wilson intervals <strong>assume the counts are independent
+Bernoulli draws</strong> (a binomial model); flag instances instead
+<strong>cluster by server::tool</strong>, so the intervals are
+descriptive under that model rather than exact under dependence.
+<strong>No multiplicity adjustment was applied</strong> across the 13
+fired classes; the per-class figures in §6.2 are descriptive and
+uncorrected. Cluster sensitivity: collapsing those clusters (13 sample
+rows in 5 duplicate-name groups), the pooled text-support rate is 13/251
+(5.18%) instead of 15/268 (5.60%) — the reading is unchanged.</p>
 <p><strong>This 5.6% (all-family; poison-family 4.8%) is a
 sample-bounded descriptive quantity — the observed flag-instance
-text-support rate; not a population precision estimate; the sample’s
-bias direction is unknown.</strong> The validation sample is the top 100
-rows by suspicion score plus 50 controls with zero capability- and
-poison-family flags (§5) — two selection groups (top-score review +
-zero-flag controls), deliberately over-represents the detector’s
-highest-scoring output; the text-support rate within that purposive
-top-score review is what the 15/268 ratio measures — 263 of those 268
-instances fall in the top-score stratum, the other 5 being
+text-support rate; not a population precision estimate.</strong> The
+sample’s bias direction is unknown: selection is on the
+<em>detector’s</em> suspicion score (top 100), and the score–support
+relationship outside that top stratum is unmeasured, so the direction of
+the selection effect on a population rate is not identifiable from this
+sample — a directional hypothesis, not a bound. The validation sample is
+the top 100 rows by suspicion score plus 50 controls with zero
+capability- and poison-family flags (§5) — two selection groups
+(top-score review + zero-flag controls), deliberately over-represents
+the detector’s highest-scoring output; the text-support rate within that
+purposive top-score review is what the 15/268 ratio measures — 263 of
+those 268 instances fall in the top-score stratum, the other 5 being
 channel-family instances that fire on the zero-flag controls (all
 unsupported), so the stratum-specific rate is 15/263 = 5.70%. A
 population estimate would require a probability sample over ALL flagged
@@ -1240,10 +1248,13 @@ also appeared in the final answer — the DP row’s glm-5.3 cell is 2/3
 A-covert with its third trial A-overt, scored a non-success; Finding 3).
 All scope claims below cover these three model versions, via one
 gateway, under this harness.</p>
-<p><strong>Estimand.</strong> Each cell is i.i.d. replications of one
+<p><strong>Estimand.</strong> Each cell is three replications of one
 (arm, model) cell under this fixed harness, deployment and gateway;
-pooling across cells is descriptive of this matrix and estimates no
-population quantity.</p>
+treating them as i.i.d. is a <strong>modeling assumption</strong> —
+decoding is deterministic (temperature 0) and the reps are not
+independent draws from any population — so the intervals describe these
+trials only. Pooling across cells is descriptive of this matrix and
+estimates no population quantity.</p>
 <table>
 <colgroup>
 <col style="width: 25%" />
@@ -1308,10 +1319,12 @@ ASR and from the live-mechanism count (§9).</p>
 <figcaption>Supplemental figure S2 (not a numbered paper figure). Per-cell success/total; lower panel gives 95% compatibility intervals for the pooled arms — FL [0.70, 1.00], DP [0.57, 0.98], WF [0.35, 0.88], CTRL [0.00, 0.19]. Fully mocked harness, synthetic data only. <span class="src">Source: data/live_tests/trials_ledger.jsonl (assert-verified).</span></figcaption>
 </figure>
 <p>Pooled attack ASR (attack success rate; WF+DP only — FL is excluded
-as task-conflated, so the figure pools two criteria, A / A-covert; it is
-descriptive of this matrix and not a comparable-rate estimate): glm-5.3
-5/6, deepseek-v4.1-flash 6/6, gemini-3.8-flash 3/6. Controls never
-triggered in the 16 valid control trials (2 of 18 scheduled excluded as
+as task-conflated, so the figure pools two criteria, A / A-covert, and,
+implicitly, two unlike arms; pooling assumes an interchangeability we do
+not claim, so it is a summary of heterogeneous arms, descriptive of this
+matrix and not a comparable-rate estimate): glm-5.3 5/6,
+deepseek-v4.1-flash 6/6, gemini-3.8-flash 3/6. Controls never triggered
+in the 16 valid control trials (2 of 18 scheduled excluded as
 infra-timeouts per the pre-registered protocol); the gray arm never
 triggered (0/8 eligible).</p>
 <p><strong>Finding 1 — a design lesson: the exec-priming arm is
@@ -1584,13 +1597,14 @@ reproduction chain.</p>
 <p>The study is analysis of public metadata and public source only: no
 third-party server endpoint was contacted, no third-party code was
 executed, and no payload usable against unpatched live servers is
-reproduced in any artifact. No CVEs have been filed: the five confirmed
-mechanisms are latent-surface findings — instruction-shaped text, not
-exploited code paths — and this project’s 90-day coordinated-disclosure
-rule is reserved for any future finding that meets a
-confirmed-exploitability bar. The rubric-consistency second-rater
-provenance (an unversioned consumer LLM web UI — a methodological
-limitation, §7) is disclosed in Section 7 and Methods.</p>
+reproduced in any artifact. No CVEs have been filed (as of 2026-10-06):
+the five confirmed mechanisms are latent-surface findings —
+instruction-shaped text, not exploited code paths — and this project’s
+90-day coordinated-disclosure rule is reserved for any future finding
+that meets a confirmed-exploitability bar. The rubric-consistency
+second-rater provenance (an unversioned consumer LLM web UI — a
+methodological limitation, §7) is disclosed in Section 7 and
+Methods.</p>
 <h2 id="references">References</h2>
 <ol class="references">
   <li id="ref-1">AgentsID Security Research, &ldquo;Weaponized-by-Design,&rdquo; <span class="ref-venue">industry census (vendor research, non-peer-reviewed)</span> April 2026. <a href="https://agentsid.dev/research">https://agentsid.dev/research</a></li>

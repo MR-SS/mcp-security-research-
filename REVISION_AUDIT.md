@@ -167,14 +167,22 @@ These reviewer concerns were **not** reached in this pass and must not be treate
 
 - **Phase 3.8** — whether Wilson intervals are presented with their binomial model assumption stated, and
   whether "compatibility interval" is doing work it cannot do.
+  **→ RESOLVED in Phase-set D** (`REVISION_REPORT.md` §10): the binomial assumption and the
+  `server::tool` clustering are now stated in §6.1.
 - **Phase 3.9–3.12** — i.i.d. trial-independence assumptions, pooled-arm interchangeability,
   multiplicity framing, top-score selection bias direction.
+  **→ RESOLVED in Phase-set D**: i.i.d. framed as a modeling assumption; pooling now states the
+  interchangeability it cannot assume; multiplicity tied to the 13 fired classes; selection-bias
+  direction explained as non-identifiable from this sample.
 - **Phase 4** — full labeling-chronology reconstruction; what the assistant saw and proposed where documented;
   whether the labeling assistant and the κ probe were related; whether the 40-row subset can contain positives.
 - **Phase 5** — the FL scoring rule vs quotation/adoption; the 6 fixture rows vs 4 mechanisms;
   timeout exclusions by arm/model; the two hand-selected live control fixtures.
 - **Phase 6** — OWASP identifier qualification, client/runtime authority separation wording,
   disclosure status.
+  **→ RESOLVED in Phase-set D**: OWASP identifiers already `OWASP-adjacent` with unverified titles
+  (§3 note; §9 junction citation); the §2 authority-separation claim is scoped to the evaluated
+  models ("we found no standard mechanism"); §10 disclosures are time-stamped (`as of 2026-10-06`).
 - **Phase 7** — duplicate figure numbering, obsolete §5.10 cross-references, stale version banners.
   **→ RESOLVED in Phase-set C (2026-10-06)**, see `REVISION_REPORT.md` §9 and `paper/CONVENTIONS.md`
   (reviewer plots renamed S1/S2; bare §5.1x refs qualified to `data/collection_report.md` / §A.3–§A.6;
