@@ -17,6 +17,14 @@ def check(name, got, want):
 
 CORPUS, ANYFLAG, POISON_ROWS, INSTANCES = 16763, 4128, 698, 4926
 SUPPORTED, TP_ROWS, REVIEWED = 15, 5, 150
+# Denominator-funnel stage figures (item 5), verified against
+# data/collection_report.md §2-§4 (600-page snapshot 20260921T115232Z):
+# 60,000 entries -> 17,167 isLatest (28.6%) -> 11,370 with repository.url (66.2%)
+# -> 11,288 github.com (65.8%) -> extraction yield 16,763 rows / 4,725 repos.
+ENTRIES, SERVERS, REPO_REF, GITHUB_LINKED = 60000, 17167, 11370, 11288
+check("repo-ref share", round(100 * REPO_REF / SERVERS, 1), 66.2)
+check("github share", round(100 * GITHUB_LINKED / SERVERS, 1), 65.8)
+check("dedupe share", round(100 * SERVERS / ENTRIES, 1), 28.6)
 with open(os.path.join(REPO, "data", "candidate_rate_scan.csv"), encoding="utf-8") as fh:
     scanrows = list(csv.DictReader(fh))
 total_row = [r for r in scanrows if r["class"] == "__TOTAL__"][0]
@@ -55,15 +63,15 @@ if fails:
     print("MISMATCH — aborting:"); print("\n".join(fails)); sys.exit(1)
 print("All figure values match frozen artifacts.")
 plt.rcParams.update({"font.size": 9, "figure.dpi": 200})
-stages = [("Corpus rows: 16,763", 16763, 16763), ("Any-flag: 4,128 (24.6%)", 4128, 16763), ("Poison-flag: 698 (4.2%)", 698, 16763), ("Reviewed: 150", 150, 16763), ("Flag instances: 268", 268, 268), ("Supported: 15 (5.6%)", 15, 268), ("TP rows: 5", 5, 150)]
-fig, ax = plt.subplots(figsize=(7, 2.6))
+stages = [("Registry entries: 60,000", 60000, 60000), ("isLatest servers: 17,167 (28.6%)", 17167, 60000), ("With repository reference: 11,370 (66.2%)", 11370, 17167), ("GitHub-linked: 11,288 (65.8%)", 11288, 17167), ("Corpus rows extracted: 16,763 (4,725 repos)", 16763, 16763), ("Any-flag rows: 4,128 (24.6%)", 4128, 16763), ("Poison-flag rows: 698 (4.2%)", 698, 16763), ("Reviewed: 150", 150, 16763), ("Flag instances: 268", 268, 268), ("Supported: 15 (5.6%)", 15, 268), ("TP rows: 5", 5, 150)]
+fig, ax = plt.subplots(figsize=(7, 3.1))
 ys = list(range(len(stages)-1, -1, -1))
 vals = [s/d for _, s, d in stages]
 ax.barh(ys, vals, color="#3a6ea5")
 for y, (lab, s, d) in zip(ys, stages):
     ax.text(vals[len(stages)-1-y] + 0.015, y, lab, va="center", fontsize=8)
 ax.set_yticks([]); ax.set_xlabel("fraction of stage denominator (annotated)")
-ax.set_title("Figure 1 \u2014 Measurement funnel: 16,763 corpus rows to 5 poison-positive rows")
+ax.set_title("Figure 1 \u2014 Denominator funnel: 60,000 entries → 17,167 servers (28.6%) → 11,370 repo-ref (66.2%) → 16,763 rows → 5 TP rows", fontsize=8.5)
 ax.set_xlim(0, 1.6); fig.tight_layout()
 fig.savefig(os.path.join(FIGDIR, "fig-1-funnel.png")); plt.close(fig)
 FAMCOL = {"capability": "#c26d3d", "poison": "#3a6ea5", "channel": "#6a9e6a"}
@@ -79,7 +87,7 @@ ax.set_yticks(ys2); ax.set_yticklabels([k for k, _ in items], fontsize=8)
 ax.axvline(6/124, color="#3a6ea5", ls="--", lw=1, label="poison 6/124=4.8%")
 ax.axvline(15/268, color="#222", ls=":", lw=1.2, label="all-family 15/268=5.6%")
 ax.set_xlabel("text-support rate (supported / instances)")
-ax.set_title("Figure 2 \u2014 Per-class text-support rate (CAP orange / POI blue / CHN green)")
+ax.set_title("Reviewer figure — Per-class text-support rate, paper §6.2 (CAP orange / POI blue / CHN green)", fontsize=9)
 ax.legend(fontsize=8, loc="lower right"); fig.tight_layout()
 fig.savefig(os.path.join(FIGDIR, "fig-2-perclass.png")); plt.close(fig)
 arms = ["wf", "fl", "dp", "nv", "ne", "pt"]
@@ -94,7 +102,7 @@ for i in range(len(arms)):
     for j in range(len(models)):
         s, t = cells[(arms[i], models[j])]
         axg.text(j, i, f"{s}/{t}", ha="center", va="center", fontsize=9, color="white" if mat[i, j] > 0.5 else "black")
-axg.set_title("Figure 3 \u2014 Mocked-harness results (success/total; fully mocked, synthetic data)")
+axg.set_title("Reviewer figure — Mocked-harness results, paper §8 (success/total; fully mocked, synthetic data)", fontsize=9)
 cis = [("FL 9/9", 0.70, 1.00), ("DP 8/9", 0.57, 0.98), ("WF 6/9", 0.35, 0.88), ("CTRL 0/16", 0.00, 0.19)]
 for k, (lab, lo, hi) in enumerate(cis):
     axc.hlines(k, lo, hi, lw=3, color="#3a6ea5")

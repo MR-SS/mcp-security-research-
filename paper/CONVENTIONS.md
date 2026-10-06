@@ -17,6 +17,8 @@
 | §5.10 duplicate-name census (1,484) / §5.11 source-cuts (1,082 = 6.45%) / §5.12 Unicode scan (0 Cc/Cf) / §5.13 P7 surface (2 rows) | `data/collection_report.md` §5.10–§5.13 + `data/unicode_scan.csv` + `data/p7_bypass_scan.csv` | producing commands embedded in each §5.x subsection |
 | FP taxonomy buckets | `data/validation_report.md` FP-reason table (semantic grouping in `docs/FINDINGS_DISCUSSION.md` §c) | same as validation report |
 | Related-work rows & cite-as lines | `docs/RELATED_WORK_MAP.md` (AgentsID row verified against the public report 2026-09-28; arXiv IDs PI-verified 2026-09-28; **four 2026 works agent-verified 2026-09-29 at R2** — three arXiv abstract fetches, the TSE DOI via Crossref + Semantic Scholar, MCPZoo's numbers re-derived from its full text) | edit only with provenance note updated |
+| Headline Wilson intervals (15/268, 6/124, 5/100, 5/150) + cluster sensitivity 13/251 + κ delta-method CI (n = 30) | `pilot/derive_r4_numbers.py` (assert-guarded; STRUCTURE-LOCK block) | `python3 pilot/derive_r4_numbers.py` (must exit 0) |
+| Labeling rulebook + second-rater pack (40 rows, seed 2026, sha256 `af2718…4b77a`) | `docs/LABELING_RULEBOOK.md`, `pilot/second_rater_pack.csv`, `docs/SECOND_RATER_PROTOCOL.md`, `docs/SECOND_RATER_SCORER.py` | pack generation recipe recorded in the protocol; scorer sha-verifies the pack |
 
 ## 2. Style rules for future edits
 
@@ -59,15 +61,19 @@
     every claim is about *detector calibration*, *candidate prevalence under a stated
     rubric*, or *controlled steering in a mocked harness*. Attack-shaped text from a
     benign vendor is reported as a mechanism, never as a vulnerability (paper §9,
-    Figure R2-1).
+    Figure 2).
 12. **5.6% is always scoped to the validation sample.** Wherever flag-instance precision
     appears (abstract, §2, §4, §6.1–§6.2, §9, tables) it must be written as
-    *"flag-instance precision 5.6% (15/268) **in the stratified validation sample**"* —
+    *"flag-instance precision 5.6% (15/268) **in the purposive top-score validation
+    sample**"* (the abstract's shorter form is *"in a top-score validation sample"*) —
     never as a bare or unweighted population claim. The sample is the top 100 rows by
-    `suspicion_score` plus 50 zero-flag controls, so it over-represents the detector's
-    highest-scoring output; a population estimate would require score-weighted
-    re-weighting, which was not performed (§6.1). (Binding from the R3 review,
-    2026-09-29.)
+    `suspicion_score` (capability flags + 3 × poison flags, stable descending sort, ties
+    by corpus row order) plus 50 zero-flag controls — a **purposive top-score review**,
+    renamed from "stratified sample" at STRUCTURE-LOCK because the design is purposive,
+    not probability-based — so it over-represents the detector's highest-scoring output;
+    a population estimate would require a probability sample over ALL flagged rows, which
+    was not drawn (§6.1). (Binding from the R3 review, 2026-09-29; wording updated at
+    STRUCTURE-LOCK, 2026-10-05.)
 13. **No author-intent claims.** The five TP rows are described as occurring in *otherwise
     benign product descriptions*; the paper never asserts that their authors were
     "benign-intent" or "in good faith", and never contrasts the rows with a hypothetical
@@ -161,3 +167,20 @@
   tables could no longer rebuild `main_clean.md`, which has been hand-maintained and
   authoritative since). No code imports them; the historical log entries above (R5 gate
   record) stay as written.
+- **2026-10-05: STRUCTURE-LOCK (batches A + A-ext + limitation commitments) applied to
+  both papers.** Canonical mechanism count = **four** (priority capture carries an
+  unconditional and a conditional-gateway variant); **funnel figure = Figure 1** (denominator
+  funnel: 60,000 → 17,167 (28.6%) → 11,370 repo-ref (66.2%) / 11,288 GitHub (65.8%) →
+  16,763 rows / 4,725 repos — the task's "8,767 (51.0%)" does not appear in any committed
+  artifact and was replaced with the verified report figures), **evidence chain = Figure 2**
+  (the legacy `FIGURE_*_RE` strippers in `pilot/legacy/make_publication.py` accept both the
+  old and new captions so the 5-op number-parity baseline stays computable at HEAD);
+  completed-vs-valid wording (54 completed with transcripts / 51 valid / 3 excluded);
+  Wilson CIs + cluster sensitivity (13/251) + κ delta-method CI assert-guarded in
+  `pilot/derive_r4_numbers.py`; "stratified" → "purposive top-score review" (rule 12
+  updated); honest-aid and second-rater-future-work sentences in §5/§7; κ-packet POI=21
+  defined (5 TP + 16 flagged non-TP; 9 zero-flag controls excluded); Appendix provenance
+  chronology table; second-rater pack specified as future work (no in-progress claim).
+  Gates at this commit: abstract **179/180**, number parity **5 ops == HEAD baseline**,
+  `derive_r4_numbers.py` exit 0, `trial_accounting --check` exit 0, banned-phrase grep 0,
+  secret scan clean.

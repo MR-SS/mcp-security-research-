@@ -185,6 +185,102 @@ def main():
         s = [r for r in t if r["verdict"] == "success"]
         print(f"    {mdl:<22} {len(s)}/{len(t)}")
 
+    # ------------------------------------------------------------------
+    # STRUCTURE-LOCK - section 6.1 headline Wilson intervals,
+    # duplicate-name cluster sensitivity, and the section 7 kappa CI.
+    # Every figure printed here is assert-guarded against the paper text.
+    # ------------------------------------------------------------------
+    print()
+    print("=" * 70)
+    print("STRUCTURE-LOCK - headline CIs, cluster sensitivity, kappa CI")
+    print("=" * 70)
+
+    # (name, k, n, expected (lo, hi) as printed in section 6.1, 2 dp)
+    headline = [("all-family text-support", 15, 268, (0.03, 0.09)),
+                ("poison-family text-support", 6, 124, (0.02, 0.10)),
+                ("TP yield in the top-100 rows", 5, 100, (0.02, 0.11)),
+                ("row-level TP", 5, 150, (0.01, 0.08))]
+    for name, k, n, want in headline:
+        lo, hi = wilson(k, n)          # rounds to 2 dp, exactly as section 6.1
+        assert (lo, hi) == want, (
+            f"{name}: Wilson [{lo}, {hi}] != paper interval {want}")
+        print(f"  {name:<30} {k}/{n}  Wilson 95% [{lo:.2f}, {hi:.2f}]  OK")
+    print("  section 6.1 scope note: no multiplicity adjustment; "
+          "per-class figures descriptive")
+
+    # Cluster sensitivity: collapse flag instances that share a server::tool
+    # (duplicate-name groups) and recompute the pooled text-support rate.
+    import csv as _csv
+    sample_rows = list(_csv.DictReader(open(SAMPLE, encoding="utf-8")))
+    human_full = load_human_labels()
+
+    def _instances(i):
+        r = sample_rows[i]
+        out = []
+        for prefix, fld in (("capability:", "capability_flags"),
+                            ("poison:", "poison_flags"),
+                            ("addressing:", "addressing_flags")):
+            for cls in (r[fld] or "").split(";"):
+                cls = cls.strip()
+                if cls:
+                    out.append(cls if ":" in cls else prefix + cls)
+        return out
+
+    n_inst = sum(len(_instances(i)) for i in range(len(sample_rows)))
+    assert n_inst == 268, f"sample instances {n_inst} != 268"
+    tp_rows = [i for i in range(len(sample_rows)) if human_full[i] == "tp"]
+    tp_inst = sum(len(_instances(i)) for i in tp_rows)
+    # supported == instance carried by a TP row (15 supported / 15 instances)
+    assert tp_inst == 15, f"instances on TP rows {tp_inst} != 15 supported"
+    groups = {}
+    for i, r in enumerate(sample_rows):
+        groups.setdefault(r["name"], []).append(i)
+    collapsed = {}
+    for name, rws in groups.items():
+        classes = set()
+        for i in rws:
+            classes.update(_instances(i))
+        for cls in classes:
+            collapsed[(name, cls)] = any(human_full[i] == "tp" for i in rws)
+    c_k, c_n = sum(collapsed.values()), len(collapsed)
+    assert (c_k, c_n) == (13, 251), (
+        f"cluster collapse {c_k}/{c_n} != paper's 13/251")
+    print(f"  cluster sensitivity (same server::tool collapsed)  "
+          f"{c_k}/{c_n} = {100 * c_k / c_n:.2f}%  "
+          f"vs 15/268 = {100 * 15 / 268:.2f}%  OK")
+
+    # Kappa delta-method 95% CI (n = 30), from the packet's own 2x2 table.
+    counts = {}
+    for h, l in pairs_all:
+        counts[(h, l)] = counts.get((h, l), 0) + 1
+    assert sorted(counts.values()) == [1, 1, 4, 24], (
+        f"packet 2x2 table drifted: {counts}")
+    kk = len(pairs_all)
+    p = {c: v / kk for c, v in counts.items()}
+    labels_ord = ["tp", "fp"]
+    a_m = {x: sum(v for (h, _l), v in p.items() if h == x) for x in labels_ord}
+    b_m = {y: sum(v for (_h, l), v in p.items() if l == y) for y in labels_ord}
+    po_k = sum(v for c, v in p.items() if c[0] == c[1])
+    pe_k = sum(a_m[x] * b_m[x] for x in labels_ord)
+    kappa_k = (po_k - pe_k) / (1 - pe_k)
+    grad = {}
+    for (i_, j_) in p:
+        delta = 1.0 if i_ == j_ else 0.0
+        h_ij = b_m[i_] + a_m[j_]
+        grad[(i_, j_)] = ((delta - h_ij) * (1 - pe_k)
+                          + (po_k - pe_k) * h_ij) / (1 - pe_k) ** 2
+    mean_g = sum(v * grad[c] for c, v in p.items())
+    var_k = (sum(v * grad[c] ** 2 for c, v in p.items()) - mean_g ** 2) / kk
+    se_k = math.sqrt(var_k)
+    lo_k, hi_k = kappa_k - Z * se_k, kappa_k + Z * se_k
+    assert round(kappa_k, 3) == 0.760 and round(se_k, 3) == 0.162, (
+        f"kappa {kappa_k:.3f} (se {se_k:.3f}) != +0.760 (se 0.162)")
+    assert (round(lo_k, 2), round(min(1.0, hi_k), 2)) == (0.44, 1.00), (
+        f"kappa CI [{lo_k:.2f}, {min(1.0, hi_k):.2f}] != paper [0.44, 1.00]")
+    print(f"  kappa delta-method (n={kk})          {kappa_k:+.3f}  "
+          f"SE {se_k:.3f}  95% CI [{lo_k:.2f}, "
+          f"{min(1.0, hi_k):.2f}] (untruncated upper {hi_k:.2f})  OK")
+
 
 # --------------------------------------------------------------------------
 # R4 FIX 2 — section 6.4 false-positive taxonomy over the 95 flagged-benign rows

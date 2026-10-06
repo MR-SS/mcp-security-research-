@@ -234,7 +234,7 @@ across 16 valid trials. Step 4 is deliberately **not** implied: there is no expl
 live target, no attacker, no credential at risk, and no filed CVE (§10)."""
 
 CHAIN_RE = re.compile(
-    r"\*\*Figure R2-1 — the evidence chain: what we show, and where it stops\.\*\*\n+"
+    r"\*\*Figure (?:R2-1|2) — the evidence chain: what we show, and where it stops\.\*\*\n+"
     r"```text\n.*?\n```\n",
     re.S,
 )
@@ -302,12 +302,17 @@ def numbers(text):
     return re.findall(r"\d+(?:[.,]\d+)*", t)
 
 
+# Accept BOTH the pre-STRUCTURE-LOCK caption ("Figure 1") and the renumbered one
+# ("Figure 2", funnel figure = Figure 1). The 5-op number-parity baseline is
+# computed at HEAD, where the caption still reads "Figure 1", so both forms must
+# strip; otherwise the token walk compares a stripped clean body against an
+# unstripped source body and reports false NUMBER DRIFT.
 FIGURE_CAPTION_RE = re.compile(
-    r"\*\*Figure 1 — The evidence chain.*?filed CVE \(§10\)\.", re.S
+    r"\*\*Figure (?:1|2) — The evidence chain.*?filed CVE \(§10\)\.", re.S
 )
-# The same block in the source, still an ASCII diagram.
+# The same block in the source, still an ASCII diagram (old heading and new).
 FIGURE_SOURCE_RE = re.compile(
-    r"\*\*Figure R2-1 — the evidence chain: what we show, and where it stops\.\*\*"
+    r"\*\*Figure (?:R2-1|2) — the evidence chain: what we show, and where it stops\.\*\*"
     r"\n+```text\n.*?\n```\n",
     re.S,
 )
@@ -319,7 +324,9 @@ def _strip_figure(text):
 
 
 # Scientific quantities the figure caption must preserve from the ASCII original.
-FIGURE_REQUIRED = ("5 TP rows", "54 mocked trials", "9/9", "8/9", "0/16", "6.3", "8", "10")
+FIGURE_REQUIRED = ("5 true-positive rows", "four in-the-wild mechanisms",
+                   "27 attack trials (of 54 total)", "9/9", "8/9",
+                   "16 valid trials", "6.3", "10")
 
 
 def word_count(t):
@@ -371,8 +378,9 @@ def check(clean, src):
         problems.append("R5: numbered figure caption not found")
     else:
         ctext = cap.group(0)
-        for need in ("5 true-positive rows", "54 mocked trials", "exec-priming steered 9/9",
-                     "8/9", "16 valid trials", "§6.3", "§8", "§10", "Step 1", "Step 2",
+        for need in ("5 true-positive rows", "four in-the-wild mechanisms",
+                     "27 attack trials (of 54 total)", "9/9", "8/9",
+                     "16 valid trials", "§6.3", "§8", "§10", "Step 1", "Step 2",
                      "Step 3", "Step 4"):
             if need not in ctext:
                 problems.append(f"R5: figure caption lost {need!r}")
