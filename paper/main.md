@@ -270,8 +270,13 @@ human-in-the-terminal via `pilot/label_sample.py` with
 per-class TP rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
 ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* Labeling is two-level: (a) the **row-level
 verdict** — a row is `tp` iff at least one poison flag is genuinely supported by the
-visible text (the master rule); capability and channel flags never decide a row; and (b) **per-flag-instance adjudication** — every fired (row, class) instance is separately
-judged against its class definition, which is what the per-class table in §6.2 reports. We use
+visible text (the master rule); capability and channel flags never decide a row; and (b) **per-class apportionment** — the per-class table in §6.2 is derived from the row verdict rather
+than adjudicated instance by instance: every flag that fired on a row labeled `tp` counts as a
+supported instance of its class, every flag on a row labeled `fp` counts as unsupported, and
+`unclear` rows contribute nothing. This is a limitation of the per-class figures: an instance is
+never separately judged once its row is decided, so a class's supported count on a positive row is
+inherited from the row verdict rather than established instance by instance, and class-level
+support recorded in a rationale for a non-positive row is not counted. We use
 the term *false positive* only in this poison-detection sense — a row whose poison-family
 flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*.
 Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,

@@ -85,25 +85,25 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "f3f4982b3ad8b33cef1d0dc0e725c5c133c3b94e69452446decceaf2eb3c4332",
+      "sha256": "1af7135e4bded5f2194b522d620fc3cb24626d1a7864f38648afa3faa9f61f8f",
       "role": "traceable manuscript record (edited this revision)",
       "status": "derived"
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "cf83cb8fec6dca8d73a17e6ec601562d3091df761b59fcbe36d0c8660bb740a6",
+      "sha256": "304b2d7e024944331fdd6abc976cd8dcb6b8196cfdc9c73c00315a5281c358a0",
       "role": "authoritative publication copy (edited this revision)",
       "status": "derived"
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "0e38af0ac42388b950e2bcbe452222433000fe1cf6ca006c2e5eb4e1d5e0a678",
+      "sha256": "843521557e2bed9b3bc23abb2fe87d2adc5b441d64ebb8f16e12b7f7d2c4a5b1",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived"
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
-      "sha256": "de5347f1fec2a79e0082ae51423cc04baa37f8fb3d55d6a1ec00c3d341464e03",
+      "sha256": "aa05f4951e2a275949ada5f0c519e9eecc05231b51f9b75ecb902a7ff713f3af",
       "role": "built reviewer PDF",
       "status": "derived"
     },
@@ -139,7 +139,7 @@
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "0cc5b196dac88e532d3a4d2f6eca3da98d989ca6ed8a8d6cf546168c41af0ad2",
+      "sha256": "8cd992cf1e9fca2b53d997d381d841e9f3ca0f50964eb54f8bc34cc50e7bdf1f",
       "role": "machine-readable claim ledger (22 claims)",
       "status": "derived"
     },
@@ -157,19 +157,19 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "601d21ca7f0ca3efa44c6a6e5f5706e63a3d3dd9bafc5b3aa0f3a3cc3118393e",
+      "sha256": "791e7843a8f1eda3907af090ad1ca2b3ce6c30ff1b822c0e5d18eed0d4afcea8",
       "role": "offline verification entry point",
       "status": "derived"
     },
     {
       "path": "REVISION_AUDIT.md",
-      "sha256": "e015fb92352767d826bfb6b24bd8887414246047dcccb3c270b0f520aab2d7b5",
+      "sha256": "090f199023bf7afe869bc99fd8f102ed7e5f964e6f58c01e8448097f6c730f08",
       "role": "revision audit (Phase 1 + applied record)",
       "status": "derived"
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "45151b378ad2d899b707729555ed3f9b14bfadcf0b73720584629d2de56ab262",
+      "sha256": "79598dfeb843b4d13b65571b2ed760a9347c95a17331e00c06cb5168ba72232b",
       "role": "human-dependency list",
       "status": "derived"
     },
@@ -177,6 +177,12 @@
       "path": "REVISION_REPORT.md",
       "sha256": "8ee81edaa1813dbdfb5d2939903d014ed08517b9c131cde88b01f0fa6d024c29",
       "role": "revision report",
+      "status": "derived"
+    },
+    {
+      "path": "scripts/gate_battery.py",
+      "sha256": "ab3ffee566ee617d6dd0bde876d9c0c0210ce61238f7f9fb83518f039c680a38",
+      "role": "standard four-gate battery (derive, trial accounting, abstract cap, number parity)",
       "status": "derived"
     }
   ],
@@ -215,7 +221,8 @@
     "verification": "python3 scripts/verify_claims.py",
     "figures": "python3 paper/preview/make_figures.py",
     "preview_html": "python3 paper/preview/build_preview.py",
-    "preview_pdf": "chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=20000 --print-to-pdf=<out>.pdf 'http://127.0.0.1:8231/paper.html'"
+    "preview_pdf": "chromium --headless --no-sandbox --disable-gpu --virtual-time-budget=20000 --print-to-pdf=<out>.pdf 'http://127.0.0.1:8231/paper.html'",
+    "gate_battery": "python3 scripts/gate_battery.py"
   },
   "unknowns": [
     "gateway deployment boundary and model/backend identity behind the proxy",
@@ -227,7 +234,7 @@
     "exact upstream extraction truncation rate after recovery (1,082/16,763 pre-recovery)"
   ],
   "self_check": {
-    "note": "No entry may have a null hash; scripts/verify_claims.py C11 asserts every entry matches the file on disk.",
+    "note": "No entry may have a null hash; scripts/verify_claims.py C12 asserts every entry matches the file on disk.",
     "null_hashes": []
   }
 }

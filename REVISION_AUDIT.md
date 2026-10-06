@@ -242,3 +242,30 @@ Removed by measurement rather than by edit: RA-01's causal claim, RA-02's unit e
 RA-04's literal reading, and the "structurally uninformative about recall" phrasing.
 The bucket `withdrew` keyword turned out to be dead code — removing it changed no
 membership, which is itself evidence it never described the data.
+
+### RA-20 — HIGH (found this pass) — the manuscript claimed an adjudication granularity the code does not implement
+- **Section / quote** — §5 *Human labeling protocol*, both files (pre-revision):
+  `and (b) **per-flag-instance adjudication** — every fired (row, class) instance is separately
+  judged against its class definition, which is what the per-class table in §6.2 reports.`
+- **Still applies?** **YES, and it was false.** Provenance is now established end to end:
+  `data/labels.jsonl` → `pilot/label_sample.py --report` → `data/validation_report.md` per-class
+  table → `pilot/derive_family_split.py` → `data/validation_family_split.csv` → manuscript.
+- **Evidence** — `pilot/label_sample.py` `report()` implements:
+  `if lab == 'tp': for _, c in flags: tp[c] += 1` / `elif lab == 'fp': for _, c in flags: fp[c] += 1`.
+  The per-class counts are therefore **apportioned from the ROW verdict**: every flag on a positive
+  row counts as supported, every flag on a non-positive row as unsupported, `unclear` contributes
+  nothing. No instance is ever judged on its own. Re-derived under exactly this rule, the published
+  table is reproduced with **zero mismatches** (13 classes, sums 15 supported / 268 instances).
+- **A false lead, recorded** — an earlier hypothesis in this pass was that the per-class rationales
+  contradict the counts (16 rationales mention `secret_env_access TP-by-text` against a published 3).
+  That hypothesis is **wrong**: the report never reads the rationale text, so the note language is not
+  the source of the counts. Reporting it as an inconsistency would have been an error, which is why
+  the producer was read before the claim was made.
+- **Disposition** — **FIXED (wording made true, not the numbers).** Both files now say *per-class
+  apportionment*, state the rule explicitly, and disclose the limitation: an instance is never
+  separately judged once its row is decided, so a class's supported count on a positive row is
+  inherited from the row verdict, and class-level support recorded in a rationale for a non-positive
+  row is not counted. **No number changed.** A genuine per-instance adjudication is new human work.
+- **Verification** — `scripts/verify_claims.py` C11 reproduces the published table from the row
+  verdict; C9 asserts the old phrasing is absent and the new phrasing present.
+- **Author action** — **YES** — `AUTHOR_ACTION_REQUIRED.md` A8.

@@ -108,3 +108,29 @@ RA-07 still needs one verified sub-count: the server→repository mapping, deriv
 `data/github_tools.jsonl`.
 
 RA-01 is blocked on A1 above.
+
+## A8 — A true per-instance adjudication does not exist
+
+**Affected claims:** the per-class text-support figures in §6.2, the family split, and every
+denominator derived from them (poison 6/124, capability 5/102, channel 4/42, all-family 15/268).
+
+**Why this is a human dependency.** `pilot/label_sample.py --report` computes per-class counts by
+**apportioning the row verdict** — every flag on a positive row counts as supported, every flag on a
+non-positive row as unsupported. There is no per-instance judgment in the pipeline, so the
+manuscript's former claim of per-instance adjudication was false. The wording is now corrected and
+the limitation disclosed; the *numbers* were not changed, and must not be.
+
+**What only a human can add.** A genuine per-instance pass over the 268 sampled instances, judging
+each `(row, class)` pair against that class's definition independently of the row verdict. The
+rationales already contain class-level evidence the current rule discards — e.g. 16 rationales mark
+`secret_env_access` as supported by text while the published count is 3 — so a real pass would
+plausibly **move** the per-class numbers in both directions. That is a new annotation task, not an
+edit.
+
+**Acceptance criterion:** either an instance-level annotation artifact exists and the per-class table
+is regenerated from it (with the old figures preserved as historical), or the manuscript continues to
+describe the row-verdict apportionment and carries the disclosed limitation.
+
+**Blocks submission?** Not by itself — the corrected wording is defensible and the headline 15/268 is
+unaffected. It does block any claim of per-class instance-level precision, and it should be resolved
+before a reviewer with the code in hand finds it.

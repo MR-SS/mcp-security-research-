@@ -22,6 +22,7 @@ validation of either.
 
 Usage:  python3 scripts/verify_claims.py
 """
+import collections
 import csv
 import hashlib
 import json
@@ -172,12 +173,14 @@ check("NV gray arm (violation / trials)", agg.get("nv"), (0, 8))
 print("C9 manuscript wording (superseded absent / corrected present)")
 SUPERSEDED = ["trigger withdrew on full text", "1,484/16,763", "Flagged non-TP subset",
               "Capability only (no model-addressed instruction)", "structurally uninformative",
-              "Control violations 0/16", "54 mocked trials"]
+              "Control violations 0/16", "54 mocked trials",
+              "per-flag-instance adjudication", "separately judged against its class definition"]
 # main.md keeps repo paths (backticked `server::tool`) where main_clean.md does not,
 # so phrase-level requirements are split into fragments both files must satisfy.
 REQUIRED = ["15/263", "ae1aff9f", "adjudicated from the 300-char excerpt",
             "by extraction, not by absence upstream",
-            "1,484 of the 16,763 rows carry a", "name shared with at least"]
+            "1,484 of the 16,763 rows carry a", "name shared with at least",
+            "per-class apportionment", "derived from the row verdict rather"]
 for f in ("paper/main.md", "paper/main_clean.md"):
     raw = open(p(*f.split("/")), encoding="utf-8").read()
     # whitespace-insensitive: the prose is hard-wrapped, so a phrase may straddle
@@ -210,8 +213,56 @@ else:
     nv = [r["claim_id"] for r in led if r.get("status") == "VERIFIED" and not r.get("source_paths")]
     check("no VERIFIED claim lacks artifact backing", nv, [])
 
-# ------------------------------------------------- C11 manifest freshness
-print("C11 reproducibility_manifest.json freshness")
+# ------------------------- C11 per-class table provenance (apportionment rule)
+# The per-class table is NOT a per-instance adjudication. label_sample.py --report
+# apportions each row's fired flags by the ROW verdict: flags on a tp row count as
+# supported, flags on an fp row as unsupported, unclear rows contribute nothing.
+# This block re-derives the published table under exactly that rule; it is the
+# check that keeps the manuscript's §5 description honest.
+print("C11 per-class table reproduces under the row-verdict apportionment rule")
+
+def _parse_flags(s):
+    out = []
+    for tok in (s or "").split(";"):
+        tok = tok.strip()
+        if ":" in tok:
+            _pre, cl = tok.split(":", 1)
+            out.extend(c.strip() for c in cl.split("+"))
+        elif tok:
+            out.append(tok)
+    return out
+
+_tp, _fp = collections.Counter(), collections.Counter()
+for _i, _row in enumerate(S):
+    if _i not in last:
+        continue
+    _lab = last[_i]["label"]
+    _flags = (_parse_flags(_row.get("poison_flags")) +
+              _parse_flags(_row.get("capability_flags")) +
+              _parse_flags(_row.get("addressing_flags")))
+    if _lab == "tp":
+        for _c in _flags:
+            _tp[_c] += 1
+    elif _lab == "fp":
+        for _c in _flags:
+            _fp[_c] += 1
+recomputed = {c: (_tp[c], _fp[c]) for c in set(_tp) | set(_fp)}
+_vr = open(p("data", "validation_report.md"), encoding="utf-8").read()
+published = {m.group(1): (int(m.group(2)), int(m.group(3)))
+             for m in re.finditer(r"\| `(\w+)` \| (\d+) \| (\d+) \| ([\d.]+|N/A[^|]*) \|", _vr)}
+check("published per-class classes", len(published), 13)
+check("apportionment reproduces every published cell",
+      sorted((c, recomputed.get(c), published.get(c)) for c in set(published) | set(recomputed)
+             if recomputed.get(c) != published.get(c)), [])
+check("apportioned supported sum", sum(t for t, _f in recomputed.values()), 15)
+check("apportioned instance sum", sum(t + f for t, f in recomputed.values()), 268)
+check("classes with zero supported instances",
+      sorted(c for c, (t, _f) in recomputed.items() if t == 0),
+      ["database_write", "exfiltration_language", "fake_system_role",
+       "file_write_delete", "model_addressed", "network_egress", "stealth_concealment"])
+
+# ------------------------------------------------- C12 manifest freshness
+print("C12 reproducibility_manifest.json freshness")
 mp = p("reproducibility_manifest.json")
 if not os.path.exists(mp):
     check("reproducibility_manifest.json exists", False, True)
