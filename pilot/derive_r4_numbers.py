@@ -90,16 +90,21 @@ def main():
         lo, hi = wilson(k, n)
         print(f"  {name:<34} {k}/{n}  CI [{lo:.2f}, {hi:.2f}]")
 
-    # Consistency assert 1: FL + DP + WF successes must sum to the pooled
-    # attack ASR quoted in the paper (23/27 = 9 + 8 + 6 over 9 + 9 + 9).
+    # Consistency assert 1: the pooled attack ASR is DP + WF only. FL is
+    # EXCLUDED (A9 option C): its criterion [B] is a marker-presence test
+    # satisfied by relaying the install guide, which is also the benign task, so
+    # the arm is outcome-conflated with task completion and tests no steering
+    # (paper §8 Finding 1). The frozen FL row (9/9) stays in ci_rows.
+    # Pooled = 14/18 (DP 8 + WF 6 over 9 + 9).
     ci_by_case = {case: (k, n) for _name, case, k, n in ci_rows if case}
-    pooled_k = sum(k for k, _n in ci_by_case.values())
-    pooled_n = sum(n for _k, n in ci_by_case.values())
-    assert (pooled_k, pooled_n) == (23, 27), (
-        f"pooled attack ASR drift: FL+DP+WF = {pooled_k}/{pooled_n}, "
-        f"paper quotes 23/27")
-    print(f"  pooled attack (FL+DP+WF)     {pooled_k}/{pooled_n}  "
-          f"matches the paper's 23/27  OK")
+    POOLED_CASES = ("wf", "dp")
+    pooled_k = sum(ci_by_case[c][0] for c in POOLED_CASES)
+    pooled_n = sum(ci_by_case[c][1] for c in POOLED_CASES)
+    assert (pooled_k, pooled_n) == (14, 18), (
+        f"pooled attack ASR drift: WF+DP = {pooled_k}/{pooled_n}, "
+        f"paper quotes 14/18")
+    print(f"  pooled attack (WF+DP; FL excluded as task-conflated)  "
+          f"{pooled_k}/{pooled_n}  matches the paper's 14/18  OK")
 
     # Consistency assert 2: the CI denominators must equal the per-arm valid
     # counts that experiments/trial_accounting.py derives from the same ledger
@@ -165,10 +170,11 @@ def main():
           f"{[(r['model'], r['rep']) for r in overt]}")
 
     print()
-    attack = [r for r in rows if r["case"] in ("wf", "fl", "dp")]
+    # FL is excluded from the pooled figure as task-conflated (A9 option C).
+    attack = [r for r in rows if r["case"] in ("wf", "dp")]
     succ = [r for r in attack if r["verdict"] == "success"]
-    print(f"  pooled attack ASR (WF+FL+DP, success = A/B/A-covert): "
-          f"{len(succ)}/{len(attack)}")
+    print(f"  pooled attack ASR (WF+DP, success = A/A-covert; FL excluded "
+          f"as task-conflated): {len(succ)}/{len(attack)}")
     # Assert 3: the ledger must reproduce the CI table's pooled attack ASR,
     # and each attack arm's own (successes, trials) pair.
     assert (len(succ), len(attack)) == (pooled_k, pooled_n), (

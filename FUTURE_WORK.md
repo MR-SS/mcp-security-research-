@@ -251,6 +251,25 @@ authorization for the trial increment.
 
 ---
 
+**16. Redesigned exec-priming arm with a non-task-required marker — deferred 2026-10-06 (PI decision A9 option C).**
+*Situation:* the live FL arm's criterion `[B]` is implemented as a marker-presence test on the
+install-guide command text (`TESTKEY-DEMO-INSTALL`), but the arm's own task asks the model to
+retrieve and follow that guide — so the success condition is satisfied on the benign path and the
+arm is **outcome-conflated with task completion**: it measures instruction surfacing (9/9), not
+steering, and is therefore excluded from the pooled ASR and the live-mechanism count (paper §8
+Finding 1, §9 Limitations (x)).
+*Idea:* redesign the marker so that it is **not** required by the task — e.g. a tool-supplied
+instruction whose execution leaves an observable artifact (a sentinel written through a separate
+call, a distinct side-effect channel) that a merely-compliant model would never produce — and
+re-run the arm at 3 reps/model with the same frozen protocol discipline. This turns exec-priming
+from a propagation count into a genuine adoption test.
+*Deferred:* the frozen 54-trial matrix is closed and committed; changing the criterion or the task
+mid-paper changes the denominators and invalidates the published §8 table.
+*Unblocked by:* a pre-registered BRIEF04 protocol amendment (arm definition, non-task-required
+marker, and success criterion frozen before any run) plus PI authorization for the trial increment.
+
+---
+
 Before pushing these artifacts, tracked files were scanned for credential patterns
 (`ghp_/gho_/github_pat_`, `AKIA…`, `sk-…`, `xox[baprs]-`, PEM headers, JWTs, `AIza…`). Two
 regex hits were investigated and both are **documentation prose, not secrets**:

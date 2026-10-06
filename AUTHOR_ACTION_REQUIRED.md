@@ -150,14 +150,27 @@ expresses intent to execute in the model's own voice (0/9)**. The manuscript now
 ledger and the table cell (`FL 3/3 [B]`) are **unchanged**; criterion `[B]` is described as a
 marker-presence test. Verified by `scripts/verify_claims.py` C13.
 
-**What only the PI can decide.** (1) Whether to keep FL in the pooled WF+FL+DP figure (already
-disclosed as mixing heterogeneous criteria) or drop it to WF+DP. (2) Whether the arm should be
-reframed in `docs/BRIEF04_PROTOCOL.md` as a propagation/utility measurement for a future run rather
-than an attack arm.
+**PI decision — APPLIED 2026-10-06 (option C: recast FL as a task-conflated null arm).** All four
+items are implemented and committed as Phase-set A9:
+1. FL removed from the pooled ASR — recomputed **WF+DP = 14/18** (glm 5/6, deepseek 6/6,
+   gemini 3/6), assert-guarded in `pilot/derive_r4_numbers.py` and `experiments/summarize.py`; the
+   frozen `FL 9/9 [B]` row is unchanged in the ledger and re-checked by `scripts/verify_claims.py`
+   (C8). The §8 table row now reads "FL — exec-priming, **task-conflated** (B)†" with the footnote
+   "outcome-conflated with task completion — steering not tested; 0/9 execution intent".
+2. Abstract, §8, §9 now state the live matrix tests **two of the four** mechanisms (DP, WF);
+   exec-priming joins the untested ledger. Finding 1 is reframed as a design lesson — instruction
+   surfacing 9/9 vs execution intent 0/9, all three models refusing or deferring, with the deepseek
+   refusal quoted once.
+3. Figure 3 (`paper/preview/figs/fig-3-trials.png`): the FL row is labeled "task-conflated (see
+   text)" and FL is dropped from the pooled-CI panel.
+4. Limitations (x) added: criterion [B] == task completion; the arm cannot test steering; a
+   redesigned non-task-required marker + re-run is parked in `FUTURE_WORK.md`.
 
-**Acceptance criterion:** the pooled-ASR sentence either states FL is excluded, or retains FL with the
-over-attribution caveat now present; no sentence reads `FL 9/9` as "models executed tool-supplied
-shell text".
+**Remaining sub-action (PI).** Whether to reframe the arm in `docs/BRIEF04_PROTOCOL.md` as a
+propagation/utility measurement for a future run rather than an attack arm — low priority; the
+manuscript already reports it as a design lesson.
 
-**Blocks submission?** No — the corrected wording is defensible and the frozen counts are unchanged.
-It does block any sentence that reads FL 9/9 as model-side execution.
+**Acceptance criterion:** **MET** — the pooled-ASR sentence states FL is excluded, and no sentence
+reads `FL 9/9` as "models executed tool-supplied shell text".
+
+**Blocks submission?** No — resolved (option C applied).

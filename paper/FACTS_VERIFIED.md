@@ -190,17 +190,17 @@ Source of truth: `data/live_tests/trials_ledger.jsonl` (54 records; verdicts
 
 | Value | Source | Recompute command |
 |---|---|---|
-| **FL 9/9**, 95% CI **[0.70, 1.00]** | ledger case `fl`; `pilot/derive_r4_numbers.py:84`; `paper/main_clean.md:575`, `paper/main.md:576` | `python3 pilot/derive_r4_numbers.py` (section "FIX 5") |
+| **FL 9/9**, 95% CI **[0.70, 1.00]** — **frozen but task-conflated** (PI A9 option C): excluded from the pooled ASR and the live-mechanism count; the arm tests no steering | ledger case `fl`; `pilot/derive_r4_numbers.py`; `paper/main_clean.md`, `paper/main.md` (§8 Finding 1) | `python3 pilot/derive_r4_numbers.py` (section "FIX 5") |
 | **DP 8/9 A-covert** + **1 A-overt** (glm-5.3 rep 2), 95% CI **[0.57, 0.98]** | ledger case `dp`; `pilot/derive_r4_numbers.py:85`; `paper/main_clean.md:598`, `paper/main.md:599` | same |
 | **WF 6/9**, 95% CI **[0.35, 0.88]** (glm 3/3, deepseek 3/3, gemini 0/3) | ledger case `wf`; `pilot/derive_r4_numbers.py:86`; `paper/main_clean.md:585` | same |
 | **Controls 0/16** (NE+PT: 18 completed, 2 infra-excluded, 0 success) | ledger cases `ne`,`pt`; `paper/main_clean.md:32,570-571` | same |
 | **NV 0/8** (9 completed, 1 infra-excluded), never pooled; CI [0.00, 0.32] (not quoted in draft) | ledger case `nv`; `paper/main_clean.md:572,614`; `paper/main.md:614` | same |
-| **Pooled attack 23/27** (= 9+8+6 over 9+9+9) | `pilot/derive_r4_numbers.py:96-101,174-181` (3 asserts); `paper/main_clean.md:569` | `python3 pilot/derive_r4_numbers.py` → "pooled attack (FL+DP+WF) 23/27 … OK" |
+| **Pooled attack 14/18** (= 8+6 over 9+9; **WF+DP only — FL excluded as task-conflated**) | `pilot/derive_r4_numbers.py` (3 asserts); `experiments/summarize.py`; `paper/main_clean.md` §8 | `python3 pilot/derive_r4_numbers.py` → "pooled attack (WF+DP; FL excluded as task-conflated) 14/18 … OK" |
 | Accounting **54 / 54 / 51 / 3** | `experiments/trial_accounting.py:32`; `paper/main_clean.md:808-816` | `python3 experiments/trial_accounting.py --check` (exit 0) |
 
 Wilson intervals recomputed independently (z = 1.959963984540054, 2 dp) →
 9/9 → [0.70, 1.00]; 8/9 → [0.57, 0.98]; 6/9 → [0.35, 0.88]; 0/16 → [0.00, 0.19];
-0/8 → [0.00, 0.32]; 23/27 → [0.68, 0.94] (pooled CI not quoted in the draft — no conflict).
+0/8 → [0.00, 0.32]; pooled 14/18 (FL excluded; no pooled CI quoted in the draft — no conflict).
 
 ---
 
@@ -310,7 +310,7 @@ pairs" is the reading that matches the census. **Flagged for the PI; not edited.
 
 **10.4 All other checked draft numbers matched their recompute:** sample hash/rows, both
 quote blocks (byte-exact), 15/268 + 6/124, 4,128/698/4,926, taxonomy 95, all five live
-arms + pooled 23/27 + three CIs + 54/54/51/3, κ full and FP-subset, 1,082/16,763 truncation,
+arms + pooled 14/18 + CIs + 54/54/51/3, κ full and FP-subset, 1,082/16,763 truncation,
 16,763/4,725/17,167, crawl date, 1,484. **No draft number required a fix.**
 
 ---

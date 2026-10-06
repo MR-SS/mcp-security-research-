@@ -1,6 +1,6 @@
 {
   "schema": "mcp-measurement/reproducibility-manifest/1",
-  "generated_utc": "2026-10-06T06:58:53Z",
+  "generated_utc": "2026-10-06T07:46:52Z",
   "baseline_commit": "769b7d968eb207d5b4e0fac46202e15945ebde75",
   "note": "This manifest does not hash itself. 'unknown' means not established, not empty.",
   "frozen_inputs": [
@@ -85,105 +85,122 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "a8721eaa6a92e5c723e935e12664fe75517821014e73647c2deed8fb21d4a264",
+      "sha256": "4026dfac761b03993aa73f9949ede3848f06146a4676005b092c8e0e2b22294b",
       "role": "traceable manuscript record (edited this revision)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 74817
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "59260a57567f4975fb55e6ba3311803b35e85eeaa7ed362f966c0b1c7b8c4be7",
+      "sha256": "f22d2a02928cde9dcb37c2baf1f37c8787f25e39c907a1fc39107cb5a4f86ac3",
       "role": "authoritative publication copy (edited this revision)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 72805
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "cdc7901012d532c8b41b54790084d5e4bc68390d6af3023e3ea86e40abeeeeb9",
+      "sha256": "22ac5787ca16718fecc73a486ec8b9b6eb66ae033a6851b3201aa62e3db09574",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 830143
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
-      "sha256": "18035b3a7a3bf4404ee05c5a4c2381e8d091fe50c704c6115f8a4d8d916081f5",
+      "sha256": "723f0d7c68b227fe41bb8b6e7c8d210a90055f02862ef41a995a9f99bd167021",
       "role": "built reviewer PDF",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 1031055
     },
     {
       "path": "paper/preview/build_preview.py",
       "sha256": "d30c35ef0ed6d0434b41a7a75a8a45a5b016f207abf314e065aea418341a7562",
       "role": "HTML builder for the reviewer package",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 11735
     },
     {
       "path": "paper/preview/make_figures.py",
-      "sha256": "f710e893e1f63b3b5bcf12c7151dbbb870f579022df255423b6a15fd92906e22",
+      "sha256": "4a76e72c4b78374429e2ed8566df1499ac748c2f564ccaf975f66527ed003a52",
       "role": "figure generator; fails loud on value mismatch",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 12650
     },
     {
       "path": "paper/preview/figs/fig-1-funnel.png",
       "sha256": "beedda4b5feed68a9f16051a5561b82c6f9c692e4709b51ebad6ff134b2d2509",
       "role": "funnel figure (denominator funnel)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 187738
     },
     {
       "path": "paper/preview/figs/fig-2-perclass.png",
       "sha256": "6c0f6c4f65dc1cdb4675c30fe132324b48124264f96bc620120bf540b90e6f21",
       "role": "per-class text-support figure",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 188293
     },
     {
       "path": "paper/preview/figs/fig-3-trials.png",
-      "sha256": "552ae8672f32592b4fe8a3e687902c7e8b846e996c4c9fbf738f38fa9889f910",
+      "sha256": "38db541486398051849b1d0062a4e20f6c5431cab644d647bea7b5bea77af463",
       "role": "mocked-harness grid figure",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 173492
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "b47c2538bacf5d6153f9544dce3a3ac5ccce7380f62f687e03e572d9c0e12149",
+      "sha256": "72addf83ec0f5314f6c939ef2f58a4c4d8f25275275f4731941ad5117d25a080",
       "role": "machine-readable claim ledger (22 claims)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 15936
     },
     {
       "path": "pilot/derive_r4_numbers.py",
-      "sha256": "cb4388990c7523f2dbae736483c108a2e8caa66cab052fe3ae83d931c62607f9",
+      "sha256": "8a47c843bc9ab6282933bdb9333c49115185f4e091e20df77f783d9948a71bb8",
       "role": "assert-guarded derivation of headline numbers",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 17580
     },
     {
       "path": "experiments/trial_accounting.py",
       "sha256": "8a5972ead782358a883aaf39876480915b632b2711e071ab3b44a0c3dfdb1464",
       "role": "trial accounting gate",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 4352
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "1d2e0c65936b1dbee67e35111bfd2ed438d4689ee601821f4d20073103c00549",
+      "sha256": "a7fe9b08f460bbcefd868e22446df309ffcf513476e96f8496859c941b4736c3",
       "role": "offline verification entry point",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 17920
     },
     {
       "path": "REVISION_AUDIT.md",
-      "sha256": "aae6d9aee5ac3b80bbbc8349e92913a177ce826546ffce20fc76a00a8e727f4b",
+      "sha256": "5e3f43113d0c386bf7fe6979e47095d40fbced348ff502eaaacd2e32a55c220e",
       "role": "revision audit (Phase 1 + applied record)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 29808
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "2be2486edc949fb4b377f73f0d1ec1209a9a4de84b4a0f3cd2c0aee4a56df3a6",
+      "sha256": "98739f3439c536493dd3152a691a4fef0b1d8d5e55e1aeea3664c3f55fc349f8",
       "role": "human-dependency list",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 10801
     },
     {
       "path": "REVISION_REPORT.md",
-      "sha256": "faad4825ecf58a0329ed7257c8ff1055536a9044c6507d18b24ef2879b3691ef",
+      "sha256": "a84d27baa6302fcef5282299316ecd1cdf5998a9219e70e76e66303f0fa035d8",
       "role": "revision report",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 14788
     },
     {
       "path": "scripts/gate_battery.py",
       "sha256": "ab3ffee566ee617d6dd0bde876d9c0c0210ce61238f7f9fb83518f039c680a38",
       "role": "standard four-gate battery (derive, trial accounting, abstract cap, number parity)",
-      "status": "derived"
+      "status": "derived",
+      "bytes": 3557
     }
   ],
   "sample_identity": {

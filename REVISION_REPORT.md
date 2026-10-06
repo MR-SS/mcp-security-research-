@@ -147,7 +147,26 @@ was found and fixed in wording only**; the frozen ledger was not touched.
 C9 now asserts the superseded execution-intent strings are absent and the propagation strings present.
 Gate battery: **4/4** (derive exit 0, trial-accounting exit 0, abstract 179/179 ≤ 180, number parity 5).
 
-## 8. Reproduction
+## 8. Phase-set A9 — FL recast as a task-conflated null arm (PI decision, option C; 2026-10-06)
+
+The PI ruled that the exec-priming (FL) arm is **outcome-conflated with task completion**: its
+criterion `[B]` is satisfied by relaying the install guide, which the benign task also requires,
+so the arm tests no steering and must be excluded from every attack-success aggregate. All four
+ruled items were applied.
+
+| # | Item | Disposition |
+|---|---|---|
+| 1 | FL removed from the pooled ASR | **DONE.** Pooled attack ASR recomputed to **WF+DP = 14/18** (glm 5/6, deepseek 6/6, gemini 3/6), assert-guarded in `pilot/derive_r4_numbers.py` and `experiments/summarize.py`; the frozen `FL 9/9 [B]` row stays in the ledger and is re-checked (C8). §8 arm label → "FL — exec-priming, **task-conflated** (B)†" with a footnote (outcome-conflated; steering not tested; 0/9 execution intent). |
+| 2 | Abstract + §8 + §9: two-of-four mechanisms; Finding 1 → design lesson | **DONE.** Exec-priming joins the untested ledger; the live matrix is stated as testing **two of the four** mechanisms (DP, WF). Finding 1 is now a design lesson — instruction surfacing 9/9 vs execution intent 0/9, all three models refused or deferred, deepseek refusal quoted once. |
+| 3 | Figure 3 | **DONE.** `paper/preview/figs/fig-3-trials.png` rebuilt: FL row labeled "task-conflated (see text)"; FL dropped from the pooled-CI panel (DP/WF/CTRL only). |
+| 4 | Limitations | **DONE.** New item (x): criterion `[B]` == task completion; the arm cannot test steering; a redesigned non-task-required marker + re-run is parked in `FUTURE_WORK.md` (#16). |
+
+**Verification.** `pilot/derive_r4_numbers.py` exit 0 (pooled `(14, 18)`); `scripts/verify_claims.py`
+C8 pooled check + C9 superseded/required wording; gate battery **4/4** (G3 abstract **178/178** ≤ 180;
+G4 parity 5). Ledger gains **C-026** (25 → 26 records); C-024 closed out; audit **RA-23** added; A9
+marked applied; reviewer package (figures, HTML, PDF) rebuilt and the manifest re-hashed last.
+
+## 9. Reproduction
 
 ```bash
 python3 pilot/derive_r4_numbers.py                                    # exit 0

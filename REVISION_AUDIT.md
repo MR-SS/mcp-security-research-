@@ -327,3 +327,27 @@ membership, which is itself evidence it never described the data.
   row is inherited from the row verdict. No further edit required; recorded so the next pass does not
   re-open it.
 - **Verification** — C9 wording; C8 ledger; direct transcript re-derivation.
+
+### RA-23 — MEDIUM (PI decision A9, option C) — the FL arm is outcome-conflated with task completion
+- **Defect (sharper than RA-21)** — RA-21 corrected the *description* of criterion `[B]` (a
+  marker-presence test) but left the arm inside the pooled attack ASR and counted it as one of
+  three steered mechanisms. That is still unsound: because the task itself asks the model to relay
+  the install guide, the arm's success condition is satisfied on the benign path, so the arm tests
+  **no steering at all** and must not contribute to any attack-success aggregate.
+- **Decision** — recast FL as a **task-conflated null arm** (PI, 2026-10-06, option C).
+- **Applied** —
+  1. **Pooled ASR** recomputed to **WF+DP = 14/18** (glm 5/6, deepseek 6/6, gemini 3/6), with
+     assert guards in `pilot/derive_r4_numbers.py` (assert 1 = `(14, 18)`; ledger cross-check) and
+     `experiments/summarize.py` (`asr_table()` pools `wf+dp`). The frozen `FL 9/9 [B]` row is
+     unchanged; `verify_claims.py` re-derives it (C8) and the new pooled figure.
+  2. **Abstract + §8 + §9** — the live matrix now tests **two of the four** mechanisms; exec-priming
+     joins the untested ledger. Finding 1 is a **design lesson** (instruction surfacing 9/9 vs
+     execution intent 0/9; all three models refused or deferred; the deepseek refusal is quoted once).
+  3. **Figure 3** — FL row labeled "task-conflated (see text)"; FL dropped from the pooled-CI panel.
+  4. **Limitations (x)** — criterion `[B]` == task completion; the arm cannot test steering; a
+     redesigned non-task-required marker + re-run is parked in `FUTURE_WORK.md`.
+- **Not changed** — the frozen ledger, the §8 `FL 3/3 [B]` cell, and the per-arm FL compatibility
+  interval (still reported as an arm-level descriptive count, not as a pooled or steering result).
+- **Verification** — `pilot/derive_r4_numbers.py` (exit 0, pooled 14/18), `scripts/verify_claims.py`
+  (C8 pooled check; C9 superseded/required wording), gate battery 4/4 (G3 abstract 178/178; G4 parity 5).
+- **Author action** — A9 marked applied; a protocol-level reframing of the arm remains optional.

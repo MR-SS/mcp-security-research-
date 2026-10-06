@@ -160,9 +160,14 @@ agg = {}
 for (case, _m), (s, t) in cells.items():
     ss, tt = agg.get(case, (0, 0))
     agg[case] = (ss + s, tt + t)
-check("FL arm", agg.get("fl"), (9, 9))
+check("FL arm (frozen; task-conflated, excluded from pooled ASR)", agg.get("fl"), (9, 9))
 check("DP arm (final-answer-omission endpoint)", agg.get("dp"), (8, 9))
 check("WF arm", agg.get("wf"), (6, 9))
+# A9 option C: the pooled attack ASR is WF + DP only (FL is outcome-conflated with
+# task completion, so it tests no steering and is excluded).
+check("pooled attack ASR = WF + DP only, FL excluded",
+      (agg.get("wf", (0, 0))[0] + agg.get("dp", (0, 0))[0],
+       agg.get("wf", (0, 0))[1] + agg.get("dp", (0, 0))[1]), (14, 18))
 # CTRL pooled = NE + PT (0/16). NV is a separate gray arm (0/8), not part of CTRL:
 # ne + pt = 16 evaluable trials, nv adds 8 more.
 check("control arms pooled CTRL = NE + PT (violation / trials)",
@@ -179,7 +184,11 @@ SUPERSEDED = ["trigger withdrew on full text", "1,484/16,763", "Flagged non-TP s
               # RA-21: [B] is a marker-presence test, not execution adoption.
               "expressed intent in 9/9 exec-priming trials",
               "B shell-text adoption as expressed intent to execute",
-              "away from ASI04"]
+              "away from ASI04",
+              # A9 option C: FL is excluded from the pooled ASR and the mechanism count.
+              "WF+FL+DP", "three of the four", "three different success",
+              "8/9, deepseek-v4.1-flash 9/9",
+              "Exec-priming text surfaced in 9/9 trials, unadopted"]
 # main.md keeps repo paths (backticked `server::tool`) where main_clean.md does not,
 # so phrase-level requirements are split into fragments both files must satisfy.
 REQUIRED = ["15/263", "ae1aff9f", "adjudicated from the 300-char excerpt",
@@ -187,7 +196,10 @@ REQUIRED = ["15/263", "ae1aff9f", "adjudicated from the 300-char excerpt",
             "1,484 of the 16,763 rows carry a", "name shared with at least",
             "per-class apportionment", "derived from the row verdict rather",
             # RA-21: the FL arm is reported as propagation, not adoption.
-            "marker-presence test", "text-propagation", "0/9"]
+            "marker-presence test", "text-propagation", "0/9",
+            # A9 option C: FL is task-conflated; the live matrix tests two of four.
+            "WF+DP only", "two of the four", "task-conflated",
+            "5/6, deepseek-v4.1-flash 6/6"]
 for f in ("paper/main.md", "paper/main_clean.md"):
     raw = open(p(*f.split("/")), encoding="utf-8").read()
     # whitespace-insensitive: the prose is hard-wrapped, so a phrase may straddle

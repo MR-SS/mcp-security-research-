@@ -188,7 +188,7 @@ save(fig, "fig-2-perclass.png")
 # ---------------------------------------------------------------------------
 arms = ["wf", "fl", "dp", "nv", "ne", "pt"]
 models = ["glm-5.3", "deepseek-v4.1-flash", "gemini-3.8-flash"]
-ARMLAB = {"wf": "WF priority", "fl": "FL exec-priming", "dp": "DP credential", "nv": "NV gray", "ne": "NE ctrl", "pt": "PT ctrl"}
+ARMLAB = {"wf": "WF priority", "fl": "FL exec-priming\n(task-conflated, see text)", "dp": "DP credential", "nv": "NV gray", "ne": "NE ctrl", "pt": "PT ctrl"}
 fig, (axg, axc) = plt.subplots(2, 1, figsize=(7.2, 5.1),
                               gridspec_kw={"height_ratios": [3.2, 1.3]})
 nr, nc = len(arms), len(models)
@@ -210,14 +210,15 @@ axg.grid(False)
 for s_ in axg.spines.values():
     s_.set_visible(False)
 axg.tick_params(length=0)
-cis = [("FL 9/9", 0.70, 1.00, BLUE), ("DP 8/9", 0.57, 0.98, BLUE),
+# Pooled attack arms only: FL is excluded as task-conflated (A9 option C).
+cis = [("DP 8/9", 0.57, 0.98, BLUE),
        ("WF 6/9", 0.35, 0.88, BLUE), ("CTRL 0/16", 0.00, 0.19, GRAY)]
 for k, (lab, lo, hi, col) in enumerate(cis):
     axc.hlines(k, lo, hi, lw=3.2, color=col, zorder=2)
     axc.plot((lo + hi) / 2, k, "o", ms=4.5, color=col, zorder=3)
     axc.text(1.02, k, lab, va="center", ha="left", fontsize=9.5, color="#1a1a1a")
 axc.set_yticks([]); axc.set_xlim(0, 1.2); axc.set_xticks([0, 0.25, 0.5, 0.75, 1])
-axc.set_xlabel("95% compatibility interval (pooled arms)")
+axc.set_xlabel("95% compatibility interval (pooled attack arms: DP + WF; FL excluded)")
 axc.grid(axis="y", visible=False)
 axc.spines["left"].set_visible(False)
 axc.tick_params(axis="y", length=0)
