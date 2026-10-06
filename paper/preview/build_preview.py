@@ -51,7 +51,7 @@ FIGURES = [
         "anchor": '<h3 id="the-five-tp-rows-and-four-mechanisms">',
         "png": "fig-2-perclass.png",
         "alt": "Sorted per-class text-support rates with family reference lines",
-        "caption": ('Reviewer figure R1 (not a numbered paper figure). Colors: capability '
+        "caption": ('Supplemental figure S1 (not a numbered paper figure). Colors: capability '
                     'orange, poison blue, channel green. Dashed vertical line: poison family '
                     '6/124 = 4.8%; dotted: all-family 15/268 = 5.6%. Whiskers mark each '
                     'class\'s n. <span class="src">Source: data/validation_report.md '
@@ -63,7 +63,7 @@ FIGURES = [
         "anchor": "<p>Pooled attack ASR",
         "png": "fig-3-trials.png",
         "alt": "Mocked-harness per-cell success over total, with pooled compatibility intervals",
-        "caption": ('Reviewer figure R2 (not a numbered paper figure). Per-cell success/total; '
+        "caption": ('Supplemental figure S2 (not a numbered paper figure). Per-cell success/total; '
                     'lower panel gives 95% compatibility intervals for the pooled arms — '
                     'FL [0.70, 1.00], DP [0.57, 0.98], WF [0.35, 0.88], CTRL [0.00, 0.19]. '
                     'Fully mocked harness, synthetic data only. <span class="src">Source: '

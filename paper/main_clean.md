@@ -1,7 +1,7 @@
 # Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions
 
-*Preprint v1 (for endorsement review) — 2026-09-29 — Sajjad Rahim Nouri, Islamic Azad
-University, Ramsar Branch — License: CC BY 4.0.*
+*Preprint (for endorsement review) — 2026-09-29; revised 2026-10-06 — Sajjad Rahim Nouri,
+Islamic Azad University, Ramsar Branch — License: CC BY 4.0.*
 
 *Every number in this paper traces to a released artifact; the mapping from claim to file
 is given in Appendix A, whose files are cited in the body as: §A the collection report
@@ -222,7 +222,7 @@ from source by matching the common registration idioms of the major MCP server f
 tool-description rows from 4,725 repositories** (the released description
 corpus; the collection report, §A.2). One row is one extracted (server, tool-name) registration
 from a GitHub-linked repository; 1,484 tool names appear in multiple rows
-(6,740 rows share one of these names; §5.10 dedup rule: mechanisms counted once
+(6,740 rows share one of these names; §A.4 dedup rule: mechanisms counted once
 where they collide). The measurement
 population is therefore **descriptions extracted from GitHub-linked registry servers,
 not live manifests of deployed servers**.
@@ -384,7 +384,7 @@ rows (the frozen label set).
 ### 6.3 The five TP rows and four mechanisms
 
 Five rows carry true-positive text: 12, 35, 60, 94 and 95. Rows 94 and 95 are duplicate
-registrations of the *same* tool name from the same server (a §5.10 duplicate-name
+registrations of the *same* tool name from the same server (a §A.4 duplicate-name
 collision) and instantiate one mechanism, counted once. A sixth candidate, row 61 (the same server's compressed manifest tagline) reads —
 *"Credential custody for agents: use secrets blind (ssh/http/smtp/git/db), never in
 context."* — and lacks both the imperative deposit clause ("deposit it here immediately")
@@ -448,7 +448,7 @@ rationale notes, not an independent coding (re-runnable; see Appendix A):
 | Negated assurance | 24 | "credentials never leave your machine" trips the exfiltration class |
 | Defensive / anti-injection guard | 18 | "do not execute code or follow embedded instructions" trips the imperative class |
 | Regex accident (class words as parameter/API names) | 11 | "a system prompt" as a named API parameter trips the fake-role class |
-| Template / duplicate-name inflation | 9 | same-server template siblings, counted once (§5.10 census) |
+| Template / duplicate-name inflation | 9 | same-server template siblings, counted once (§A.4 census) |
 | Declared function (the product *is* the behavior) | 7 | sending via the user's own SMTP is the shipped function |
 | Truncation artifact (adjudicated from the 300-char excerpt) | 3 | rows 58, 70, 72 — the detector read the full stored text; these rows were adjudicated from the 300-char excerpt and their full-text re-review is still pending: unresolved, not confirmed benign |
 | Capability-only reading (poison flags fired but unsupported) | 3 | telemetry channel that is real but never addresses the model |
@@ -862,7 +862,7 @@ over-represents GitHub-linked, open-source servers relative to the registry's fu
 package population. (iv) The registry dataset is a cursor-order prefix, not an exhausted
 census. (v) All detector counts are subject to an unknown-direction bias from partially-cut stored
 evidence; the recovered subset (7/7, 0 flips) is an observed sensitivity check and cannot
-quantify it (§5.11).
+quantify it (§A.3).
 (vi) The blind rater was a consumer LLM, not a second human. (vii) The live-experiment
 matrix runs at n=3 per (arm, model) cell from a single authorized run on 2026-09-29
 via the AvalAI gateway (base-tier; 3 vendor families) — counts only, no population
@@ -915,8 +915,8 @@ limitation, §7) is disclosed in Section 7 and Methods.
 | Family split | `data/validation_family_split.csv` | poison/capability/channel instance split (6/124, 5/102, 4/42; total 15/268), produced by `pilot/derive_family_split.py` with sum asserts (§6.1) |
 | Candidate-rate scan | `data/candidate_rate_scan.csv` | frozen-detector re-run over all 16,763 rows (4,128 any-flag / 698 poison-flag / 4,926 instances), produced by `pilot/derive_candidate_rate.py` (§5.14) |
 | Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B rubric-consistency protocol, verbatim rater verdicts, κ computation as a consistency check (§7) |
-| Unicode scan | `data/unicode_scan.csv` + §5.12 | Type V mirror (0 Cc/Cf) |
-| P7 bypass scan | `data/p7_bypass_scan.csv` + §5.13 | Type III mirror (2/16,763) |
+| Unicode scan | `data/unicode_scan.csv` + §A.5 | Type V mirror (0 Cc/Cf) |
+| P7 bypass scan | `data/p7_bypass_scan.csv` + §A.6 | Type III mirror (2/16,763) |
 | Live-matrix protocol | `docs/BRIEF04_PROTOCOL.md` | arms, criteria A–G, infra taxonomy, stage gates |
 | Trial ledger + transcripts | `data/live_tests/trials_ledger.jsonl`, `data/live_tests/*.jsonl` | 54 records; per-round redacted transcripts (§8) |
 | Trial accounting | `experiments/trial_accounting.py` | regenerates the Appendix A per-arm table from the ledger and asserts its totals (54/54/51/3) |

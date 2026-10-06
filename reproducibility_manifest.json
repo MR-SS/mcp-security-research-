@@ -1,6 +1,6 @@
 {
   "schema": "mcp-measurement/reproducibility-manifest/1",
-  "generated_utc": "2026-10-06T07:46:52Z",
+  "generated_utc": "2026-10-06T07:58:39Z",
   "baseline_commit": "769b7d968eb207d5b4e0fac46202e15945ebde75",
   "note": "This manifest does not hash itself. 'unknown' means not established, not empty.",
   "frozen_inputs": [
@@ -85,38 +85,38 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "4026dfac761b03993aa73f9949ede3848f06146a4676005b092c8e0e2b22294b",
+      "sha256": "5e9f290a24424aba3bcaee9d6954fe0b62d86d95d122cd403beed8abaa1be78e",
       "role": "traceable manuscript record (edited this revision)",
       "status": "derived",
-      "bytes": 74817
+      "bytes": 75470
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "f22d2a02928cde9dcb37c2baf1f37c8787f25e39c907a1fc39107cb5a4f86ac3",
+      "sha256": "c9c4f4ef5bc76ef6e75956430edd6c6e5389c7ac22f0d26246e749bed2c1ed9f",
       "role": "authoritative publication copy (edited this revision)",
       "status": "derived",
-      "bytes": 72805
+      "bytes": 72816
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "22ac5787ca16718fecc73a486ec8b9b6eb66ae033a6851b3201aa62e3db09574",
+      "sha256": "613b3e8a1536af6b1cd25137d9f47a457d7e73e64e0602c332376b9723e27319",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived",
-      "bytes": 830143
+      "bytes": 830162
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
-      "sha256": "723f0d7c68b227fe41bb8b6e7c8d210a90055f02862ef41a995a9f99bd167021",
+      "sha256": "1fa18d68c19cfcec677bf850ff91900695f3cb3deb2a874fa4b244083a5d6db7",
       "role": "built reviewer PDF",
       "status": "derived",
-      "bytes": 1031055
+      "bytes": 1030931
     },
     {
       "path": "paper/preview/build_preview.py",
-      "sha256": "d30c35ef0ed6d0434b41a7a75a8a45a5b016f207abf314e065aea418341a7562",
+      "sha256": "e399281d1e0791c5f7c547eb1f1a7c8c63e7f679106e13bf771d3c9a1e8c2518",
       "role": "HTML builder for the reviewer package",
       "status": "derived",
-      "bytes": 11735
+      "bytes": 11743
     },
     {
       "path": "paper/preview/make_figures.py",
@@ -176,10 +176,10 @@
     },
     {
       "path": "REVISION_AUDIT.md",
-      "sha256": "5e3f43113d0c386bf7fe6979e47095d40fbced348ff502eaaacd2e32a55c220e",
+      "sha256": "8d6a27dbc78e535fab74446f816084fd73a3c006454f7db86cbad72d5214a8a3",
       "role": "revision audit (Phase 1 + applied record)",
       "status": "derived",
-      "bytes": 29808
+      "bytes": 30050
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
@@ -190,10 +190,10 @@
     },
     {
       "path": "REVISION_REPORT.md",
-      "sha256": "a84d27baa6302fcef5282299316ecd1cdf5998a9219e70e76e66303f0fa035d8",
+      "sha256": "1b43d5aad3c782ff636a547a3fa74cbae4ab8e9471cb67ebe745776a9b9e610f",
       "role": "revision report",
       "status": "derived",
-      "bytes": 14788
+      "bytes": 16260
     },
     {
       "path": "scripts/gate_battery.py",

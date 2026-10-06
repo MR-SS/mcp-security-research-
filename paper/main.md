@@ -1,12 +1,11 @@
 *Publication version lives in `main_clean.md` — keep both in sync on numbers only.*
 # Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions
 
-*Preprint — 2026-09-29 — Sajjad Rahim Nouri, Islamic Azad University, Ramsar Branch —
-License: CC BY 4.0.*
+*Preprint — 2026-09-29; revised 2026-10-06 — Sajjad Rahim Nouri, Islamic Azad University,
+Ramsar Branch — License: CC BY 4.0.*
 
-*Skeleton with drafted sections; Markdown now, LaTeX later. Every number traces to a
-repo artifact (see `paper/CONVENTIONS.md` §1); unverified and pending items are marked
-inline.*
+*Markdown source with drafted sections; every number traces to a released artifact (see
+`paper/CONVENTIONS.md` §1); unverified and pending items are marked inline.*
 
 ---
 
@@ -222,8 +221,8 @@ from source (`@mcp.tool`, `server.tool(`, `ListToolsResult`), yielding **16,763
 tool-description rows from 4,725 repositories** (`data/github_tools.jsonl`;
 `data/collection_report.md` §8). One row is one extracted (server, tool-name) registration
 from a GitHub-linked repository; 1,484 tool names appear in multiple rows
-(6,740 rows share one of these names; §5.10 dedup rule: mechanisms counted once
-where they collide). The measurement
+(6,740 rows share one of these names; `data/collection_report.md` §5.10 dedup rule:
+mechanisms counted once where they collide). The measurement
 population is therefore **descriptions extracted from GitHub-linked registry servers,
 not live manifests of deployed servers**.
 
@@ -302,10 +301,12 @@ detector counts here are subject to an unknown-direction bias from truncation; t
 subset is an observed sensitivity check (7/7 re-extractions, 0 verdict flips) and cannot
 quantify the bias. (iii) *Dataset
 anomaly censuses*: **1,484 of the 16,763 rows carry a `server::tool` name shared with at
-least one other row** (6,740 rows share one of these 1,484 names; collection_report §5.10;
+least one other row** (6,740 rows share one of these 1,484 names; `data/collection_report.md`
+§5.10;
 mechanisms counted once by hand where they collide); **0 control/format Unicode codepoints
 in the stored text** (negative; NFKC + Cc/Cf byte-diff over stored descriptions,
-`data/unicode_scan.csv`; §5.12) — a scanner- and representation-scoped null: the extractor
+`data/unicode_scan.csv`; `data/collection_report.md` §5.12) — a scanner- and
+representation-scoped null: the extractor
 already collapses newlines, so the one trivially-expected Cc class is absent by extraction,
 not by absence upstream;
 **2/16,763** rows match
@@ -395,8 +396,8 @@ two supported poison classes (`cross_tool_shadowing`, `imperative_to_model`), wh
 ### 6.3 The five TP rows and four mechanisms
 
 Five rows carry true-positive text: 12, 35, 60, 94 and 95. Rows 94 and 95 are duplicate
-registrations of the *same* tool name from the same server (a §5.10 duplicate-name
-collision) and instantiate one mechanism, counted once. A sixth candidate, row 61
+registrations of the *same* tool name from the same server (a `data/collection_report.md`
+§5.10 duplicate-name collision) and instantiate one mechanism, counted once. A sixth candidate, row 61
 (`com.dustforge/demipass::manifest:com.dustforge/demipass`), is the same server's compressed
 manifest tagline — *"Credential custody for agents: use secrets blind
 (ssh/http/smtp/git/db), never in context."* — which lacks both the imperative deposit
@@ -463,7 +464,7 @@ see Appendix A):
 | Negated assurance | 24 | "credentials never leave your machine" trips the exfiltration class |
 | Defensive / anti-injection guard | 18 | "do not execute code or follow embedded instructions" trips the imperative class |
 | Regex accident (class words as parameter/API names) | 11 | "a system prompt" as a named API parameter trips the fake-role class |
-| Template / duplicate-name inflation | 9 | same-server template siblings, counted once (§5.10 census) |
+| Template / duplicate-name inflation | 9 | same-server template siblings, counted once (`data/collection_report.md` §5.10 census) |
 | Declared function (the product *is* the behavior) | 7 | sending via the user's own SMTP is the shipped function |
 | Truncation artifact (adjudicated from the 300-char excerpt) | 3 | rows 58, 70, 72 — the detector read the full stored text; these rows were adjudicated from the 300-char excerpt and their full-text re-review is still pending: unresolved, not confirmed benign |
 | Capability-only reading (poison flags fired but unsupported) | 3 | telemetry channel that is real but never addresses the model |
@@ -497,10 +498,11 @@ one surface is central to Section 9's Discussion.
 
 Two checks mirror the vendor AgentsID taxonomy on our population, both returning nulls:
 **Type V hidden Unicode — 0 control/format codepoints in 16,763 stored descriptions**
-(NFKC + Cc/Cf byte-diff; `data/unicode_scan.csv`; §5.12); **Type III confirmation
+(NFKC + Cc/Cf byte-diff; `data/unicode_scan.csv`; `data/collection_report.md` §5.12);
+**Type III confirmation
 bypass — 2/16,763 rows** match a conservative nine-phrase trigger family, one the
 row-47 benign onboarding funnel ("do not wait for OTP"), one dependency-ordering prose
-(`data/p7_bypass_scan.csv`; §5.13). Against AgentsID's 145 hidden-character findings and
+(`data/p7_bypass_scan.csv`; `data/collection_report.md` §5.13). Against AgentsID's 145 hidden-character findings and
 "financially concentrated" bypass class — in a package-registry population, unvalidated —
 these are population contrasts, not replication conflicts; both scans state their
 scanner-blind classes and stored-cut caveats honestly.
@@ -876,7 +878,7 @@ over-represents GitHub-linked, open-source servers relative to the registry's fu
 package population. (iv) The registry dataset is a cursor-order prefix, not an exhausted
 census. (v) All detector counts are subject to an unknown-direction bias from partially-cut stored
 evidence; the recovered subset (7/7, 0 flips) is an observed sensitivity check and cannot
-quantify it (§5.11).
+quantify it (`data/collection_report.md` §5.11).
 (vi) The blind rater was a consumer LLM, not a second human. (vii) The live-experiment
 matrix runs at n=3 per (arm, model) cell from a single authorized run on 2026-09-29
 via the AvalAI gateway (base-tier; 3 vendor families) — counts only, no population
@@ -930,8 +932,8 @@ limitation, §7) is disclosed in Section 7 and Methods.
 | Family split | `data/validation_family_split.csv` | poison/capability/channel instance split (6/124, 5/102, 4/42; total 15/268), produced by `pilot/derive_family_split.py` with sum asserts (§6.1) |
 | Candidate-rate scan | `data/candidate_rate_scan.csv` | frozen-detector re-run over all 16,763 rows (4,128 any-flag / 698 poison-flag / 4,926 instances), produced by `pilot/derive_candidate_rate.py` (§5.14) |
 | Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B rubric-consistency protocol, verbatim rater verdicts, κ computation as a consistency check (§7) |
-| Unicode scan | `data/unicode_scan.csv` + §5.12 | Type V mirror (0 Cc/Cf) |
-| P7 bypass scan | `data/p7_bypass_scan.csv` + §5.13 | Type III mirror (2/16,763) |
+| Unicode scan | `data/unicode_scan.csv` + `data/collection_report.md` §5.12 | Type V mirror (0 Cc/Cf) |
+| P7 bypass scan | `data/p7_bypass_scan.csv` + `data/collection_report.md` §5.13 | Type III mirror (2/16,763) |
 | Live-matrix protocol | `docs/BRIEF04_PROTOCOL.md` | arms, criteria A–G, infra taxonomy, stage gates |
 | Trial ledger + transcripts | `data/live_tests/trials_ledger.jsonl`, `data/live_tests/*.jsonl` | 54 records; per-round redacted transcripts (§8) |
 | Trial accounting | `experiments/trial_accounting.py` | regenerates the Appendix A per-arm table from the ledger and asserts its totals (54/54/51/3) |
@@ -1002,5 +1004,5 @@ are never committed, logged, or echoed (AGENTS.md §2.8): transcripts store env-
 to status classes, and every artifact is scrubbed recursively before persistence. The
 live panel was accessed through the AvalAI gateway via a PI-held environment key.
 
-<!-- word count: 9,558 words (markdown source with HTML comments stripped, whitespace split) — re-counted 2026-10-05 at STRUCTURE-LOCK (batches A + A-ext + limitation commitments): abstract 179 of the PI's 180 cap (top-score clause added, four mechanisms named, 54-completed/51-valid restored with the 3 named exclusions), denominator funnel + Figure 1/2 renumber, Wilson headline CIs + cluster sensitivity 13/251 + κ delta CI assert-guarded in pilot/derive_r4_numbers.py, κ-packet POI=21 defined, provenance chronology table, second-rater pack specified as future work. Previously updated 2026-10-04 for the FACTS-driven micro-fixes (dup-names noun corrected in the §5 census sentence: 1,484 distinct tool names / 6,740 rows, per FACTS_VERIFIED §10.3; truncation unit re-verified as stored descriptions, not flag instances, per §10.1); previously re-verified 2026-10-04 for the WF-CI pass; abstract 179 of the PI's 180 cap (unchanged this pass). WF-CI changes: pilot/derive_r4_numbers.py WF entry corrected 8/9 → 6/9 (ledger-verified: glm 3/3, deepseek 3/3, gemini 0/3) with pooled (23/27), trial_accounting, and per-arm ledger asserts; Finding 2 gained its 95% compatibility interval [0.35, 0.88] for symmetry with Findings 1/3. Earlier: R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). -->
+<!-- word count: 9,558 words (markdown source with HTML comments stripped, whitespace split) — re-counted 2026-10-05 at STRUCTURE-LOCK (batches A + A-ext + limitation commitments): abstract 179 of the PI's 180 cap (top-score clause added, four mechanisms named, 54-completed/51-valid restored with the 3 named exclusions), denominator funnel + Figure 1/2 renumber, Wilson headline CIs + cluster sensitivity 13/251 + κ delta CI assert-guarded in pilot/derive_r4_numbers.py, κ-packet POI=21 defined, provenance chronology table, second-rater pack specified as future work. Previously updated 2026-10-04 for the FACTS-driven micro-fixes (dup-names noun corrected in the §5 census sentence: 1,484 distinct tool names / 6,740 rows, per FACTS_VERIFIED §10.3; truncation unit re-verified as stored descriptions, not flag instances, per §10.1); previously re-verified 2026-10-04 for the WF-CI pass; abstract 179 of the PI's 180 cap (unchanged this pass). WF-CI changes: pilot/derive_r4_numbers.py WF entry corrected 8/9 → 6/9 (ledger-verified: glm 3/3, deepseek 3/3, gemini 0/3) with pooled (23/27), trial_accounting, and per-arm ledger asserts; Finding 2 gained its 95% compatibility interval [0.35, 0.88] for symmetry with Findings 1/3. Earlier: R7 changes: class count verified from pilot/analyze.py (18 checks defined, 13 fired; §5 note fixed), FP terminology → flagged non-TP rows + poison-sense false-positive definition (§5/§6.1/§6.4/§7), TP-yield phrasing + 100/100 poison-flag count (§6.1), abstract covert sentence + Finding 3 renamed + [A-covert] defined beside the table (§8), causality phrases replaced (Findings 1/3), Wilson CIs relabeled as 95% compatibility intervals with scope note (§8), primary-reference-labels wording (§7), novelty qualifier + Appendix literature-search log row (§2/Appendix A). Phase-set A9 (2026-10-06): FL recast as a task-conflated null arm — pooled ASR WF+DP = 14/18, live matrix tests two of four mechanisms, Finding 1 a design lesson; abstract 178/180. Phase-set C (2026-10-06): figure numbering disambiguated (supplemental S1/S2 vs numbered Figure 1/2), dangling §5.1x cross-references qualified to `data/collection_report.md`, version banners refreshed. -->
 <!-- latex mirror: paper/latex/main.tex (format-only rendering; regenerate and re-verify counts after any wording change here). -->

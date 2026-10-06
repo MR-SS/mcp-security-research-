@@ -184,3 +184,18 @@
   Gates at this commit: abstract **179/180**, number parity **5 ops == HEAD baseline**,
   `derive_r4_numbers.py` exit 0, `trial_accounting --check` exit 0, banned-phrase grep 0,
   secret scan clean.
+- **2026-10-06: Phase-sets A9 + C applied to both papers.** A9 (PI option C) recast the FL
+  exec-priming arm as a **task-conflated null arm**: its criterion `[B]` is satisfied by
+  relaying the install guide (the benign task), so it tests no steering and is excluded from
+  the pooled attack ASR — now **WF+DP = 14/18** — and from the live-mechanism count (**two of
+  four** mechanisms live-tested). The frozen `FL 9/9 [B]` row is unchanged; Finding 1 is a
+  design lesson (instruction surfacing 9/9 vs execution intent 0/9). Phase-set C (consistency):
+  **figure numbering disambiguated** — numbered paper figures are **Figure 1** (denominator
+  funnel) and **Figure 2** (evidence chain); the two reviewer-package plots are labeled
+  **supplemental figure S1/S2** (renamed from R1/R2, which collided with the "R2" review-round
+  label and the legacy "Figure R2-1" caption). Rule: never label a supplemental plot "R<n>".
+  **Dangling `§5.1x` cross-references qualified** — the paper's §5 has no numbered subsections,
+  so bare `§5.10–§5.13` (collection-report sections) now read `` `data/collection_report.md` §5.10 ``
+  etc. in `main.md`, and the Appendix-A mapping `§A.3`–`§A.6` in `main_clean.md`. **Version
+  banners refreshed** (both papers dated `2026-09-29; revised 2026-10-06`; the stale "Skeleton"
+  banner removed). Gates: abstract **178/178**, parity **5**, derive exit 0, accounting exit 0.

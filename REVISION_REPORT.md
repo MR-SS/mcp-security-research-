@@ -96,8 +96,9 @@ revision. The revised text blocks and table breaks were **not** re-screenshotted
 
 **"assert-verified" labels audited.** The three figure captions carry `(assert-verified)`. Each is
 backed by value asserts that actually run in `paper/preview/make_figures.py` against
-`data/collection_report.md`/`candidate_rate_scan.csv`/`validation_family_split.csv` (figure 1),
-`data/validation_report.md` (figure R1), and `data/live_tests/trials_ledger.jsonl` (figure R2).
+`data/collection_report.md`/`candidate_rate_scan.csv`/`validation_family_split.csv` (Figure 1),
+`data/validation_report.md` (supplemental figure S1), and `data/live_tests/trials_ledger.jsonl`
+(supplemental figure S2).
 No false `assert-verified` label was found.
 
 ---
@@ -158,7 +159,7 @@ ruled items were applied.
 |---|---|---|
 | 1 | FL removed from the pooled ASR | **DONE.** Pooled attack ASR recomputed to **WF+DP = 14/18** (glm 5/6, deepseek 6/6, gemini 3/6), assert-guarded in `pilot/derive_r4_numbers.py` and `experiments/summarize.py`; the frozen `FL 9/9 [B]` row stays in the ledger and is re-checked (C8). §8 arm label → "FL — exec-priming, **task-conflated** (B)†" with a footnote (outcome-conflated; steering not tested; 0/9 execution intent). |
 | 2 | Abstract + §8 + §9: two-of-four mechanisms; Finding 1 → design lesson | **DONE.** Exec-priming joins the untested ledger; the live matrix is stated as testing **two of the four** mechanisms (DP, WF). Finding 1 is now a design lesson — instruction surfacing 9/9 vs execution intent 0/9, all three models refused or deferred, deepseek refusal quoted once. |
-| 3 | Figure 3 | **DONE.** `paper/preview/figs/fig-3-trials.png` rebuilt: FL row labeled "task-conflated (see text)"; FL dropped from the pooled-CI panel (DP/WF/CTRL only). |
+| 3 | Trials figure | **DONE.** `paper/preview/figs/fig-3-trials.png` rebuilt: FL row labeled "task-conflated (see text)"; FL dropped from the pooled-CI panel (DP/WF/CTRL only). |
 | 4 | Limitations | **DONE.** New item (x): criterion `[B]` == task completion; the arm cannot test steering; a redesigned non-task-required marker + re-run is parked in `FUTURE_WORK.md` (#16). |
 
 **Verification.** `pilot/derive_r4_numbers.py` exit 0 (pooled `(14, 18)`); `scripts/verify_claims.py`
@@ -166,7 +167,22 @@ C8 pooled check + C9 superseded/required wording; gate battery **4/4** (G3 abstr
 G4 parity 5). Ledger gains **C-026** (25 → 26 records); C-024 closed out; audit **RA-23** added; A9
 marked applied; reviewer package (figures, HTML, PDF) rebuilt and the manifest re-hashed last.
 
-## 9. Reproduction
+## 9. Phase-set C — §7 consistency pass (2026-10-06)
+
+Presentation/consistency items from `REVISION_AUDIT.md` §D Phase 7. No scientific number
+changed; gate battery 4/4 afterwards.
+
+| Item | Finding | Fix |
+|---|---|---|
+| Duplicate figure numbering | The reviewer package labeled its two plots "Reviewer figure R1/R2", which collided with the manuscript's numbered **Figure 1/2** and with the "R2" review-round label (and the legacy "Figure R2-1"). | Renamed to **supplemental figure S1/S2** in `build_preview.py` and here; documented the rule in `paper/CONVENTIONS.md`. |
+| Obsolete `§5.10` cross-references | The paper's §5 has no numbered subsections, so bare `§5.10–§5.13` (which are `data/collection_report.md` sections) were dangling. | `main.md` qualifies them as ```data/collection_report.md``` §5.10–§5.13; `main_clean.md` maps them to the Appendix-A letters **§A.3–§A.6**. |
+| Stale version banners | `main.md` still called itself a "Skeleton with drafted sections"; both headers read only `2026-09-29`; the footer provenance comment stopped at STRUCTURE-LOCK. | Both headers now read `2026-09-29; revised 2026-10-06`; the "Skeleton" banner is corrected; the footer comment records Phase-sets A9 and C. |
+
+**Verification.** `scripts/gate_battery.py` 4/4 (G3 abstract **178/178**; G4 parity 5);
+`scripts/verify_claims.py` exit 0; reviewer package (HTML + PDF, 23 pp A4) rebuilt and the
+manifest re-hashed last.
+
+## 10. Reproduction
 
 ```bash
 python3 pilot/derive_r4_numbers.py                                    # exit 0

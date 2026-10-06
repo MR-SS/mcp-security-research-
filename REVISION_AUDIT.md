@@ -176,6 +176,9 @@ These reviewer concerns were **not** reached in this pass and must not be treate
 - **Phase 6** — OWASP identifier qualification, client/runtime authority separation wording,
   disclosure status.
 - **Phase 7** — duplicate figure numbering, obsolete §5.10 cross-references, stale version banners.
+  **→ RESOLVED in Phase-set C (2026-10-06)**, see `REVISION_REPORT.md` §9 and `paper/CONVENTIONS.md`
+  (reviewer plots renamed S1/S2; bare §5.1x refs qualified to `data/collection_report.md` / §A.3–§A.6;
+  version banners refreshed).
 
 ---
 
