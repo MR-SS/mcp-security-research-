@@ -4,3 +4,7 @@ __pycache__/
 # local secret stores — never commit
 .env*
 *.local
+
+# local agent state — never commit
+.freebuff/
+.hermes/
