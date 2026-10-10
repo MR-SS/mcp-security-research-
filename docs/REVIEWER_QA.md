@@ -6,6 +6,12 @@ Provenance: **2026-10-10** | HEAD **`fad31cff95d1e59fff117efcc7cecce088504648`**
 `python3 pilot/derive_candidate_rate.py` · `python3 pilot/derive_family_split.py` ·
 direct reads of `data/`, `pilot/`, `experiments/`, `docs/`, `prompts/`, git history.
 
+Second pass (§I, added 2026-10-10): recomputed Wilson widths (5.6 / 7.9 / 8.9 / 18.3 pp),
+the illustrative-extrapolation arithmetic (`698×6/124≈33.8`, `4128×15/268≈231`) and a
+`grep` confirming neither product appears in the manuscript, plus reads of
+`data/collection_report.md`, `docs/BRIEF04_PROTOCOL.md`, `data/kappa_report.md`,
+`docs/DETECTOR_FIX_PROPOSAL.md`, and `data/live_tests/`.
+
 > Rules of this file: every answer ends with evidence refs `[file:line]` or `[command → output]`.
 > Where the paper asserts something the artifacts do not support it is marked `[PAPER–ARTIFACT GAP]`;
 > where nothing in the repo can answer, `[NOT DERIVABLE FROM REPO — AUTHOR ACTION]`.
@@ -183,6 +189,112 @@ Defining files + hashes (all in `reproducibility_manifest.json`): **corpus** `da
 
 ---
 
+## I. Additional reviewer questions (second pass, added 2026-10-10)
+
+> These were not in the original A–H bank. They are the follow-ups a systems-security
+> referee reaches for after reading the answers above: power, cost, freshness, ethics of
+> attribution, detector versioning, and replicability. Same rules apply (evidence refs;
+> recompute where cheap).
+
+### I1.
+**No — the study cannot distinguish a low (≈2%) from a moderate (≈6%) support rate.** The
+paper publishes Wilson 95% intervals for four headline figures — all-family 15/268
+`[0.03, 0.09]` (5.6 pp wide), poison-family 6/124 `[0.02, 0.10]` (7.9 pp), top-100 TP yield
+5/100 `[0.02, 0.11]`, row-level 5/150 `[0.01, 0.08]`; recomputing on the family denominators
+gives capability 5/102 `[0.02, 0.11]` and channel 4/42 `[0.04, 0.22]` (18 pp). The paper
+therefore positions the result as "single-digit, an order of magnitude below raw detector
+counts", not a tight estimate — and notes the intervals assume independent Bernoulli draws
+while flags *cluster* by `server::tool`, so they are descriptive under that model.
+— Evidence: [paper/main_clean.md:334-343] (published intervals + clustering caveat); [command → `python3 pilot/derive_r4_numbers.py` STRUCTURE-LOCK prints `15/268 [0.03, 0.09] OK`, `6/124 [0.02, 0.10] OK`]; [command → recomputed Wilson for 5/102 and 4/42 = [2.1%, 11.0%] and [3.8%, 22.1%]].
+
+### I2.
+**A naive extrapolation exists in arithmetic but is deliberately NOT made.** Multiplying the
+frozen candidate counts by the sample support rate would give ≈ `698 × 6/124 = 33.8`
+poison-flag rows and ≈ `4,128 × 15/268 = 231` any-flag rows corpus-wide — but this is
+invalid because the sample is purposive (selected on the detector's own score) and the
+bias direction is non-identifiable, so the arithmetic is illustrative only. **Neither number
+appears anywhere in the manuscript**, and the paper explicitly labels the rate
+"a sample-bounded descriptive quantity … not a population precision estimate."
+— Evidence: [command → recompute `698*6/124 = 33.8`, `4128*15/268 = 231.0`]; [paper/main_clean.md:335-350]; [command → `grep -E "231|33.8|34 rows" paper/main_clean.md` → NO MATCH].
+
+### I3.
+**The corpus is a timestamped snapshot of a mutable, server-controlled surface.** The crawl ran
+`2026-09-21T11:52:32Z → 12:09:53Z` (17 m 21 s) over a 600-page prefix with the cursor still
+live; because remote servers can change descriptions server-side (rug-pull), every
+prevalence statement decays from that timestamp, and a week-6 re-crawl diff (approved
+stretch, $0) is the designated drift check.
+— Evidence: [data/collection_report.md:14-18]; [data/collection_report.md:161-166]; [FUTURE_WORK.md #3]; [paper/main_clean.md:203-208].
+
+### I4.
+**Documented spend is near-zero against the guards, but only two figures exist.** The registry
+crawl was `$0.00` (unauthenticated public GETs, no key) against the $50 pilot cap; the live
+matrix was a 40 → 54 trial PI-authorised raise with "**<$2 estimated at base-tier
+pricing**" through the AvalAI gateway. There is **no single running total** for the whole
+project (the $300 project cap is a constraint, not a ledger), so a referee asking "what did
+this cost?" gets ~$2 plus $0.
+— Evidence: [data/collection_report.md:24, :593]; [docs/BRIEF04_PROTOCOL.md:183-185].
+
+### I5.
+**The five TP findings are text-anchored, not target-anchored.** The manuscript names vendor
+*types* ("a site-builder vendor", "an agent-framework server", "a password-manager server")
+and quotes the stored text verbatim, but prints **no server name or repository URL** for any
+positive; the quoted texts are fixture-checksum-pinned (sha256, byte-exact) in the
+replication package. So no third party is identifiable from the paper, and §10's "no payload
+usable against unpatched live servers" rule is satisfied by construction.
+— Evidence: [paper/main_clean.md:392-441]; [command → `grep -E "github.com|https?://" paper/main_clean.md` → only the OWASP citation, no repo URLs]; [paper/FACTS_VERIFIED.md §2]; [paper/main_clean.md:904-911].
+
+### I6.
+**Versioning is coherent and explicitly rule-governed.** The corpus *scan* runs the frozen v2
+detector (`RULES_VERSION="v2"`), but `suspicion_score` stays the **v1** definition
+(capability flags + 3 × poison flags) so the triage queue remains comparable across runs,
+and the `model_addressed` channel class is excluded from that score and from every poisoning
+statistic; v2 adds only the channel class alongside v1 and never re-weights v1 rules.
+— Evidence: [pilot/analyze.py:21-79]; [AGENTS.md §2.9 (detector-version rule)]; [paper/main_clean.md:230-246]; [paper/CONVENTIONS.md rule 2].
+
+### I7.
+**A third party can re-run the live matrix only with their own gateway credentials.** The
+harness and the frozen allowlist (exactly 3 model lines) are public, but the model requests
+go through the AvalAI gateway with the key read from the environment — deliberately absent
+from the repo — so an external replicator must supply independent gateway access. The
+"model/backend identity behind the proxy" is an explicit `unknowns` entry in the manifest.
+— Evidence: [docs/BRIEF04_PROTOCOL.md:5, :183-185]; [reproducibility_manifest.json `unknowns`]; [data/live_tests/MODEL_ALLOWLIST.txt]; [experiments/run_matrix.py `load_allowlist`].
+
+### I8.
+**The live matrix is descriptive, not an estimate.** It is 3 repetitions × 3 models × 6 arms
+through one gateway; the summarizer's own docstring opens "*Counts first: 3 reps do not
+establish population rates*", and the pooled WF+DP = 14/18 figure is framed as assuming "an
+interchangeability we do not claim". So a referee should read it as a demonstration of
+outcome-criterion operationalisation, not a measured ASR.
+— Evidence: [experiments/summarize.py module docstring]; [paper/main_clean.md:664-668]; [paper/main_clean.md:862-872].
+
+### I9.
+**The abstract does not overstate the body.** Every abstract figure matches the body/artifact
+(5 TP / 95 benign flagged / 50 controls; 15/268 = 5.6%; poison 6/124 = 4.8%; 54 completed /
+51 valid / 3 excluded; FL 9/9 surfacing vs 0/9 intent; DP 8/9; 16 valid controls), the
+abstract word count is 178 ≤ 180, and the number-token checks pass. The one carry-over item
+is wording, not magnitude: the abstract repeats "pre-registered operational criteria" (Gap 1
+above).
+— Evidence: [paper/main_clean.md:18-36]; [command → `python3 scripts/gate_battery.py` G3 `abstract 178/178 ≤180` PASS]; [command → `python3 scripts/verify_claims.py` abstract checks PASS].
+
+### I10.
+**Duplicate-row collapse is disclosed and does not move the reading.** The two duplicate TP
+registrations (rows 94/95, same `server::tool`) are counted once, giving **5 unique TP rows
+over 4 mechanisms**; the cluster-collapsed headline is **13/251 (5.18%)** vs 15/268 (5.60%).
+Name-key joins are separately declared unsafe (`name_join_unsafe = true`).
+— Evidence: [paper/main_clean.md:345-347], [paper/main_clean.md:392-397]; [reproducibility_manifest.json `sample_identity.name_join_unsafe`].
+
+### I11.
+**The benign-stratum taxonomy is converted into a concrete detector contribution (P1–P7).**
+§9 lists seven fixes derived from the 95-row flagged-benign analysis: P1 negation-window
+downgrade, P2 defense-vocabulary suppression, P3 template-family dedup, P4 new
+`exec_priming` class (gated/unconditional), P5 precision-safe recall paraphrases, P6
+multilingual review flag, P7 a **non-scoring** `confirmation_bypass` candidate whose
+measured surface is only 1/16,763 (row 47, human-labeled `fp`) — i.e. a demonstrated
+non-finding, kept prospective.
+— Evidence: [paper/main_clean.md:856-871]; [data/collection_report.md §5.13]; [docs/DETECTOR_FIX_PROPOSAL.md].
+
+---
+
 ## SUMMARY TABLE
 
 | ID | Status: ANSWERED / GAP / AUTHOR-ACTION | One-line takeaway |
@@ -221,6 +333,17 @@ Defining files + hashes (all in `reproducibility_manifest.json`): **corpus** `da
 | H1 | ANSWERED (partial) | Closest single entry point is `scripts/verify_claims.py`; no one-command wrapper exists. |
 | H2 | ANSWERED | Corpus/sample/labels/packet/ledger hashes in the manifest; ledger role-count string is stale (22 vs 26). |
 | H3 | AUTHOR-ACTION | RA-12 STATED_NOT_CHECKED; A1–A9 BLOCKED; audit §D Phases 4–5 unresolved. |
+| I1 | ANSWERED | Intervals are 5.6–18 pp wide: the study cannot resolve 2% vs 6%; it claims order-of-magnitude, not a tight rate. |
+| I2 | ANSWERED | Naive extrapolation ≈34 / ≈231 rows is arithmetically possible but explicitly NOT made and absent from the paper. |
+| I3 | ANSWERED | Corpus is a 2026-09-21 17-minute, cursor-live snapshot of a mutable surface; week-6 re-crawl is the drift check. |
+| I4 | ANSWERED | Documented spend = $0 crawl + <$2 live ≈ $2 vs a $50 pilot cap; no single project-wide total exists. |
+| I5 | ANSWERED | Five positives are text/checksum-anchored with vendor types, no server name or repo URL printed. |
+| I6 | ANSWERED | Scan = frozen v2; score = v1; channel class excluded from score and all poisoning stats (rule-tracked). |
+| I7 | ANSWERED | Live matrix is re-runnable only with independent gateway credentials; backend identity is an explicit unknown. |
+| I8 | ANSWERED | Live results are descriptive counts (3 reps × 3 models × 1 gateway), not an ASR estimate. |
+| I9 | ANSWERED | Abstract matches the body on every figure and is 178/180 words; only the "pre-registered" wording carries over. |
+| I10 | ANSWERED | Duplicate rows counted once (5 TP rows → 4 mechanisms); cluster-collapsed 13/251 disclosed. |
+| I11 | ANSWERED | The 95-row benign taxonomy becomes 7 detector fixes (P1–P7), incl. P7's measured 1/16,763 non-finding. |
 
 ---
 
@@ -229,6 +352,7 @@ Defining files + hashes (all in `reproducibility_manifest.json`): **corpus** `da
 1. **"Pre-registered" protocol/criteria** — the manuscript says the live-matrix protocol and operational criteria are *pre-registered* ([paper/main_clean.md:593], [:630], [:965], [:969]), but `reproducibility_manifest.json` sets `preregistration.status = "unknown"` and instructs *"Do not assert preregistration."* Remedy: replace with "protocol frozen before the run" (which the artifacts do support) or supply a registration record.
 2. **Second-rater packet "served as full texts"** (minor, artifact-qualified) — §5/§7 say the packet was "served full-text" ([paper/main_clean.md:306-307], [:504]); `data/kappa_packet.md` serves 30 texts with **no display truncation** but flags **12 of 30 as `[TRUNCATED-AT-SOURCE]`** (the extractor itself cut them). The artifact supports "no display truncation," not "source-complete full text." Remedy: one-clause qualifier.
 3. **"Latest published version"** ([paper/main_clean.md:206]) — supported only as "the registry `isLatest` at crawl time within the prefix"; the artifact does not establish it is the authors' latest published release. Low severity; the prefix caveat is disclosed two sentences later.
+4. **(re-checked in the second pass, §I — no NEW gaps.)** I1–I11 were answered from artifacts; the only paper-facing wording issue they re-confirm is Gap 1 ("pre-registered", restated in the abstract [paper/main_clean.md:33]). No naive-extrapolation product, no vendor attribution, and no cost overstatement was found.
 
 ### (2) Questions answerable only from "as reported" external data
 
@@ -242,3 +366,8 @@ Defining files + hashes (all in `reproducibility_manifest.json`): **corpus** `da
 3. **"Is the exec-priming (FL) 9/9 a steering result?"** — No: `[B]` is a marker-presence test satisfied by relaying the guide (the benign task), so the arm is task-conflated and excluded; instruction surfacing is 9/9, own-voice execution intent is 0/9. [paper/main_clean.md:673-700]
 4. **"Are your five positives attacks or vulnerabilities?"** — Neither: they are **attack-shaped mechanisms** in otherwise benign product descriptions, with no exploit path, no live target, and no filed CVE (Figure 2 step 4 deliberately not drawn). [paper/main_clean.md:758-770], [paper/main_clean.md:902-909]
 5. **"How is the per-class table computed?"** — By **row-verdict apportionment**, not per-instance adjudication: every flag on a positive row counts as supported, every flag on a non-positive row as unsupported — a disclosed limitation (A8). [paper/main_clean.md:272-278], [AUTHOR_ACTION_REQUIRED.md A8]
+
+*Second-pass additions worth memorising (from §I):* the interval widths (7.9 pp on poison,
+18 pp on channel) — i.e. why this is a calibration of *order of magnitude*, not a point
+estimate (I1); and the fact that the paper deliberately **never** extrapolates the sample
+rate to the corpus (I2).
