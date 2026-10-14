@@ -99,15 +99,23 @@ Exact Froglet action name. Do not invent actions. Use status first to verify loc
 
 ---
 
-## 3. PER-CLASS TABLE — 13 fired classes, supported/unsupported (sum 15/268)
+## 3. PER-CLASS TABLE — 13 fired classes, instance-level adjudication (sum 82/268)
 
 | Value | Source | Recompute command |
 |---|---|---|
-| 13 fired classes; **15 supported / 253 unsupported / 268 instances** | `data/validation_report.md:13,17,23-39`; `data/validation_family_split.csv:5` | see snippet below |
-| `poison:imperative_to_model` 5/76 · `capability:secret_env_access` 3/53 · `poison:exfiltration_language` 0/34 · `capability:network_egress` 0/21 · `addressing:model_addressed` 0/21 · `addressing:second_person_imperative` 4/21 · `capability:shell_execution` 1/18 · `poison:stealth_concealment` 0/9 · `poison:cross_tool_shadowing` 1/4 · `capability:database_write` 0/4 · `capability:file_write_delete` 0/4 · `capability:file_read_sensitive` 1/2 · `poison:fake_system_role` 0/1 | `data/analysis_toollevel.csv` flags × `data/labels.jsonl` labels; cross-check `data/validation_report.md:23-39` | snippet below |
-| **Poison-family subtotal 6/124 = 4.8%** (6 supported, 118 unsupported) | `data/validation_family_split.csv:2`; `paper/main_clean.md:26,148` | `cat data/validation_family_split.csv` |
-| Capability family 5/102 = 4.9% · Channel family 4/42 = 9.5% | `data/validation_family_split.csv:3-4` | same |
+| 13 fired classes; **82 supported / 186 unsupported / 268 instances** | `data/INSTANCE_VERDICTS.csv` (one row per fired flag: verdict + evidence quote + provenance) | `python3 pilot/adjudicate_instances.py`; `python3 scripts/verify_claims.py` (C15) |
+| `capability:secret_env_access` 28/53 · `addressing:model_addressed` 19/21 · `addressing:second_person_imperative` 13/21 · `capability:network_egress` 11/21 · `poison:imperative_to_model` 5/76 · `poison:exfiltration_language` 0/34 · `capability:shell_execution` 1/18 · `poison:stealth_concealment` 0/9 · `poison:cross_tool_shadowing` 1/4 · `capability:database_write` 2/4 · `capability:file_write_delete` 2/4 · `capability:file_read_sensitive` 0/2 · `poison:fake_system_role` 0/1 | `data/INSTANCE_VERDICTS.csv`, summarized in `data/instance_summary.csv` (with Wilson intervals) | `cat data/instance_summary.csv` |
+| **Poison-family subtotal 6/124 = 4.84%** (6 supported, 118 unsupported) | `data/instance_summary.csv` family row; `paper/main_clean.md:26,148` | `cat data/instance_summary.csv` |
+| Capability family 44/102 = 43.14% · Channel family 32/42 = 76.19% · All-family **82/268 = 30.60%** | `data/instance_summary.csv`; `paper/main_clean.md:26` | same |
+| Top-score stratum 78/263 = 29.66% · duplicate-name collapse 75/251 = 29.88% | `pilot/derive_r4_numbers.py` STRUCTURE-LOCK | `python3 pilot/derive_r4_numbers.py` |
 | Sample totals: 5 TP rows, 150/150 labeled | `data/validation_report.md:9,13` | `python3 pilot/label_sample.py --report` |
+
+**Superseded — the first-pass row-verdict apportionment (retained as the earlier figure):
+15/268** (13 classes, 15 supported / 253 unsupported; poison 6/124, capability 5/102,
+channel 4/42, stratum 15/263), `data/validation_family_split.csv`. The snippet below
+re-derives *that* table, and `verify_claims.py` C11 still reproduces it — which is what keeps
+the §5 "first-pass default" wording honest. The published table is §3's instance-level block
+above, re-derived by C15 and by `pilot/adjudicate_instances.py`.
 
 ```bash
 python3 - <<'EOF'
@@ -133,8 +141,11 @@ print('SUM', sum(v[0] for v in per.values()), '/', sum(v[1] for v in per.values(
 EOF
 ```
 
-Recomputed output: **13 classes, 15/268**; poison family (5 classes) **6/124 = 0.0484 →
-4.8%** — matches `data/validation_family_split.csv` and the draft.
+Recomputed output (the **superseded** apportioned table): **13 classes, 15/268**; poison family
+(5 classes) **6/124 = 0.0484 → 4.8%** — matches `data/validation_family_split.csv`. The
+published instance-level table is re-derived instead by `python3
+pilot/adjudicate_instances.py` (268 verdicts, 82 supported) and asserted cell by cell in
+`scripts/verify_claims.py` C15.
 
 ---
 
@@ -309,7 +320,7 @@ participate in a duplicate-name group. The numeric value 1,484 (and 1,484/16,763
 pairs" is the reading that matches the census. **Flagged for the PI; not edited.**
 
 **10.4 All other checked draft numbers matched their recompute:** sample hash/rows, both
-quote blocks (byte-exact), 15/268 + 6/124, 4,128/698/4,926, taxonomy 95, all five live
+quote blocks (byte-exact), 6/124, 4,128/698/4,926, taxonomy 95, all five live
 arms + pooled 14/18 + CIs + 54/54/51/3, κ full and FP-subset, 1,082/16,763 truncation,
 16,763/4,725/17,167, crawl date, 1,484. **No draft number required a fix.**
 

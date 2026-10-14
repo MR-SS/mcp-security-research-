@@ -85,24 +85,24 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "d97b7a18b4a359b03d55aef93ec5cf48e1363db24f88483a208761a5441418ae",
+      "sha256": "e2eaefc1dd4deb0f3c84463c255c786e865affef9522f2ae7b191f6e87b6a338",
       "role": "traceable manuscript record (edited this revision)",
       "status": "derived",
-      "bytes": 77556
+      "bytes": 80987
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "7fca6e9b08be2475b57bdee8ccb0a13c99db64423dd2a1081cc0d2056d527c0d",
+      "sha256": "6d4717db475090090b8f7d1e8a596e46b1ff4abe614e8dae3bd310a9cd0338a5",
       "role": "authoritative publication copy (edited this revision)",
       "status": "derived",
-      "bytes": 74900
+      "bytes": 78429
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "ce999d2d4c27bfbd80eb0e3ec79e919e0f35ed0a740fac7bcb7c6a96188500aa",
+      "sha256": "43671ad008ddf293392748e502779542ba90e02c819086d6a26726595edb0f06",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived",
-      "bytes": 832356
+      "bytes": 843280
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
@@ -113,31 +113,31 @@
     },
     {
       "path": "paper/preview/build_preview.py",
-      "sha256": "e399281d1e0791c5f7c547eb1f1a7c8c63e7f679106e13bf771d3c9a1e8c2518",
+      "sha256": "48e7235ca20b19067eecbbd3ebd7044d60fc69e9b4a252ef38ba430e63804207",
       "role": "HTML builder for the reviewer package",
       "status": "derived",
-      "bytes": 11743
+      "bytes": 11889
     },
     {
       "path": "paper/preview/make_figures.py",
-      "sha256": "4a76e72c4b78374429e2ed8566df1499ac748c2f564ccaf975f66527ed003a52",
+      "sha256": "d04c1223b2ae947cf2029c6feb1c5ffaefcaba6a4a38a17406a0c61ec1f0b2fc",
       "role": "figure generator; fails loud on value mismatch",
       "status": "derived",
-      "bytes": 12650
+      "bytes": 13166
     },
     {
       "path": "paper/preview/figs/fig-1-funnel.png",
-      "sha256": "beedda4b5feed68a9f16051a5561b82c6f9c692e4709b51ebad6ff134b2d2509",
+      "sha256": "b87809ec52a3df13bed23f9ac835bcce8845c39b56d462434e770b6cccc0919a",
       "role": "funnel figure (denominator funnel)",
       "status": "derived",
-      "bytes": 187738
+      "bytes": 190085
     },
     {
       "path": "paper/preview/figs/fig-2-perclass.png",
-      "sha256": "6c0f6c4f65dc1cdb4675c30fe132324b48124264f96bc620120bf540b90e6f21",
+      "sha256": "2d3648c14601c47739d3912e2423f98f944e3d419b127da51295c3e9547eeec9",
       "role": "per-class text-support figure",
       "status": "derived",
-      "bytes": 188293
+      "bytes": 191176
     },
     {
       "path": "paper/preview/figs/fig-3-trials.png",
@@ -148,17 +148,17 @@
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "5bbb0de6ddca3e3e62fe8becb49b5f567f7c9504a0d5c8204f08032b528168a8",
-      "role": "machine-readable claim ledger (27 claims)",
+      "sha256": "d0eb6344976621ac5a1de16ed98f065234a1767419700e082bb3029d68c185a4",
+      "role": "machine-readable claim ledger (29 claims)",
       "status": "derived",
-      "bytes": 17799
+      "bytes": 22401
     },
     {
       "path": "pilot/derive_r4_numbers.py",
-      "sha256": "8a47c843bc9ab6282933bdb9333c49115185f4e091e20df77f783d9948a71bb8",
+      "sha256": "72aa39488d49eb71ebe7d24f79c76944e43b2e2f916ec96b67629cbb57d9919b",
       "role": "assert-guarded derivation of headline numbers",
       "status": "derived",
-      "bytes": 17580
+      "bytes": 18865
     },
     {
       "path": "experiments/trial_accounting.py",
@@ -169,10 +169,10 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "5e89f296f2b2cef30a4587bb8e3f422212d9d9cadfd9c5ac4f9652f259a8d155",
+      "sha256": "bffcb68f8923ba54bf623c3f351ffe67dce7c51fde70811a9c61fd64b4f1c23e",
       "role": "offline verification entry point",
       "status": "derived",
-      "bytes": 21794
+      "bytes": 31218
     },
     {
       "path": "REVISION_AUDIT.md",
@@ -183,10 +183,10 @@
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "22ec2890bf43a66fb16bd90580f48bd7b918e136492fa9c63fb01933fcd325a4",
+      "sha256": "0e01bc8eb7ad65aff8b24f622d68cbe10db2424982346ce57c653d27d3d10ace",
       "role": "human-dependency list",
       "status": "derived",
-      "bytes": 11909
+      "bytes": 14356
     },
     {
       "path": "REVISION_REPORT.md",
@@ -201,6 +201,27 @@
       "role": "standard four-gate battery (derive, trial accounting, abstract cap, number parity)",
       "status": "derived",
       "bytes": 3557
+    },
+    {
+      "path": "data/INSTANCE_VERDICTS.csv",
+      "sha256": "89e23f58e9dac9399804fc0fa9f18aaddd7a0a1de3d29d4b223ae3d9f4de9483",
+      "role": "A8 instance-level adjudication: one supported/unsupported verdict per fired flag, with a verbatim evidence quote and a provenance tag",
+      "status": "derived",
+      "bytes": 58791
+    },
+    {
+      "path": "data/instance_summary.csv",
+      "sha256": "5b999a6366d586460b5a0f5a99403cb6c7281223a262bf78144da261279a9bfc",
+      "role": "per-class/family/all summary of the instance verdicts with Wilson intervals (published table source)",
+      "status": "derived",
+      "bytes": 885
+    },
+    {
+      "path": "pilot/adjudicate_instances.py",
+      "sha256": "9738c3d5c6087e4cfd7419f4a22953ad4c46baef0409cb3c7f5e5b5395662697",
+      "role": "producer of data/INSTANCE_VERDICTS.csv and data/instance_summary.csv (fails loud on count mismatch)",
+      "status": "derived",
+      "bytes": 20488
     }
   ],
   "sample_identity": {

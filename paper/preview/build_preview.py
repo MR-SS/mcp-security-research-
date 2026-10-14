@@ -38,8 +38,8 @@ FIG_FUNNEL = {
     "png": "fig-1-funnel.png",
     "alt": "Denominator funnel from 60,000 registry version-entries to 5 poison-positive rows",
     "caption": ('<span class="src">Source: data/collection_report.md §2–§4 and §A.1–§A.2; '
-                'data/candidate_rate_scan.csv; data/validation_family_split.csv '
-                '(assert-verified).</span>'),
+                'data/candidate_rate_scan.csv; data/INSTANCE_VERDICTS.csv '
+                '(§6.2 instance-level table) (assert-verified).</span>'),
     "before": False,
 }
 
@@ -51,11 +51,13 @@ FIGURES = [
         "anchor": '<h3 id="the-five-tp-rows-and-four-mechanisms">',
         "png": "fig-2-perclass.png",
         "alt": "Sorted per-class text-support rates with family reference lines",
-        "caption": ('Supplemental figure S1 (not a numbered paper figure). Colors: capability '
-                    'orange, poison blue, channel green. Dashed vertical line: poison family '
-                    '6/124 = 4.8%; dotted: all-family 15/268 = 5.6%. Whiskers mark each '
-                    'class\'s n. <span class="src">Source: data/validation_report.md '
-                    '(§6.2 per-class table) (assert-verified).</span>'),
+        "caption": ('Supplemental figure S1 (not a numbered paper figure). Instance-level '
+                    'adjudication (A8). Colors: capability orange, poison blue, channel '
+                    'green. Dashed vertical line: poison family 6/124 = 4.8%; dotted: '
+                    'all-family 82/268 = 30.6%. Whiskers mark each class\'s n. '
+                    '<span class="src">Source: data/INSTANCE_VERDICTS.csv, summarized in '
+                    'data/instance_summary.csv (§6.2 per-class table) '
+                    '(assert-verified).</span>'),
         "before": True,
     },
     {

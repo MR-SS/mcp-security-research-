@@ -202,8 +202,13 @@ def main():
     print("=" * 70)
 
     # (name, k, n, expected (lo, hi) as printed in section 6.1, 2 dp)
-    headline = [("all-family text-support", 15, 268, (0.03, 0.09)),
+    # A8 (2026-10-14): the headline figures are now instance-level (data/INSTANCE_VERDICTS.csv,
+    # 82 supported of 268), with the families split by what a supported flag claims; the
+    # apportioned first-pass figures (15/268) are retained in the replication package only.
+    headline = [("all-family instance-level text-support", 82, 268, (0.25, 0.36)),
                 ("poison-family text-support", 6, 124, (0.02, 0.10)),
+                ("capability-family text-support", 44, 102, (0.34, 0.53)),
+                ("channel-family text-support", 32, 42, (0.61, 0.87)),
                 ("TP yield in the top-100 rows", 5, 100, (0.02, 0.11)),
                 ("row-level TP", 5, 150, (0.01, 0.08))]
     for name, k, n, want in headline:
@@ -235,9 +240,20 @@ def main():
     n_inst = sum(len(_instances(i)) for i in range(len(sample_rows)))
     assert n_inst == 268, f"sample instances {n_inst} != 268"
     tp_rows = [i for i in range(len(sample_rows)) if human_full[i] == "tp"]
-    tp_inst = sum(len(_instances(i)) for i in tp_rows)
-    # supported == instance carried by a TP row (15 supported / 15 instances)
-    assert tp_inst == 15, f"instances on TP rows {tp_inst} != 15 supported"
+
+    # A8: supported instances now come from the instance-level adjudication, which is an
+    # artifact (data/INSTANCE_VERDICTS.csv) rather than the row-verdict apportionment.
+    _verdicts = {}
+    _vpath = os.path.join(os.path.dirname(SAMPLE), "INSTANCE_VERDICTS.csv")
+    for _v in _csv.DictReader(open(_vpath, encoding="utf-8")):
+        _verdicts[(int(_v["row_id"]), _v["flag"].split(":", 1)[1])] = (
+            _v["instance_verdict"] == "supported")
+    assert len(_verdicts) == 268, f"instance verdicts {len(_verdicts)} != 268"
+    s_inst = sum(_verdicts.values())
+    assert s_inst == 82, f"supported instances {s_inst} != 82"
+    for _i in range(len(sample_rows)):
+        for _c in _instances(_i):
+            assert (_i, _c.split(":", 1)[1]) in _verdicts, f"missing verdict {_i} {_c}"
     groups = {}
     for i, r in enumerate(sample_rows):
         groups.setdefault(r["name"], []).append(i)
@@ -247,13 +263,16 @@ def main():
         for i in rws:
             classes.update(_instances(i))
         for cls in classes:
-            collapsed[(name, cls)] = any(human_full[i] == "tp" for i in rws)
+            collapsed[(name, cls.split(":", 1)[1])] = any(
+                _verdicts.get((i, cls.split(":", 1)[1]), False) for i in rws)
     c_k, c_n = sum(collapsed.values()), len(collapsed)
-    assert (c_k, c_n) == (13, 251), (
-        f"cluster collapse {c_k}/{c_n} != paper's 13/251")
+    assert (c_k, c_n) == (75, 251), (
+        f"cluster collapse {c_k}/{c_n} != paper's 75/251")
     print(f"  cluster sensitivity (same server::tool collapsed)  "
           f"{c_k}/{c_n} = {100 * c_k / c_n:.2f}%  "
-          f"vs 15/268 = {100 * 15 / 268:.2f}%  OK")
+          f"vs 82/268 = {100 * 82 / 268:.2f}%  OK")
+    print(f"  instance-level support  {s_inst}/{n_inst} = {100 * s_inst / n_inst:.2f}%  OK"
+          f"   (instance verdicts: {os.path.relpath(_vpath, os.path.dirname(os.path.dirname(SAMPLE)))})")
 
     # Kappa delta-method 95% CI (n = 30), from the packet's own 2x2 table.
     counts = {}

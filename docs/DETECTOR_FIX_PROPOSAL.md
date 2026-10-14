@@ -1,8 +1,12 @@
 # Detector-Fix Proposal — recommendations only (NEVER auto-applied)
 
 > **Status: PROPOSAL.** Nothing in this document modifies `pilot/analyze.py` or any detector
-> rule (AGENTS.md §2.3, §2.9). Measured detector precision on the 150-row validation sample
-> is **5.6% (15 of 268 flag instances)**; every proposal below is derived **only** from the
+> rule (AGENTS.md §2.3, §2.9). Measured detector text-support on the 150-row validation sample,
+> with all 268 fired flags adjudicated instance by instance (`data/INSTANCE_VERDICTS.csv`), is
+> **4.84% poison-family (6 of 124 poison instances)** and **30.60% all-family (82 of 268)** —
+> the poison-family figure is the calibration baseline, and the all-family figure is much higher
+> only because capability and channel triggers are usually justified by the text (44/102 and
+> 32/42). The earlier row-verdict apportionment read 5.6% (15/268); every proposal below is derived **only** from the
 > measured failure modes documented in `data/validation_report.md` (final per-class
 > precision), `docs/FINDINGS_DISCUSSION.md` §(e), the 145 last-wins FP rationales in
 > `data/labels.jsonl`, and `data/collection_report.md` §5.9–§5.11.
@@ -21,8 +25,10 @@ preserved or every existing `row_id` label breaks (FUTURE_WORK item 10).
 
 ## 1. Purpose
 
-Measured detector precision is **5.6% (15 TP / 268 flag instances)** with seven of thirteen
-classes at exactly 0.00 (per-class table in `data/validation_report.md`); this document
+Measured detector text-support is **4.84% on the poison family (6 supported / 124 poison
+instances; 30.60% all-family, 82/268)** with four of thirteen classes carrying no supported
+instance at all and nine of thirteen below 50% (per-class table in
+`data/INSTANCE_VERDICTS.csv`, summarized in `data/instance_summary.csv`); this document
 proposes fixes derived **only** from the measured failure modes in the 145 human FP
 rationales — no speculative hardening.
 
@@ -147,7 +153,7 @@ rationales — no speculative hardening.
   family: `skip|avoid|bypass|not needed before|do not wait (for)|proceed without` + a
   confirmation noun `approval|confirmation|consent|OTP|2FA|verification|review` within the
   sentence). Deliberately **non-scoring until v3 validation** (AGENTS.md §2.3): at the sample's
-  measured base rate (5.6% flag-instance precision) an uncalibrated class of this breadth would
+  measured base rate (4.84% poison-family text-support; 30.60% all-family) an uncalibrated class of this breadth would
   be near-pure FP, so v3 ships it as an annotation column; scoring only if the re-validation
   protocol (§3) shows the benign-funnel readings (row 47) separable from gate-suppression.
   **Measured FP-risk surface (§5.13 sizing, 2026-09-28 — measurement, not estimate):** the

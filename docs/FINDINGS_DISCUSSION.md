@@ -113,10 +113,20 @@ table — this list is the semantic (note-derived) version:
 
 ## (e) Detector gaps (what the 150-row validation says the regexes cannot see)
 
-- **0%-precision classes** (TP=0 in the sample): `database_write`, `file_write_delete`,
-  `exfiltration_language`, `network_egress`, `fake_system_role`, `stealth_concealment`,
-  `model_addressed` — every flagged instance was benign. Near-zero: `imperative_to_model`
-  0.07, `secret_env_access` 0.06, `shell_execution` 0.06, `second_person_imperative` 0.19.
+- **0%-precision classes** (TP=0 in the sample, in the row-verdict sense): `database_write`,
+  `file_write_delete`, `exfiltration_language`, `network_egress`, `fake_system_role`,
+  `stealth_concealment`, `model_addressed` — none of them decided a positive row. Near-zero:
+  `imperative_to_model` 0.07, `secret_env_access` 0.06, `shell_execution` 0.06,
+  `second_person_imperative` 0.19.
+  **Basis changed 2026-10-14 (A8):** these figures are the row-verdict apportionment, which
+  inherits a class's support from its *row*. The published table is now an instance-level
+  adjudication (`data/INSTANCE_VERDICTS.csv`): the **poison** family is unchanged (6/124, and
+  each of these poison classes still carries no supported instance except where noted), but
+  four of these classes turn out to be *trigger-justified* far more often than the apportionment
+  suggested — `database_write` 2/4, `file_write_delete` 2/4, `model_addressed` 19/21,
+  `network_egress` 11/21 — i.e. the regex is right about the capability it names and wrong about
+  the row being malicious. Read the list above as *poisoning-precision* classes, not as broken
+  regexes.
 - **Paraphrase recall gap on the highest-value mechanisms — rows 60/94/95**: the two most
   consequential TP shapes have no direct signature. Row 60's credential funnel never says
   "send"/"upload", so `exfiltration_language` is silent ("deposit … immediately" ≈ store, not

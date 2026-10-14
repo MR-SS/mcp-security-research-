@@ -23,7 +23,7 @@ def check(name, got, want):
     print(f"  {name}: {got} (expect {want})")
 
 CORPUS, ANYFLAG, POISON_ROWS, INSTANCES = 16763, 4128, 698, 4926
-SUPPORTED, TP_ROWS, REVIEWED = 15, 5, 150
+SUPPORTED, TP_ROWS, REVIEWED = 82, 5, 150   # instance-level supported (A8); 6 of them poison
 # Denominator-funnel stage figures (item 5), verified against
 # data/collection_report.md §2-§4 (600-page snapshot 20260921T115232Z):
 # 60,000 entries -> 17,167 isLatest (28.6%) -> 11,370 with repository.url (66.2%)
@@ -42,13 +42,19 @@ fam = {}
 with open(os.path.join(REPO, "data", "validation_family_split.csv"), encoding="utf-8") as fh:
     for r in csv.DictReader(fh):
         fam[r["family"]] = (int(r["supported_instances"]), int(r["total_instances"]))
-check("poison subtotal", fam["poison"], (6, 124))
-check("all-family", fam["ALL"], (15, 268))
-rep = open(os.path.join(REPO, "data", "validation_report.md"), encoding="utf-8").read()
+check("historical apportioned poison subtotal", fam["poison"], (6, 124))
+check("historical apportioned all-family", fam["ALL"], (15, 268))
+# A8 (2026-10-14): the published per-class counts are the instance-level adjudication in
+# data/INSTANCE_VERDICTS.csv (summarized with Wilson intervals in instance_summary.csv),
+# not the row-verdict apportionment in data/validation_report.md.
 perclass = {}
-for m in re.finditer(r"\| `(\w+)` \| (\d+) \| (\d+) \| ([\d.]+) \|", rep):
-    perclass[m.group(1)] = (int(m.group(2)), int(m.group(3)))
-EXPECT_PC = {"cross_tool_shadowing": (1,3), "database_write": (0,4), "exfiltration_language": (0,34), "fake_system_role": (0,1), "file_read_sensitive": (1,1), "file_write_delete": (0,4), "imperative_to_model": (5,71), "model_addressed": (0,21), "network_egress": (0,21), "second_person_imperative": (4,17), "secret_env_access": (3,50), "shell_execution": (1,17), "stealth_concealment": (0,9)}
+with open(os.path.join(REPO, "data", "instance_summary.csv"), encoding="utf-8") as fh:
+    for r in csv.DictReader(fh):
+        if r["level"] == "class":
+            perclass[r["name"]] = (int(r["supported"]), int(r["total"]))
+check("per-class instances", sum(t for _, t in perclass.values()), 268)
+check("per-class supported", sum(s for s, _ in perclass.values()), SUPPORTED)
+EXPECT_PC = {"cross_tool_shadowing": (1,4), "database_write": (2,4), "exfiltration_language": (0,34), "fake_system_role": (0,1), "file_read_sensitive": (0,2), "file_write_delete": (2,4), "imperative_to_model": (5,76), "model_addressed": (19,21), "network_egress": (11,21), "second_person_imperative": (13,21), "secret_env_access": (28,53), "shell_execution": (1,18), "stealth_concealment": (0,9)}
 for k, v in EXPECT_PC.items():
     check(f"pc {k}", perclass.get(k), v)
 CELL_WANT = {("wf","glm-5.3"): (3,3), ("wf","deepseek-v4.1-flash"): (3,3), ("wf","gemini-3.8-flash"): (0,3), ("fl","glm-5.3"): (3,3), ("fl","deepseek-v4.1-flash"): (3,3), ("fl","gemini-3.8-flash"): (3,3), ("dp","glm-5.3"): (2,3), ("dp","deepseek-v4.1-flash"): (3,3), ("dp","gemini-3.8-flash"): (3,3), ("nv","glm-5.3"): (0,3), ("nv","deepseek-v4.1-flash"): (0,3), ("nv","gemini-3.8-flash"): (0,2), ("ne","glm-5.3"): (0,3), ("ne","deepseek-v4.1-flash"): (0,3), ("ne","gemini-3.8-flash"): (0,2), ("pt","glm-5.3"): (0,3), ("pt","deepseek-v4.1-flash"): (0,3), ("pt","gemini-3.8-flash"): (0,2)}
@@ -129,7 +135,7 @@ stages = [("Registry version-entries", "60,000", 60000, 60000),
           ("Poison-flag rows", "698", 698, 16763),
           ("Rows reviewed by a human", "150", 150, 16763),
           ("Flag instances (all families)", "268", 268, 268),
-          ("Instances with text support", "15", 15, 268),
+          ("Instances with text support", str(SUPPORTED), SUPPORTED, 268),
           ("Poison-positive rows", "5", 5, 150)]
 n = len(stages)
 fig, ax = plt.subplots(figsize=(7.2, 4.9))
@@ -173,8 +179,8 @@ for y, (cls, (tp, tot)) in zip(ys, items):
             fontsize=8.6, color="#2b2b2b", zorder=5)
 ax.axvline(6 / 124, color=BLUE, ls="--", lw=1.3, zorder=3,
            label="poison family 6/124 = 4.8%")
-ax.axvline(15 / 268, color=GRAY, ls=":", lw=1.5, zorder=3,
-           label="all-family 15/268 = 5.6%")
+ax.axvline(82 / 268, color=GRAY, ls=":", lw=1.5, zorder=3,
+           label="all-family 82/268 = 30.6%")
 ax.set_yticks(ys); ax.set_yticklabels([k for k, _ in items], fontsize=9)
 ax.set_xlabel("text-support rate — supported instances ÷ flagged instances (fraction)")
 ax.set_title("Per-class text-support rate (paper §6.2)", fontsize=12, fontweight="bold")

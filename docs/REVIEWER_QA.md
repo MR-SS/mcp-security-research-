@@ -6,8 +6,8 @@ Provenance: **2026-10-10** | HEAD **`fad31cff95d1e59fff117efcc7cecce088504648`**
 `python3 pilot/derive_candidate_rate.py` · `python3 pilot/derive_family_split.py` ·
 direct reads of `data/`, `pilot/`, `experiments/`, `docs/`, `prompts/`, git history.
 
-Second pass (§I, added 2026-10-10): recomputed Wilson widths (5.6 / 7.9 / 8.9 / 18.3 pp),
-the illustrative-extrapolation arithmetic (`698×6/124≈33.8`, `4128×15/268≈231`) and a
+Second pass (§I, added 2026-10-10): recomputed Wilson widths (11.0 / 7.9 / 8.9 / 26.2 pp),
+the illustrative-extrapolation arithmetic (`698×6/124≈33.8`, `4128×82/268≈1,263`) and a
 `grep` confirming neither product appears in the manuscript, plus reads of
 `data/collection_report.md`, `docs/BRIEF04_PROTOCOL.md`, `data/kappa_report.md`,
 `docs/DETECTOR_FIX_PROPOSAL.md`, and `data/live_tests/`.
@@ -25,8 +25,8 @@ the illustrative-extrapolation arithmetic (`698×6/124≈33.8`, `4128×15/268≈
 ### A1.
 **Q.** What problem is this paper claiming to solve, in one sentence the data supports?
 
-The problem is that **prior MCP-poisoning "findings" are uncalibrated detector output**: counts of what scanners emitted, not a measure of how often a fired flag is justified by the text. The data support exactly this framing — the study's deliverables are a *candidate rate* (4,128/16,763 rows any-flag) and a *human-validated text-support rate* (15/268 all-family; 6/124 poison-family), never a poisoning-prevalence claim.
-— Evidence: [paper/main_clean.md:53-57], [paper/main_clean.md:66-75], [paper/main_clean.md:331-334]; [command → `python3 pilot/derive_candidate_rate.py` prints `rows with >=1 flag (any family): 4128 (24.6257%)`]; [paper/FACTS_VERIFIED.md §3 (15/268)].
+The problem is that **prior MCP-poisoning "findings" are uncalibrated detector output**: counts of what scanners emitted, not a measure of how often a fired flag is justified by the text. The data support exactly this framing — the study's deliverables are a *candidate rate* (4,128/16,763 rows any-flag) and an *instance-level, human-adjudicated text-support rate* (82/268 all-family; 6/124 poison-family), never a poisoning-prevalence claim.
+— Evidence: [paper/main_clean.md:53-57], [paper/main_clean.md:66-75], [paper/main_clean.md:331-334]; [command → `python3 pilot/derive_candidate_rate.py` prints `rows with >=1 flag (any family): 4128 (24.6257%)`]; [paper/FACTS_VERIFIED.md §3 (82/268; 6/124)]; [data/INSTANCE_VERDICTS.csv].
 
 ### A2.
 **Q.** Which prior-reported numbers made this study necessary, and how are they qualified in the paper ("as reported")?
@@ -119,10 +119,10 @@ Labels are **single-PI human judgments** made interactively in the terminal agai
 — Evidence: [command → `data/labels.audit.jsonl` action counter = `{'note': 43, 'set-note': 36, 'review-truncated': 8, 'verdict': 7}`]; [paper/main_clean.md:281-282], [paper/main_clean.md:583-588]; [data/validation_report.md §"Truncation-validity check"].
 
 ### D3.
-**Q.** What is the per-class table actually derived from (apportionment rule) and its published limitation?
+**Q.** What is the per-class table actually derived from, and what replaced the apportionment rule?
 
-The per-class table is derived from the **row verdict by apportionment**: every flag on a positive row counts as a supported instance of its class, every flag on a non-positive row as unsupported, `unclear` contributes nothing — with **one class exempt**: `cross_tool_shadowing`, whose four fired instances (rows 12, 19, 33, 55) are adjudicated instance by instance from the frozen row notes (row 12 supported — a priority-capture transfer; rows 19/33 same-server toolkit/workflow guidance and row 55 dependency/setup guidance — unsupported), a per-instance cell of 1/4 = 0.25 that coincides with what apportionment produces but no longer inherits from it. The published limitation stands for the other 12 classes: an instance is never separately judged, so a class's supported count on a positive row is *inherited* from the row verdict, class-level support recorded in a non-positive row's rationale is not counted, and the one disagreement running the other way (`file_read_sensitive`, apportioned 1/2 with row 94's note recording a false positive on a positive row) is left as published so the 15/268 headline does not drift.
-— Evidence: [paper/main_clean.md:272] (§5 exception clause); [paper/main_clean.md:391-401] (§6.2 † footnote); [command → `verify_claims.py` C11 `apportionment reproduces every published cell: []`, C14 `note-derived supported instances: [12]` / `note-derived unsupported instances: [19, 33, 55]` / `headline supported sum unchanged (15): 15`]; [pilot/label_sample.py `report()` (`tp[c]+=1` / `fp[c]+=1` per row label)]; [claims_ledger.jsonl C-027]; [AUTHOR_ACTION_REQUIRED.md A8].
+The published per-class table is now an **instance-level adjudication**: every one of the **268 fired flag instances** carries its own supported/unsupported verdict, made against the stored text and recorded with a verbatim evidence quote in `data/INSTANCE_VERDICTS.csv` (§5, §6.1–§6.2). The earlier **row-verdict apportionment** — every flag on a positive row counted as supported, every flag on a non-positive row as unsupported, `unclear` contributing nothing — is retained only as the **first-pass default** and as the replication package's earlier table (`data/validation_family_split.csv`, headline 15/268); it is no longer the published basis. Four of its 13 class cells were wrong in the conservative direction (`database_write` 0/4 → 2/4 supported, `file_write_delete` 0/4 → 2/4, `model_addressed` 0/21 → 19/21, `second_person_imperative` 4/21 → 13/21) and one in the other direction (`network_egress` 0/21 → 11/21, `secret_env_access` 3/53 → 28/53): a class's support is not inherited from its row, so the apportionment was a lower bound on the capability and channel families and a coin-flip on the poison family. `cross_tool_shadowing` (rows 12, 19, 33, 55) keeps its note-derived 1/4 = 0.25 — row 12 a priority-capture transfer, rows 19/33 same-server toolkit/workflow guidance and row 55 dependency/setup guidance — and `stealth_concealment` its 0/9.
+— Evidence: [paper/main_clean.md:272] (§5 apportionment clause, re-framed as the first-pass default); [paper/main_clean.md:391-401] (§6.2 reading note); [data/INSTANCE_VERDICTS.csv] (268 rows: row_id | flag | instance_verdict | evidence_quote | note); [command → `verify_claims.py` C15 `instance verdict rows: 268`, `supported instances: 82`, `every per-class cell equals the instance counts: []`, C14 `note-derived supported instances: [12]`]; [pilot/adjudicate_instances.py]; [claims_ledger.jsonl C-027, C-028, C-029]; [AUTHOR_ACTION_REQUIRED.md A8].
 
 ### D4.
 **Q.** κ: packet composition, why 3-class == 2-class, why the negative-subset κ is 0, the SE method, and why this is NOT human–human reproducibility.
@@ -141,10 +141,10 @@ Exactly **three rows are adjudicated from excerpts only — 58, 70, 72** (the `T
 ## E. Results
 
 ### E1.
-**Q.** Headline support rates (poison/all-family/capability/channel) with exact n/d, estimand composition (268 vs 263), and single-collapse sensitivity (13/251).
+**Q.** Headline support rates (poison/all-family/capability/channel) with exact n/d, estimand composition (268 vs 263), and single-collapse sensitivity (75/251).
 
-Headline (purposive top-score validation sample): **poison-family 6/124 = 4.84%**, **all-family 15/268 = 5.60%**, capability-family 5/102 = 4.90%, channel-family 4/42 = 9.52%. Estimand composition: the 268 combined flag instances split into **263 in the top-score stratum** + **5 channel-only instances on the zero-flag controls** (all unsupported), so the stratum-specific rate is **15/263 = 5.70%** and the channel family in-stratum is 4/37. Single-collapse sensitivity: **13/251 (5.18%)** vs 15/268 (5.60%).
-— Evidence: [paper/main_clean.md:331-345]; [data/validation_family_split.csv]; [command → `derive_family_split.py` asserts `instances == 268` / `supported == 15`; `derive_r4_numbers.py` STRUCTURE-LOCK prints `15/268 [0.03,0.09]`, `15/263`, `13/251`]; [paper/FACTS_VERIFIED.md §3].
+Headline (purposive top-score validation sample, **instance-level adjudication**): **poison-family 6/124 = 4.84%**, **all-family 82/268 = 30.60%**, capability-family 44/102 = 43.14%, channel-family 32/42 = 76.19%. Estimand composition: the 268 combined flag instances split into **263 in the top-score stratum** + **5 channel-only instances on the zero-flag controls** (four of them supported channel instances, one the `model_addressed` over-trigger on row 119), so the stratum-specific rate is **78/263 = 29.66%**; the channel family in-stratum is 32 − 4 = 28 / 37. Single-collapse sensitivity: **75/251 (29.88%)** vs 82/268 (30.60%). The capability and channel figures are *trigger-justification* rates (does the tool really declare the capability / is the instruction channel really in use), not malice rates; the poison family is the calibration number and it is the one that reads single-digit.
+— Evidence: [paper/main_clean.md:331-345]; [data/INSTANCE_VERDICTS.csv], [data/instance_summary.csv]; [data/validation_family_split.csv] (the historical first-pass table); [command → `derive_r4_numbers.py` STRUCTURE-LOCK prints `82/268 [0.25,0.36]`, `6/124 [0.02,0.10]`, `44/102 [0.34,0.53]`, `32/42 [0.61,0.87]`, `78/263`, `75/251 = 29.88%`]; [paper/FACTS_VERIFIED.md §3].
 
 ### E2.
 **Q.** Corpus candidate rates and what "candidate" means operationally.
@@ -269,26 +269,29 @@ Defining files + hashes (all in `reproducibility_manifest.json`): **corpus** `da
 **Q.** Statistical power: can this study distinguish a low (≈2%) from a moderate (≈6%) text-support rate?
 
 **No — the study cannot distinguish a low (≈2%) from a moderate (≈6%) support rate.** The
-paper publishes Wilson 95% intervals for four headline figures — all-family 15/268
-`[0.03, 0.09]` (5.6 pp wide), poison-family 6/124 `[0.02, 0.10]` (7.9 pp), top-100 TP yield
-5/100 `[0.02, 0.11]`, row-level 5/150 `[0.01, 0.08]`; recomputing on the family denominators
-gives capability 5/102 `[0.02, 0.11]` and channel 4/42 `[0.04, 0.22]` (18 pp). The paper
-therefore positions the result as "single-digit, an order of magnitude below raw detector
-counts", not a tight estimate — and notes the intervals assume independent Bernoulli draws
-while flags *cluster* by `server::tool`, so they are descriptive under that model.
-— Evidence: [paper/main_clean.md:334-343] (published intervals + clustering caveat); [command → `python3 pilot/derive_r4_numbers.py` STRUCTURE-LOCK prints `15/268 [0.03, 0.09] OK`, `6/124 [0.02, 0.10] OK`]; [command → recomputed Wilson for 5/102 and 4/42 = [2.1%, 11.0%] and [3.8%, 22.1%]].
+paper publishes Wilson 95% intervals for four headline figures — all-family 82/268
+`[0.25, 0.36]` (11 pp wide), poison-family 6/124 `[0.02, 0.10]` (7.9 pp), top-100 TP yield
+5/100 `[0.02, 0.11]`, row-level 5/150 `[0.01, 0.08]`; the family intervals are capability
+44/102 `[0.34, 0.53]` and channel 32/42 `[0.61, 0.87]` (26 pp). The paper therefore
+positions the *poison-family* result as "single-digit, an order of magnitude below raw
+detector counts" — that is the calibration claim — while the all-family figure is a
+30.6% *flag-justification* rate over all three families and is explicitly not a poisoning
+rate; the capability and channel families are wide because their denominators are 102 and
+42 instances. The intervals assume independent Bernoulli draws while flags *cluster* by
+`server::tool`, so they are descriptive under that model.
+— Evidence: [paper/main_clean.md:334-343] (published intervals + clustering caveat); [command → `python3 pilot/derive_r4_numbers.py` STRUCTURE-LOCK prints `82/268 [0.25, 0.36] OK`, `6/124 [0.02, 0.10] OK`, `44/102 [0.34, 0.53] OK`, `32/42 [0.61, 0.87] OK`]; [data/instance_summary.csv].
 
 ### I2.
 **Q.** If a reader naively extrapolated the sample support rate to the whole corpus, what number would result — and is that a valid claim?
 
 **A naive extrapolation exists in arithmetic but is deliberately NOT made.** Multiplying the
 frozen candidate counts by the sample support rate would give ≈ `698 × 6/124 = 33.8`
-poison-flag rows and ≈ `4,128 × 15/268 = 231` any-flag rows corpus-wide — but this is
+poison-flag rows and ≈ `4,128 × 82/268 ≈ 1,263` any-flag instances corpus-wide — but this is
 invalid because the sample is purposive (selected on the detector's own score) and the
 bias direction is non-identifiable, so the arithmetic is illustrative only. **Neither number
 appears anywhere in the manuscript**, and the paper explicitly labels the rate
 "a sample-bounded descriptive quantity … not a population precision estimate."
-— Evidence: [command → recompute `698*6/124 = 33.8`, `4128*15/268 = 231.0`]; [paper/main_clean.md:335-350]; [command → `grep -E "231|33.8|34 rows" paper/main_clean.md` → NO MATCH].
+— Evidence: [command → recompute `698*6/124 = 33.8`, `4128*82/268 = 1263.2`]; [paper/main_clean.md:335-350]; [command → `grep -E "1263|231|33.8|34 rows" paper/main_clean.md` → NO MATCH].
 
 ### I3.
 **Q.** When was the corpus captured, and how quickly does its validity decay on a server-mutable surface?
@@ -356,8 +359,9 @@ outcome-criterion operationalisation, not a measured ASR.
 **Q.** Does the abstract overstate anything relative to the body and the artifacts?
 
 **The abstract does not overstate the body.** Every abstract figure matches the body/artifact
-(5 TP / 95 benign flagged / 50 controls; 15/268 = 5.6%; poison 6/124 = 4.8%; 54 completed /
-51 valid / 3 excluded; FL 9/9 surfacing vs 0/9 intent; DP 8/9; 16 valid controls), the
+(5 TP / 95 benign flagged / 50 controls; instance-level text-support 82/268 = 30.6%, poison
+6/124 = 4.8%; 54 completed / 51 valid / 3 excluded; FL 9/9 surfacing vs 0/9 intent; DP 8/9;
+16 valid controls), the
 abstract word count is 178 ≤ 180, and the number-token checks pass. The one carry-over item
 is wording, not magnitude: the abstract repeats "pre-registered operational criteria" (Gap 1
 above).
@@ -368,7 +372,8 @@ above).
 
 **Duplicate-row collapse is disclosed and does not move the reading.** The two duplicate TP
 registrations (rows 94/95, same `server::tool`) are counted once, giving **5 unique TP rows
-over 4 mechanisms**; the cluster-collapsed headline is **13/251 (5.18%)** vs 15/268 (5.60%).
+over 4 mechanisms**; the cluster-collapsed headline is **75/251 (29.88%)** vs
+82/268 (30.60%).
 Name-key joins are separately declared unsafe (`name_join_unsafe = true`).
 — Evidence: [paper/main_clean.md:345-347], [paper/main_clean.md:392-397]; [reproducibility_manifest.json `sample_identity.name_join_unsafe`].
 
@@ -404,10 +409,10 @@ non-finding, kept prospective.
 | C4 | ANSWERED | Controls cannot reveal misses by construction; FN rate is definitional. |
 | D1 | ANSWERED | Single-PI labels with disclosed unversioned-AI drafting aid; PI owns every verdict. |
 | D2 | ANSWERED | 7 revisions (3/6/9/11/16 u→fp; 94/95 fp→tp), all in `labels.audit.jsonl`. |
-| D3 | ANSWERED | Row-verdict apportionment (limitation stated) with one instance-adjudicated class, `cross_tool_shadowing` (1/4, C-027). |
+| D3 | ANSWERED | Instance-level adjudication of all 268 fired flags (C-028); the row-verdict apportionment is retained as the first-pass default. |
 | D4 | ANSWERED | Packet n=30; 3-class==2-class; κ=0 is the prevalence paradox; delta-method SE; LLM rater ≠ human-human. |
 | D5 | ANSWERED | Rows 58/70/72 are excerpt-only and disclosed as pending/unresolved. |
-| E1 | ANSWERED | 6/124, 15/268 (stratum 15/263), 5/102, 4/42; cluster sensitivity 13/251. |
+| E1 | ANSWERED | 6/124, 82/268 (stratum 78/263), 44/102, 32/42; cluster sensitivity 75/251. |
 | E2 | ANSWERED | 4,128/698/4,926 candidates; "candidate" = detector-emitted, an upper bound on triage. |
 | E3 | ANSWERED | 5 TP rows → 4 mechanisms with verbatim locations; row 61 lacks two clauses. |
 | E4 | ANSWERED | Negated + defensive = 42/95; taxonomy is a keyword partition of PI notes, not independent coding. |
@@ -433,7 +438,7 @@ non-finding, kept prospective.
 | I7 | ANSWERED | Live matrix is re-runnable only with independent gateway credentials; backend identity is an explicit unknown. |
 | I8 | ANSWERED | Live results are descriptive counts (3 reps × 3 models × 1 gateway), not an ASR estimate. |
 | I9 | ANSWERED | Abstract matches the body on every figure and is 178/180 words; only the "pre-registered" wording carries over. |
-| I10 | ANSWERED | Duplicate rows counted once (5 TP rows → 4 mechanisms); cluster-collapsed 13/251 disclosed. |
+| I10 | ANSWERED | Duplicate rows counted once (5 TP rows → 4 mechanisms); cluster-collapsed 75/251 disclosed. |
 | I11 | ANSWERED | The 95-row benign taxonomy becomes 7 detector fixes (P1–P7), incl. P7's measured 1/16,763 non-finding. |
 
 ---
@@ -452,11 +457,11 @@ non-finding, kept prospective.
 
 ### (3) Five questions the PI should be able to recite from memory in a live defense
 
-1. **"What exactly is 5.6%, and what is it not?"** — It is the flag-instance *text-support rate* (15/268) computed in a **purposive top-score validation sample**; it is **not** a population precision estimate (the sample over-represents the detector's top-scoring output), and the sample's bias direction is non-identifiable from the data. [paper/main_clean.md:331-350]
+1. **"What exactly is 30.6% (and 4.8%), and what is it not?"** — It is the flag-instance *text-support rate* (82/268 all-family; 6/124 poison-family) computed in a **purposive top-score validation sample**; it is **not** a population precision estimate (the sample over-represents the detector's top-scoring output), and the sample's bias direction is non-identifiable from the data. The poison-family number is the calibration claim (single-digit); the all-family number counts *trigger justification* in the capability and channel families too, so it is not a poisoning rate. [paper/main_clean.md:331-350]
 2. **"Why doesn't your design estimate recall?"** — The controls were selected *for* zero flags and no content standard beyond the PI's read was applied, so a control can never be a missed poison row; the 0/50 FN rate is definitional, not measured. [paper/main_clean.md:258-264]
 3. **"Is the exec-priming (FL) 9/9 a steering result?"** — No: `[B]` is a marker-presence test satisfied by relaying the guide (the benign task), so the arm is task-conflated and excluded; instruction surfacing is 9/9, own-voice execution intent is 0/9. [paper/main_clean.md:673-700]
 4. **"Are your five positives attacks or vulnerabilities?"** — Neither: they are **attack-shaped mechanisms** in otherwise benign product descriptions, with no exploit path, no live target, and no filed CVE (Figure 2 step 4 deliberately not drawn). [paper/main_clean.md:758-770], [paper/main_clean.md:902-909]
-5. **"How is the per-class table computed?"** — By **row-verdict apportionment**, not per-instance adjudication: every flag on a positive row counts as supported, every flag on a non-positive row as unsupported — a disclosed limitation (A8) — with one exception, `cross_tool_shadowing`, adjudicated instance by instance from the row notes (1/4: row 12 priority-capture transfer supported; rows 19/33 same-server, row 55 setup guidance unsupported). [paper/main_clean.md:272], [paper/main_clean.md:391-401], [claims_ledger.jsonl C-027], [AUTHOR_ACTION_REQUIRED.md A8]
+5. **"How is the per-class table computed?"** — By **instance-level adjudication**: each of the 268 fired flags was read against its stored text and marked supported or unsupported with a verbatim evidence quote in `data/INSTANCE_VERDICTS.csv` (A8, closed). The earlier row-verdict apportionment is retained only as the first-pass default (15/268), and `cross_tool_shadowing`'s note-derived cell is 1/4 (row 12 priority-capture transfer supported; rows 19/33 same-server, row 55 setup guidance unsupported). [paper/main_clean.md:272], [paper/main_clean.md:391-401], [claims_ledger.jsonl C-027, C-028, C-029], [AUTHOR_ACTION_REQUIRED.md A8]
 
 *Second-pass additions worth memorising (from §I):* the interval widths (7.9 pp on poison,
 18 pp on channel) — i.e. why this is a calibration of *order of magnitude*, not a point

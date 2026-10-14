@@ -11,14 +11,21 @@ Checks
   C3  join integrity: labels.jsonl row_id is the positional index into the frame
   C4  sample strata: 100 top-score / 50 controls, 95 non-positive + 5 positive
   C5  flag-instance counts: 268 combined / 263 top-score stratum, 5 control channel
-  C6  family splits: poison 6/124, capability 5/102, channel 4/42 (+ 4/37 stratum)
+  C6  historical (row-verdict apportionment) family splits in
+      data/validation_family_split.csv: poison 6/124, capability 5/102, channel 4/42
+      (+ 4/37 stratum). These are the superseded first-pass figures; C15 re-derives the
+      published table from data/INSTANCE_VERDICTS.csv (poison 6/124, capability 44/102,
+      channel 32/42, all-family 82/268).
   C7  kappa recomputation from the packet 2x2 (po, pe, kappa)
   C8  trial accounting from the ledger: 54 attempted / 51 valid / 3 excluded
   C9  manuscript wording: superseded strings absent, corrected strings present
   C10 claims ledger: required fields, allowed statuses, no unbacked VERIFIED
   C13 FL criterion-[B] sub-branch accounting (propagation vs execution adoption)
-  C14 cross_tool_shadowing per-instance adjudication (cell vs row-verdict apportionment)
-Only C1/C2/C3/C4/C5/C6/C7/C8/C11/C13/C14 are artifact re-derivations. C9/C10 are
+  C14 cross_tool_shadowing cell vs the first-pass apportionment (superseded for the
+      published table by C15)
+  C15 A8 instance-level adjudication: data/INSTANCE_VERDICTS.csv drives the published
+      per-class and family counts (§6.1-§6.2)
+Only C1/C2/C3/C4/C5/C6/C7/C8/C11/C13/C14/C15 are artifact re-derivations. C9/C10 are
 consistency checks against the manuscript and the ledger, not scientific
 validation of either.
 
@@ -110,17 +117,20 @@ check("combined sampled flag instances", inst, 268)
 check("top-score stratum flag instances", inst_top, 263)
 check("control channel-family instances", ctl_ch, 5)
 check("controls carrying exactly one channel flag", sum(1 for i in ctl if adr[i] == 1), 5)
-check("control channel instances are all unsupported (excluded from the 15)", True, True)
+# The control channel instances are adjudicated instance by instance in C15 (4 of the 5 are
+# supported channel instances); the row-verdict apportionment counted none of them, which is
+# why the superseded headline was 15 and the instance-level headline is 82.
 
 fam = {r["family"]: (int(r["supported_instances"]), int(r["total_instances"]))
        for r in csv.DictReader(open(p("data/validation_family_split.csv"), encoding="utf-8"))}
-check("poison family", fam["poison"], (6, 124))
-check("capability family", fam["capability"], (5, 102))
-check("channel family", fam["channel"], (4, 42))
-check("all-family", fam["ALL"], (15, 268))
+check("historical apportioned poison family", fam["poison"], (6, 124))
+check("historical apportioned capability family", fam["capability"], (5, 102))
+check("historical apportioned channel family", fam["channel"], (4, 42))
+check("historical apportioned all-family", fam["ALL"], (15, 268))
 check("top-score stratum all-family denominator", inst - ctl_ch, 263)
-check("15/263 stratum rate", round(100 * 15 / 263, 2), 5.70)
-check("channel in flagged stratum", (fam["channel"][0], fam["channel"][1] - ctl_ch), (4, 37))
+check("historical 15/263 stratum rate", round(100 * 15 / 263, 2), 5.70)
+check("historical channel in flagged stratum",
+      (fam["channel"][0], fam["channel"][1] - ctl_ch), (4, 37))
 
 # ------------------------------------------------------------------ C7 kappa
 print("C7 kappa recomputation (packet 2x2)")
@@ -179,6 +189,12 @@ check("NV gray arm (violation / trials)", agg.get("nv"), (0, 8))
 # ------------------------------------------------- C9 manuscript wording check
 print("C9 manuscript wording (superseded absent / corrected present)")
 SUPERSEDED = ["trigger withdrew on full text", "1,484/16,763", "Flagged non-TP subset",
+              # A8 (2026-10-14): the stratum sentence and the class-shape sentence were
+              # re-derived from the instance verdicts (78/263; nine unsupported-dominated;
+              # the control channel instances are 4 supported / 1 over-trigger, not 0/5).
+              "(all unsupported)", "7 are unsupported-dominated",
+              "the 5 channel-only flags on control rows",
+              "the 13 fired classes, 7 are",
               "Capability only (no model-addressed instruction)", "structurally uninformative",
               "Control violations 0/16", "54 mocked trials",
               "per-flag-instance adjudication", "separately judged against its class definition",
@@ -188,17 +204,29 @@ SUPERSEDED = ["trigger withdrew on full text", "1,484/16,763", "Flagged non-TP s
               "away from ASI04",
               # A9 option C: FL is excluded from the pooled ASR and the mechanism count.
               "WF+FL+DP", "three of the four", "three different success",
+              # A8 (2026-10-14): the apportioned figures are no longer published numbers.
+              "capability-family 5/102 (4.90%)", "channel-family 4/42 (9.52%)",
+              "94.4% of all-family flag instances", "remains as the headline",
+              "13/251 (5.18%)", "15/263 = 5.70%", "12 are unsupported-dominated",
+              "50 confirmed-benign controls with no capability-",
+              "so the headline 15/268 is unchanged",
               "8/9, deepseek-v4.1-flash 9/9",
               "Exec-priming text surfaced in 9/9 trials, unadopted"]
 # main.md keeps repo paths (backticked `server::tool`) where main_clean.md does not,
 # so phrase-level requirements are split into fragments both files must satisfy.
-REQUIRED = ["15/263", "ae1aff9f", "adjudicated from the 300-char excerpt",
+REQUIRED = ["78/263 = 29.66%", "four supported channel instances",
+            "seven carry more", "four carry more supported than unsupported",
+            "split two-and-two", "over-trigger on row 119",
+            "ae1aff9f", "adjudicated from the 300-char excerpt",
             "by extraction, not by absence upstream",
             "1,484 of the 16,763 rows carry a", "name shared with at least",
-            "per-class apportionment", "derived from the row verdict rather",
-            # C14: the one instance-adjudicated class and its footnote phrasing.
-            "adjudicated instance by instance", "priority-capture transfer",
-            "same-server toolkit",
+            "from the row verdict", "first-pass default",
+            # C14/C15: the instance-level rule and the published instance table.
+            "instance by instance", "priority-capture transfer",
+            "same-server toolkit", "data/INSTANCE_VERDICTS.csv",
+            "82 are supported by the stored", "44/102 (43.14%)", "32/42 (76.19%)",
+            "instance-level text-support rate 82/268, 30.6%", "75/251 (29.88%)",
+            "78/263 = 29.66%", "69.4%", "pending PI sign-off",
             # RA-21: the FL arm is reported as propagation, not adoption.
             "marker-presence test", "text-propagation", "0/9",
             # A9 option C: FL is task-conflated; the live matrix tests two of four.
@@ -367,7 +395,7 @@ else:
 # still agree with the apportioned cell (no headline drift), and stealth_concealment is
 # checked in the negative direction. Ledger: claims_ledger.jsonl C-027; manuscript: §6.2
 # footnote (both papers) + the §5 exception clause.
-print("C14 cross_tool_shadowing per-instance adjudication")
+print("C14 cross_tool_shadowing cell vs the first-pass apportionment (historical)")
 CTS_ROWS = [12, 19, 33, 55]
 _cts = [i for i, r in enumerate(S)
         if "cross_tool_shadowing" in _parse_flags(r.get("poison_flags"))]
@@ -407,9 +435,131 @@ for _f in ("paper/main.md", "paper/main_clean.md"):
     _m = re.search(r"\|\s*[*`]cross_tool_shadowing[*`][^|]*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|", _t)
     check(f"{_f} cross_tool_shadowing cell",
           (_m.group(1), _m.group(2), _m.group(3)) if _m else None, ("1", "3", "0.25"))
-    check(f"{_f} states the instance-level rule", "adjudicated instance by instance" in _t, True)
+    check(f"{_f} states the instance-level rule", "instance by instance" in _t, True)
 check("headline supported sum unchanged (15)",
       sum(t for t, _f in recomputed.values()), 15)
+
+# ------------- C15 A8 instance-level adjudication (published per-class table)
+# The published per-class and family counts come from data/INSTANCE_VERDICTS.csv, not from
+# the row-verdict apportionment (C11 keeps checking that historical table reproduces).
+# C15 ties the artifact to the manuscript: the per-class cells in both papers, the family
+# sums, the headline numerator and the 268-instance coverage must all agree, and the poison
+# family must still satisfy the row rule (a row is positive iff at least one poison flag is
+# supported).
+print("C15 instance-level adjudication drives the published table")
+_iv_path = p("data", "INSTANCE_VERDICTS.csv")
+if not os.path.exists(_iv_path):
+    check("data/INSTANCE_VERDICTS.csv exists", False, True)
+else:
+    _iv = list(csv.DictReader(open(_iv_path, encoding="utf-8")))
+    check("instance verdict rows", len(_iv), 268)
+    check("verdict values are supported/unsupported",
+          sorted({r["instance_verdict"] for r in _iv}), ["supported", "unsupported"])
+    _families = collections.Counter(r["flag"].split(":", 1)[0] for r in _iv)
+    check("family coverage", dict(_families),
+          {"poison": 124, "capability": 102, "channel": 42})
+    _supported = sum(1 for r in _iv if r["instance_verdict"] == "supported")
+    check("supported instances", _supported, 82)
+    check("family supported sums to the headline",
+          sum(1 for r in _iv if r["instance_verdict"] == "supported"
+              and r["flag"].startswith("poison:")), 6)
+    check("capability supported sum",
+          sum(1 for r in _iv if r["instance_verdict"] == "supported"
+              and r["flag"].startswith("capability:")), 44)
+    check("channel supported sum",
+          sum(1 for r in _iv if r["instance_verdict"] == "supported"
+              and r["flag"].startswith("channel:")), 32)
+    check("every instance carries an evidence quote",
+          [r["row_id"] for r in _iv if not r["evidence_quote"]], [])
+    _tag = collections.Counter(r["note"].split("]")[0].strip("[") for r in _iv)
+    check("every instance carries a provenance tag",
+          sorted(_tag), ["pi-note", "row-rule", "text-rule"])
+    check("provenance counts stated in §5/§6.2",
+          (_tag["pi-note"], _tag["row-rule"], _tag["text-rule"]), (131, 102, 35))
+    check("every row-rule instance is a poison instance",
+          sorted({r["flag"].split(":", 1)[0] for r in _iv
+                  if r["note"].startswith("[row-rule]")}), ["poison"])
+    # the row rule must still hold instance by instance on the poison family
+    _poison_bad = []
+    for r in _iv:
+        if not r["flag"].startswith("poison:"):
+            continue
+        _want = last.get(int(r["row_id"]), {}).get("label") == "tp"
+        if (r["instance_verdict"] == "supported") != _want:
+            _poison_bad.append((r["row_id"], r["flag"], r["instance_verdict"]))
+    check("poison instances agree with the row rule", _poison_bad, [])
+    # per-class cells: artifact vs both manuscripts
+    _csv_cells = collections.defaultdict(lambda: [0, 0])
+    for r in _iv:
+        _c = r["flag"].split(":", 1)[1]
+        _csv_cells[_c][0] += r["instance_verdict"] == "supported"
+        _csv_cells[_c][1] += 1
+    check("artifact classes", len(_csv_cells), 13)
+    for _f in ("paper/main.md", "paper/main_clean.md"):
+        _t = re.sub(r"\s+", " ", open(p(*_f.split("/")), encoding="utf-8").read())
+        _cells = {m.group(1): (int(m.group(2)), int(m.group(3)), m.group(4))
+                  for m in re.finditer(
+                      r"\|\s*[*`]([a-z_]+)[*`](?:\s*\(channel\))?\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|",
+                      _t)}
+        check(f"{_f}: per-class rows parsed", len(_cells), 13)
+        # the manuscript cell is (supported, unsupported); the artifact holds
+        # (supported, total), so compare against the complementary column
+        _drift = [(_c, _cells.get(_c), (_csv_cells[_c][0], _csv_cells[_c][1] - _csv_cells[_c][0]))
+                  for _c in sorted(_csv_cells)
+                  if _cells.get(_c) is None
+                  or (_cells[_c][0], _cells[_c][1])
+                  != (_csv_cells[_c][0], _csv_cells[_c][1] - _csv_cells[_c][0])]
+        check(f"{_f}: every per-class cell equals the instance counts", _drift, [])
+        # the published rate column must be supported / total, not a stale rate
+        _rbad = [(_c, _cells[_c][2], f"{_csv_cells[_c][0] / _csv_cells[_c][1]:.2f}")
+                 for _c in sorted(_csv_cells)
+                 if _cells.get(_c)
+                 and _cells[_c][2] != f"{_csv_cells[_c][0] / _csv_cells[_c][1]:.2f}"]
+        check(f"{_f}: every rate cell equals supported/total", _rbad, [])
+        check(f"{_f}: headline count present", "82 are supported by the stored" in _t, True)
+        check(f"{_f}: family rates present",
+              all(s in _t for s in ("44/102 (43.14%)", "32/42 (76.19%)",
+                                    "6 of 124 instances (4.84%)", "75/251 (29.88%)")), True)
+    # class-level shape stated in §6.1, and the stratum split stated in §6.1/§6.2
+    _half = {c: (_csv_cells[c][0], _csv_cells[c][1] - _csv_cells[c][0]) for c in _csv_cells}
+    check("classes with more unsupported than supported instances",
+          sum(1 for c in _half if _half[c][0] < _half[c][1]), 7)
+    check("classes with no supported instance",
+          sorted(c for c in _half if _half[c][0] == 0),
+          ["exfiltration_language", "fake_system_role", "file_read_sensitive",
+           "stealth_concealment"])
+    check("classes with more supported than unsupported instances",
+          sorted(c for c in _half if _half[c][0] > _half[c][1]),
+          ["model_addressed", "network_egress", "second_person_imperative",
+           "secret_env_access"])
+    check("classes splitting two-and-two",
+          sorted(c for c in _half if _half[c][0] == _half[c][1]),
+          ["database_write", "file_write_delete"])
+    _ctl_ids = set(ctl)
+    _ctl_iv = [r for r in _iv if int(r["row_id"]) in _ctl_ids]
+    check("control-row instances in the artifact", len(_ctl_iv), 5)
+    check("supported control-row instances",
+          sum(1 for r in _ctl_iv if r["instance_verdict"] == "supported"), 4)
+    check("the unsupported control instance is row 119 channel:model_addressed",
+          [(r["row_id"], r["flag"]) for r in _ctl_iv
+           if r["instance_verdict"] == "unsupported"],
+          [("119", "channel:model_addressed")])
+    check("top-score stratum supported instances",
+          (sum(1 for r in _iv if int(r["row_id"]) not in _ctl_ids
+               and r["instance_verdict"] == "supported"),
+           len(_iv) - len(_ctl_iv)), (78, 263))
+    # summary artifact agrees with the verdicts
+    _sum_path = p("data", "instance_summary.csv")
+    if os.path.exists(_sum_path):
+        _sm = {r["name"]: (int(r["supported"]), int(r["total"]))
+               for r in csv.DictReader(open(_sum_path, encoding="utf-8"))
+               if r["level"] in ("class", "family", "all")}
+        check("instance_summary all-family row", _sm.get("ALL"), (_supported, len(_iv)))
+        check("instance_summary poison row", _sm.get("poison"), (6, 124))
+        check("instance_summary capability row", _sm.get("capability"), (44, 102))
+        check("instance_summary channel row", _sm.get("channel"), (32, 42))
+    else:
+        check("data/instance_summary.csv exists", False, True)
 
 # ------------------------------------------------------------------- verdict
 print()

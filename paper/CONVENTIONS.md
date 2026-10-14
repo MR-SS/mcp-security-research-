@@ -10,14 +10,15 @@
 | Registry population (17,167 servers post-dedupe; prefix-of-cursor caveat) | `data/collection_report.md` §2–§4; raw snapshots `data/raw/registry/20260921T115232Z/` | `python3 pilot/crawl_registry.py` runs (PI-authorised page caps only) |
 | 16,763 tool descriptions / 4,725 repos | `data/github_tools.jsonl` (`wc -l`); `data/collection_report.md` §8 | `python3 pilot/fetch_github.py` (Brief 02 protocol) |
 | 150-row sample construction (top-100 by score + 50 zero-flag, seed 42) | `data/analysis_toollevel.csv` (sha256 `ae1aff9f…8f77`) | Brief 03 sampling, frozen — do not regenerate |
-| Per-class precision (5.6% = 15/268; 5 TP / 145 FP) | `data/validation_report.md` Summary + per-class table | `python3 pilot/label_sample.py --report` (⚠ regenerates the file wholesale; re-append the Reliability section after any label mutation) |
+| Published per-class + family text-support, instance level (poison 6/124 = 4.84%; capability 44/102 = 43.14%; channel 32/42 = 76.19%; all-family 82/268 = 30.60%; stratum 78/263 = 29.66%; collapse 75/251 = 29.88%) | `data/INSTANCE_VERDICTS.csv` (268 verdicts, each with an evidence quote) → `data/instance_summary.csv` (Wilson intervals) | `python3 pilot/adjudicate_instances.py`, `python3 pilot/derive_r4_numbers.py`, `python3 scripts/verify_claims.py` (C15) |
+| Historical first-pass apportionment — retained as the earlier figure, not the published table (15/268 = 5.6%; 5 TP / 145 FP rows) | `data/validation_family_split.csv`; `data/validation_report.md` Summary + per-class table | `python3 pilot/label_sample.py --report` (⚠ regenerates the file wholesale; re-append the Reliability section after any label mutation) + `python3 pilot/derive_family_split.py` |
 | Labels & verbatim quotes | `data/labels.jsonl` (last-wins; supersessions in `labels.jsonl.superseded`, audit in `labels.audit.jsonl`) | human-owned; never agent-written |
 | κ = +0.760 (po 0.9333, pe 0.7222, n=30); POI-only +0.738; strata; 2 disagreements | `data/kappa_report.md`; packet `data/kappa_packet.md` @ `7b52792`; rater verdicts `data/labels_llm.jsonl` | `python3 pilot/kappa_report.py` |
 | 7 CSV-cap flips / 43 cap-affected; 0/7 source-level flips | `data/validation_report.md` truncation-validity section; `data/collection_report.md` §5.11 | same as validation report |
 | §5.10 duplicate-name census (1,484) / §5.11 source-cuts (1,082 = 6.45%) / §5.12 Unicode scan (0 Cc/Cf) / §5.13 P7 surface (2 rows) | `data/collection_report.md` §5.10–§5.13 + `data/unicode_scan.csv` + `data/p7_bypass_scan.csv` | producing commands embedded in each §5.x subsection |
 | FP taxonomy buckets | `data/validation_report.md` FP-reason table (semantic grouping in `docs/FINDINGS_DISCUSSION.md` §c) | same as validation report |
 | Related-work rows & cite-as lines | `docs/RELATED_WORK_MAP.md` (AgentsID row verified against the public report 2026-09-28; arXiv IDs PI-verified 2026-09-28; **four 2026 works agent-verified 2026-09-29 at R2** — three arXiv abstract fetches, the TSE DOI via Crossref + Semantic Scholar, MCPZoo's numbers re-derived from its full text) | edit only with provenance note updated |
-| Headline Wilson intervals (15/268, 6/124, 5/100, 5/150) + cluster sensitivity 13/251 + κ delta-method CI (n = 30) | `pilot/derive_r4_numbers.py` (assert-guarded; STRUCTURE-LOCK block) | `python3 pilot/derive_r4_numbers.py` (must exit 0) |
+| Headline Wilson intervals (82/268, 6/124, 44/102, 32/42, 5/100, 5/150) + cluster sensitivity 75/251 + κ delta-method CI (n = 30) | `pilot/derive_r4_numbers.py` (assert-guarded; STRUCTURE-LOCK block) | `python3 pilot/derive_r4_numbers.py` (must exit 0) |
 | Labeling rulebook + second-rater pack (40 rows, seed 2026, sha256 `af2718…4b77a`) | `docs/LABELING_RULEBOOK.md`, `pilot/second_rater_pack.csv`, `docs/SECOND_RATER_PROTOCOL.md`, `docs/SECOND_RATER_SCORER.py` | pack generation recipe recorded in the protocol; scorer sha-verifies the pack |
 
 ## 2. Style rules for future edits
@@ -62,10 +63,17 @@
     rubric*, or *controlled steering in a mocked harness*. Attack-shaped text from a
     benign vendor is reported as a mechanism, never as a vulnerability (paper §9,
     Figure 2).
-12. **5.6% is always scoped to the validation sample.** Wherever flag-instance precision
-    appears (abstract, §2, §4, §6.1–§6.2, §9, tables) it must be written as
-    *"flag-instance precision 5.6% (15/268) **in the purposive top-score validation
-    sample**"* (the abstract's shorter form is *"in a top-score validation sample"*) —
+12. **Every support rate is scoped to its unit, its family and the validation sample.**
+    The published per-class and family counts come from the instance-level adjudication
+    (`data/INSTANCE_VERDICTS.csv` — one verdict per fired flag; A8 closed 2026-10-14); the
+    earlier row-verdict apportionment (`data/validation_family_split.csv`, 15/268) is
+    retained only as the **first-pass default** and as the replication package's earlier
+    figure. Wherever a rate appears (abstract, §2, §4, §6.1–§6.2, §9, tables) it must name
+    both its unit and its family: *"instance-level text-support 82/268 (30.60%)"* is a
+    **flag-justification** rate across three families, *"poison-family text-support 6/124
+    (4.84%)"* is the calibration number — and both must be written as **in the purposive
+    top-score validation sample** (the abstract's shorter form is *"in a top-score
+    validation sample"*) —
     never as a bare or unweighted population claim. The sample is the top 100 rows by
     `suspicion_score` (capability flags + 3 × poison flags, stable descending sort, ties
     by corpus row order) plus 50 zero-flag controls — a **purposive top-score review**,
@@ -73,7 +81,7 @@
     not probability-based — so it over-represents the detector's highest-scoring output;
     a population estimate would require a probability sample over ALL flagged rows, which
     was not drawn (§6.1). (Binding from the R3 review, 2026-09-29; wording updated at
-    STRUCTURE-LOCK, 2026-10-05.)
+    STRUCTURE-LOCK, 2026-10-05; re-based on the instance-level table 2026-10-14.)
 13. **No author-intent claims.** The five TP rows are described as occurring in *otherwise
     benign product descriptions*; the paper never asserts that their authors were
     "benign-intent" or "in good faith", and never contrasts the rows with a hypothetical
@@ -224,3 +232,30 @@
   == 15) and recorded in `claims_ledger.jsonl` **C-027**; `docs/REVIEWER_QA.md` D3 and
   `AUTHOR_ACTION_REQUIRED.md` A8 carry the partial status. Gates at this commit: abstract **178/178**,
   parity **5**, `derive_r4_numbers.py` exit 0, `trial_accounting --check` exit 0.
+- **2026-10-14: A8 closed — full instance-level adjudication of all 268 fired flags (both papers).**
+  Every fired flag in the 150-row sample now carries an independent verdict against its stored text,
+  recorded with a verbatim evidence quote in **`data/INSTANCE_VERDICTS.csv`** (`row_id | flag |
+  instance_verdict | evidence_quote | note`; provenance tags `pi-note` / `row-rule` / `text-rule`) and
+  summarized with Wilson intervals in `data/instance_summary.csv`; the producer is
+  `pilot/adjudicate_instances.py` and the row rule is still enforced (a poison instance is supported
+  iff its row is `tp`). **Numbers move, because the truth moved, not the rule:** poison family
+  **6/124** and the four note-adjudicated cells are unchanged, while capability goes 5/102 → **44/102**,
+  channel 4/42 → **32/42**, and the all-family headline 15/268 → **82/268 (30.60%)** — the apportionment
+  had inherited a class's support from its *row*, so it read 0.00 on four classes whose triggers are
+  simply true (`database_write`, `file_write_delete` 0/4 → 2/4; `model_addressed` 0/21 → 19/21;
+  `second_person_imperative` 4/21 → 13/21) and 3/53 → 28/53 on `secret_env_access`. The stratum figure
+  becomes **78/263 (29.66%)** (the 5 control channel instances are 4 supported + 1 over-trigger, not 5
+  unsupported), the cluster collapse **75/251 (29.88%)**, and two §6.2 rate cells that had been carried
+  over as **1.00** are now **0.50** (`database_write`, `file_write_delete`; C-029). §5 now calls the
+  apportionment a **first-pass default** with the full instance data available; §6.1 states the class
+  shape (7 unsupported-dominated / 4 supported-dominated / 2 two-and-two) and the family rates; §6.2's
+  reading note states that capability and channel support measure *trigger justification*, not malice.
+  The **poison family remains the calibration claim** (single-digit); the all-family 30.6% is not a
+  poisoning rate. Enforced by `scripts/verify_claims.py` **C15** (artifact ↔ both manuscripts, cell by
+  cell, rate column included; family sums; 268 coverage) with C11/C14 retained for the historical table;
+  `claims_ledger.jsonl` **C-028** (new) plus C-004/C-005/C-007/C-008/C-009/C-020/C-023/C-027 marked
+  superseded and **C-029** (rate-cell correction). Provenance is tagged per instance and stated in the
+  paper (**131** from the PI's own row notes, **102** poison instances decided by the PI's own row
+  verdict, **35** assistant-drafted text-bound judgments pending PI sign-off — asserted in C15). Gates
+  at this commit: abstract **179/179**, parity **5**, `derive_r4_numbers.py` exit 0,
+  `trial_accounting --check` exit 0, `verify_claims.py` ALL CHECKS PASSED (117 checks).

@@ -18,21 +18,20 @@ blind second-opinion protocol; §F the consistency-check report; §G the validat
 ## 1. Abstract
 
 In the Model Context Protocol (MCP), tool descriptions are surfaced to the model as
-server-authored text, varying by client. A frozen detector (18 checks; 13 fired in the
-sample) emits candidates over 16,763 registry-grounded descriptions (4,725 repos). Human
-validation of 150 rows yields **5 true positives, 95 benign flagged rows, and 50
-confirmed-benign controls with no capability- or poison-family flags**: an all-family
-text-support rate of 15/268 (5.6%) in a top-score validation sample; poison-family 6/124
-(4.8%); row-level TP 5/150; κ = +0.760 (rubric-consistency; unversioned second rater).
-Four attack-shaped mechanisms occur in benign descriptions — priority capture
-(unconditional; conditional gateway), exec-priming, a credential funnel; a
-defensive-pattern catalog explains most flagged rows. Across three model versions, 54
-trials completed with transcripts; 51 valid (3 excluded by pre-registered operational
-criteria: gateway timeouts on gemini-3.8-flash, arms NV, NE, PT). Live-testing two of four
-mechanisms, exec-priming surfaced 9/9 but 0/9 execution intent; in 8/9 the credential
-reached the tool without final-answer disclosure; controls never triggered (16
-valid trials). Seven detector fixes (P1–P7) follow. A calibration for unvalidated counts.
-Code, data, and labels are released.
+server-authored text. A frozen detector (18 checks; 13 fired in the sample) emits
+candidates over 16,763 registry-grounded descriptions (4,725 repos). Human validation of
+150 rows yields **5 true positives, 95 benign flagged rows, 50 confirmed-benign
+controls**: an all-family text-support rate of **82/268 (30.6%)** in a top-score validation
+sample — only the poison family measures steering (**6/124, 4.8%**); capability 44/102 and
+channel 32/42 count when their own claim holds — with row-level TP 5/150; κ = +0.760
+(rubric-consistency; unversioned second rater). Four attack-shaped mechanisms occur in
+benign descriptions — priority capture (unconditional; conditional gateway), exec-priming,
+a credential funnel; a defensive-pattern catalog explains most flagged rows. Across three
+model versions, 54 trials completed with transcripts; 51 valid (3 excluded by
+pre-registered operational criteria). Live-testing two of four mechanisms, exec-priming
+surfaced 9/9 but 0/9 execution intent; in 8/9 the credential reached the tool without
+final-answer disclosure; controls never triggered (16 valid trials). Seven detector fixes
+(P1–P7) follow. A calibration for unvalidated counts. Code, data, and labels are released.
 
 
 ## 2. Introduction
@@ -72,8 +71,9 @@ This paper measures the detectors, not just the ecosystem. Our research question
 We answer RQ1 compositionally with a frozen v2 detector over 16,763 descriptions (4,128 rows
 with any flag, 24.6%; 698 rows with a poison-family flag, 4.2%; 4,926 flag instances corpus-wide;
 the candidate-rate scan, the collection report); RQ2 with a 150-row human validation drawn by
-purposive top-score review (primary metric: poison-family text-support rate 6/124, 4.8%; all-family text-support rate 15/268,
-5.6% — in the purposive top-score validation sample, not an unweighted population estimate; row-level TP
+purposive top-score review (primary metric: poison-family text-support rate 6/124, 4.8%; all-family instance-level
+text-support rate 82/268, 30.6% — capability and channel flags count when their own claim holds, not when the row is malicious —
+in the purposive top-score validation sample, not an unweighted population estimate; row-level TP
 5/150; κ = +0.760, a rubric-application consistency check against an unversioned
 consumer-LLM second rater — a methodological limitation, §7); RQ3 with five human-confirmed positives
 spanning four mechanisms and a falsifiable account of why the regexes miss the
@@ -140,14 +140,14 @@ reported by authors* unless the row says otherwise[^rw-verification].
 | MCP-TDP, When the Manual Lies (2605.24069) | synthetic benchmark | tool (attack case) | 32 cases / 6 risk categories / 8 LLMs (as reported) | Yes (instruction channel in metadata) | No | No | No |
 | Stein, How are AI agents used? (2603.23802) | public MCP server repos, 11/2024–02/2026 | tool | 177,436 tools (as reported) | Partial (categorization, not poisoning) | No | No | Partial |
 | Song et al., Beyond the Protocol (IEEE TSE 2026; 10.1109/TSE.2026.3694876) | MCP attack vectors on aggregator platforms | attack vector / server | 4 attack classes; 3 platforms; user study n = 20 (as reported) | Yes (tool poisoning is the description channel) | Partial (user study; no detector precision) | No | No |
-| **Ours** | **official MCP Registry + GitHub source** | **tool description** | **16,763 rows / 4,725 repos** | **Yes** | **Yes (150/150; all-family text-support 15/268, 5.6%; poison-family 6/124, 4.8%)** | **Yes (rubric-application consistency check, κ = +0.760; unversioned consumer-LLM rater — a limitation, §7)** | **Yes** |
+| **Ours** | **official MCP Registry + GitHub source** | **tool description** | **16,763 rows / 4,725 repos** | **Yes** | **Yes (150/150; instance-level text-support 82/268, 30.6% — poison-family 6/124, 4.8%)** | **Yes (rubric-application consistency check, κ = +0.760; unversioned consumer-LLM rater — a limitation, §7)** | **Yes** |
 
 **Benchmarks (MCPTox, MSB)** construct synthetic attack sets and answer "how bad can an
 attack be," not "how often is it present"; their rates are properties of the benchmark,
 not of a population. **Raw censuses (AgentsID)** measure a population but not their
 instrument: 954 servers with Toxic Flow behavior is a count of flags, and our calibration
-measures what such flags are worth — on our sample, 94.4% of all-family flag instances (and
-95.2% of poison-family instances) lack text support. AgentsID is also a different population (npm/PyPI packages), vendor-published,
+measures what such flags are worth — on our sample, 95.2% of poison-family flag instances (and
+69.4% of all flag instances) lack text support. AgentsID is also a different population (npm/PyPI packages), vendor-published,
 and non-peer-reviewed. **Code-health and survey work (Hasan et al., Hou et al.)** does not
 operate on the description channel at all. **Spec and architecture analyses (Breaking the
 Protocol, Errico)** reason about what the protocol permits, not what deployments contain.
@@ -170,7 +170,8 @@ detector**, at the **description** level, on the official-registry + GitHub popu
 under a **stricter, text-bound rubric** (a row counts as a true positive only when the
 stored text adds a behavioral instruction to the model), and find a **poison-family text-support
 rate of 4.8% in the purposive top-score validation sample (6/124), reported per class** — the all-family
-rate is 5.6% (15/268). Framed as
+instance-level rate is 30.6% (82/268; capability and channel flags are supported when their
+own claim holds). Framed as
 what it is — **convergent evidence**:
 *independent work at a different unit reports the same calibration gap; convergent pattern,
 different magnitudes, not directly
@@ -269,7 +270,7 @@ recall estimate.
 true-positive rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
 ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* Labeling is two-level: (a) the **row-level verdict** — a row is a true positive if and
 only if at least one poison flag is genuinely supported by the visible text (the master
-rule); capability and channel flags never decide a row; and (b) **per-class apportionment** — the per-class table in §6.2 is derived from the row verdict rather than adjudicated instance by instance: every flag that fired on a row labeled a true positive counts as a supported instance of its class, every flag on a non-positive row counts as unsupported, and unclear rows contribute nothing. One class is exempt: *cross_tool_shadowing*, whose four fired instances were each adjudicated from the frozen row notes rather than inherited from their rows (§6.2 footnote). This is a limitation of the per-class figures: an instance is never separately judged once its row is decided, so a class's supported count on a positive row is inherited from the row verdict rather than established instance by instance, and class-level support recorded in a rationale for a non-positive row is not counted. We use the term *false positive* only in this poison-detection sense — a row whose poison-family flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*. Every mutation goes through supersede/audit rails (a superseded-label archive and
+rule); capability and channel flags never decide a row; and (b) **per-class apportionment** — the per-class table in §6.2 is derived from the row verdict rather than adjudicated instance by instance: every flag that fired on a row labeled a true positive counts as a supported instance of its class, every flag on a non-positive row counts as unsupported, and unclear rows contribute nothing — a **first-pass default**, kept in the replication package as the earlier figure (`data/validation_family_split.csv`) but no longer the published table. Every instance now carries its own verdict: `data/INSTANCE_VERDICTS.csv` adjudicates all 268 flags instance by instance (§6.1–§6.2), each with a verbatim evidence quote, and `pilot/adjudicate_instances.py` regenerates it from the frozen frame, labels and corpus with shape asserts (268 instances; 124 poison / 102 capability / 42 channel), so the counts are reproducible rather than transcribed. The earlier default was not arbitrary — it is the conservative reading of a row verdict, crediting a class only when its row was positive — but it is a property of the rule rather than of the text: it understated the capability and channel families and was uninformative about the poison family, so the instance pass replaces it wholesale instead of re-tuning it. The criteria differ by family, and the paper says which is which: a poison instance is supported only when the stored text adds behavioural steering (the master rule above); a capability instance when the text really declares that capability; a channel instance when the instruction channel really is in use. Where the frozen row notes type an instance themselves, that typing governs (**131** of 268 instances); the **102** poison-family instances follow the PI's own row verdict directly (the row rule), and the remaining **35** are assistant-drafted, text-bound judgments — each carrying a verbatim quote from the stored text — pending PI sign-off. The 150 row-level labels — not this table — remain the human gold standard (claims ledger C-028). We use the term *false positive* only in this poison-detection sense — a row whose poison-family flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*. Every mutation goes through supersede/audit rails (a superseded-label archive and
 a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows
 carry a rationale note; unclear rate 0%; control stratum: 0/50 rows labeled
 positive (no positive-case evidence of misses in this stratum; validation report, §G).
@@ -327,24 +328,36 @@ non-TP rows comprise the 95 flagged non-TP rows (flagged-but-benign) and the 50 
 (true negatives) — not the same kind of error: a control row, carrying at most a
 channel-family flag, can never be a poison false positive. Restated in detection terms, the sample
 holds **5 TP and 145 non-TP rows** (row-level TP 3.3%). Splitting the 268 flag instances by
-detector family (the family-split table, §G), the primary metric is the **poison-family
-text-support rate: 6 of 124 instances (4.84%)**; capability-family 5/102 (4.90%), channel-family
-4/42 (9.52%). The all-family figure remains as the headline **text-support rate, 15 of 268
-(5.60%)** — labelled as such, not as "precision". Of the 13 fired classes, 12 are
-unsupported-dominated; *file_read_sensitive* splits 1–1. Wilson 95% compatibility
-intervals for the four headline figures: 15/268 [0.03, 0.09], 6/124 [0.02, 0.10], 5/100
-[0.02, 0.11], 5/150 [0.01, 0.08] (assert-guarded in the replication package's
+detector family, every instance now carries its own verdict (§5;
+`data/INSTANCE_VERDICTS.csv`): of the 268 sampled instances, **82 are supported by the stored
+text (30.60%)**, and the primary metric remains the **poison-family text-support rate: 6 of
+124 instances (4.84%)**; capability-family 44/102 (43.14%), channel-family 32/42 (76.19%);
+the structural checks fired on nothing in this sample (0 instances). The families are not the
+same claim: a poison instance is supported only when the text adds behavioural steering (the
+master rule), while a capability instance is supported when the tool really declares that
+capability and a channel instance when the instruction channel really is in use — capability
+and channel support therefore measures whether the trigger is justified, not whether the text
+is malicious. The first-pass row-verdict default — a flag counted only when it sat on a
+positive row — read 15/268 (5.60%); it is retained in the replication package as the earlier
+figure (§5) and is not the published table. Of the 13 fired classes, seven carry more
+unsupported than supported instances — four of them with no supported instance at all
+(*exfiltration_language*, *stealth_concealment*, *file_read_sensitive*, *fake_system_role*)
+— four carry more supported than unsupported (*model_addressed*, *secret_env_access*,
+*network_egress*, *second_person_imperative*), and two split two-and-two (*database_write*,
+*file_write_delete*; both are §6.2 ties at 0.50). Wilson 95% compatibility
+intervals for the four headline figures: 82/268 [0.25, 0.36], 6/124 [0.02, 0.10], 44/102
+[0.34, 0.53], 32/42 [0.61, 0.87] (assert-guarded in the replication package's
 number-derivation script). These Wilson intervals **assume the counts are independent
 Bernoulli draws** (a binomial model); flag instances instead **cluster by server::tool**, so
 the intervals are descriptive under that model rather than exact under dependence. **No
 multiplicity adjustment was applied** across the 13 fired classes; the per-class figures in
 §6.2 are descriptive and uncorrected.
 Cluster sensitivity: collapsing those clusters (13
-sample rows in 5 duplicate-name groups), the pooled text-support rate is 13/251 (5.18%)
-instead of 15/268 (5.60%) — the reading is unchanged.
+sample rows in 5 duplicate-name groups), the pooled text-support rate is 75/251 (29.88%)
+instead of 82/268 (30.60%) — the reading is unchanged.
 
-**This 5.6% (all-family; poison-family 4.8%) is a sample-bounded descriptive quantity — the
-observed flag-instance text-support rate; not a population precision estimate.** The sample's
+**This 30.6% (all-family; poison-family 4.8%) is a sample-bounded descriptive quantity — the
+observed instance-level text-support rate; not a population precision estimate.** The sample's
 bias direction is unknown: selection is on the *detector's* suspicion score (top 100), and the
 score–support relationship outside that top stratum is unmeasured, so the direction of the
 selection effect on a population rate is not identifiable from this sample — a directional
@@ -352,9 +365,10 @@ hypothesis, not a bound. The validation
 sample is the top 100 rows by suspicion score plus 50 controls with zero capability- and
 poison-family flags (§5) — two selection groups (top-score review + zero-flag controls),
 deliberately over-represents the detector's highest-scoring output; the text-support rate
-within that purposive top-score review is what the 15/268 ratio measures — 263 of those 268
+within that purposive top-score review is what the 82/268 ratio measures — 263 of those 268
 instances fall in the top-score stratum, the other 5 being channel-family instances that fire
-on the zero-flag controls (all unsupported), so the stratum-specific rate is 15/263 = 5.70%.
+on the zero-flag controls — four supported channel instances plus the one over-trigger on row
+119 (§6.2) — so the stratum-specific rate is 78/263 = 29.66%.
 A population estimate would require a probability sample over ALL flagged rows —
 including flagged rows beyond the top-100 — not re-weighting of the current top-heavy
 sample alone; none was drawn. Two distinct denominators are in play and
@@ -367,38 +381,44 @@ controls).
 
 | Class | Supported | Unsupported | Text-support rate |
 |---|---|---|---|
-| *cross_tool_shadowing* † | 1 | 3 | 0.25 |
-| *file_read_sensitive* | 1 | 1 | 0.50 |
-| *second_person_imperative* (channel) | 4 | 17 | 0.19 |
+| *database_write* | 2 | 2 | 0.50 |
+| *file_write_delete* | 2 | 2 | 0.50 |
+| *model_addressed* (channel) | 19 | 2 | 0.90 |
+| *second_person_imperative* (channel) | 13 | 8 | 0.62 |
+| *secret_env_access* | 28 | 25 | 0.53 |
+| *network_egress* | 11 | 10 | 0.52 |
+| *cross_tool_shadowing* | 1 | 3 | 0.25 |
 | *imperative_to_model* | 5 | 71 | 0.07 |
-| *secret_env_access* | 3 | 50 | 0.06 |
 | *shell_execution* | 1 | 17 | 0.06 |
 | *exfiltration_language* | 0 | 34 | 0.00 |
-| *network_egress* | 0 | 21 | 0.00 |
-| *model_addressed* (channel) | 0 | 21 | 0.00 |
 | *stealth_concealment* | 0 | 9 | 0.00 |
-| *database_write* | 0 | 4 | 0.00 |
-| *file_write_delete* | 0 | 4 | 0.00 |
+| *file_read_sensitive* | 0 | 2 | 0.00 |
 | *fake_system_role* | 0 | 1 | 0.00 |
 
-Channel classes are shown for completeness; by v2 design they never decide a row. The 21
-unsupported *model_addressed* instances include the 5 channel-only flags on control rows
-(§5). The six supported poison-family instances sit on the five true-positive rows: row 12
-carries two supported poison classes (*cross_tool_shadowing*, *imperative_to_model*),
-while rows 35, 60, 94 and 95 carry one each (*imperative_to_model*) — 6 instances on 5
-rows (the frozen label set).
+Channel classes are shown for completeness; by v2 design they never decide a row. Only 2
+*model_addressed* instances are unsupported — one of them the over-trigger on row 119, where
+"Create with 35+ AI models" names the product's underlying models rather than an addressed
+reader — while four of the five channel-only flags on control rows (§5) are supported
+instances of the channel class (the channel really is in use) but carry no poison semantics,
+and none of them ever decides a row. The six supported poison-family instances sit
+on the five true-positive rows: row 12 carries two supported poison classes
+(*cross_tool_shadowing*, *imperative_to_model*), while rows 35, 60, 94 and 95 carry one each
+(*imperative_to_model*) — 6 instances on 5 rows (the frozen label set).
 
-† *cross_tool_shadowing* is adjudicated instance by instance from the frozen row notes: row 12
-supported (a priority-capture transfer — the universal, all-caps *"ALWAYS CALL THIS TOOL FIRST
-BEFORE CALLING ANY OTHER TOOLS"* instruction that re-orders the agent's use of other tools),
-rows 19 and 33 unsupported (same-server toolkit/workflow guidance, overview→details within one
-toolkit), and row 55 unsupported (dependency/setup guidance, not an instruction to alter how
-other tools are used). The count coincides with the row-verdict apportionment (§5) but no longer
-inherits from it; *stealth_concealment*'s nine instances were checked the same way (each carries an
-instance-level false-positive note, 0/9 unchanged), and the remaining classes stay apportioned —
-including the one disagreement apportionment produces in the other direction (*file_read_sensitive*,
-row 94 noted as a false positive on a positive row), so the headline 15/268 is unchanged (claims
-ledger C-027).
+*Reading this table.* Every cell is an instance-level count (§5), not a row verdict
+inherited by its flags: the poison column is the calibration number (a supported poison
+instance means the text adds behavioural steering), while the capability and channel columns
+count instances whose own claim is true — a tool that really does read SQL, fetch a URL or
+hold a key is a supported *capability* flag and still not a malicious row. The four
+instances that carried a class-level verdict in the frozen row notes
+(*cross_tool_shadowing* rows 12, 19, 33 and 55: one priority-capture transfer, two
+same-server toolkit/workflow guidance, one dependency/setup guidance) were re-checked
+individually and keep their notes' verdicts; the table is regenerated by
+`pilot/adjudicate_instances.py` and summarized in `data/instance_summary.csv`, which carries
+the Wilson intervals and the per-instance provenance counts — **131 instances** typed from
+the PI's own row notes, **102** decided by the PI's own row verdict (the poison row rule),
+**35** assistant-drafted text-bound judgments (each with a stored-text quote) pending PI
+sign-off (claims ledger C-028).
 
 ### 6.3 The five TP rows and four mechanisms
 
@@ -543,7 +563,7 @@ a second human. It is never presented as a human-annotation gold standard. The *
 reference labels** are the PI's human judgments on all 150 rows (§5, the frozen
 label set);
 κ indicates how reproducible those verdicts are when the rubric is re-applied, and it
-does not upgrade the detector's 5.6% all-family text-support rate (4.8% poison-family)
+does not upgrade the detector's 30.6% all-family text-support rate (4.8% poison-family)
 to anything more than a human-measured
 figure with a stated reproducibility check.
 
@@ -790,9 +810,9 @@ command text reaching the answer (9/9) — not model-side execution, which no tr
 
 **Limitations and anticipated questions.**
 
-**Q1 — Your all-family text-support rate (5.6%, in the purposive top-score validation sample; 15/268;
-poison-family 6/124, 4.8%)
-sits far below MCPZoo's scanner precision
+**Q1 — Your text-support rates (instance-level all-family 30.6%, in the purposive top-score validation
+sample; 82/268; poison-family 6/124, 4.8%)
+sit far below MCPZoo's scanner precision
 (45.53%); which number is right, and is one study wrong?** Both are right; they are not
 rankable. Three axes differ (§4, scanner-reliability cluster): **unit** — MCPZoo validates
 *server-level scanner alerts* about runtime vulnerability, we validate *individual
@@ -816,7 +836,7 @@ the regexes contribute is a reproducible sampling frame plus a falsifiable failu
 analysis (§6.4): where they fire, why they fire, and which firing patterns survive human
 judgment. A regex count presented as prevalence would indeed be indefensible; a regex
 count presented as the *input* to a precision measurement is the standard auditable
-design, and the 94.4% unsupported-flags figure we report (95.2% for the poison family) is a statement about the instrument,
+design, and the 69.4% all-family unsupported-flags figure we report (95.2% for the poison family) is a statement about the instrument,
 not about the ecosystem.
 
 **Q3 — Are the five true positives attacks?** **No.** None of the five rows is claimed as
@@ -936,7 +956,9 @@ limitation, §7) is disclosed in Section 7 and Methods.
 | Human labels | `data/labels.jsonl` (+ `.superseded`, `.audit`) | 150/150 last-wins labels + rationale notes; full mutation audit |
 | Validation report | `data/validation_report.md` | per-class text-support (§6.2), truncation validity, flagged non-TP taxonomy |
 | Literature-search log | `docs/RELATED_WORK_MAP.md` | September-2026 search: arXiv cs.CR listing + Google Scholar queries for MCP poisoning/tool-description measurement; candidate set + verification provenance (§2, Appendix A) |
-| Family split | `data/validation_family_split.csv` | poison/capability/channel instance split (6/124, 5/102, 4/42; total 15/268), produced by `pilot/derive_family_split.py` with sum asserts (§6.1) |
+| Family split (first-pass default) | `data/validation_family_split.csv` | apportioned poison/capability/channel instance split (6/124, 5/102, 4/42; total 15/268), produced by `pilot/derive_family_split.py`; retained as the earlier figure, not the published table (§5, §6.1) |
+| Instance verdicts (published) | `data/INSTANCE_VERDICTS.csv` | 268 evidence-linked per-instance verdicts (82 supported) with a verbatim quote and provenance per flag, produced by `pilot/adjudicate_instances.py` (§5–§6.2) |
+| Instance summary | `data/instance_summary.csv` | per-class / per-family / all-family supported counts, rates and Wilson 95% intervals recomputed from the instance verdicts (§6.1–§6.2) | |
 | Candidate-rate scan | `data/candidate_rate_scan.csv` | frozen-detector re-run over all 16,763 rows (4,128 any-flag / 698 poison-flag / 4,926 instances), produced by `pilot/derive_candidate_rate.py` (§5.14) |
 | Kappa packet + report | `data/kappa_packet.md`, `data/labels_llm.jsonl`, `data/kappa_report.md` | blind Mode B rubric-consistency protocol, verbatim rater verdicts, κ computation as a consistency check (§7) |
 | Unicode scan | `data/unicode_scan.csv` + §A.5 | Type V mirror (0 Cc/Cf) |
