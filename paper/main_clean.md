@@ -269,7 +269,7 @@ recall estimate.
 true-positive rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
 ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* Labeling is two-level: (a) the **row-level verdict** — a row is a true positive if and
 only if at least one poison flag is genuinely supported by the visible text (the master
-rule); capability and channel flags never decide a row; and (b) **per-class apportionment** — the per-class table in §6.2 is derived from the row verdict rather than adjudicated instance by instance: every flag that fired on a row labeled a true positive counts as a supported instance of its class, every flag on a non-positive row counts as unsupported, and unclear rows contribute nothing. This is a limitation of the per-class figures: an instance is never separately judged once its row is decided, so a class's supported count on a positive row is inherited from the row verdict rather than established instance by instance, and class-level support recorded in a rationale for a non-positive row is not counted. We use the term *false positive* only in this poison-detection sense — a row whose poison-family flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*. Every mutation goes through supersede/audit rails (a superseded-label archive and
+rule); capability and channel flags never decide a row; and (b) **per-class apportionment** — the per-class table in §6.2 is derived from the row verdict rather than adjudicated instance by instance: every flag that fired on a row labeled a true positive counts as a supported instance of its class, every flag on a non-positive row counts as unsupported, and unclear rows contribute nothing. One class is exempt: *cross_tool_shadowing*, whose four fired instances were each adjudicated from the frozen row notes rather than inherited from their rows (§6.2 footnote). This is a limitation of the per-class figures: an instance is never separately judged once its row is decided, so a class's supported count on a positive row is inherited from the row verdict rather than established instance by instance, and class-level support recorded in a rationale for a non-positive row is not counted. We use the term *false positive* only in this poison-detection sense — a row whose poison-family flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*. Every mutation goes through supersede/audit rails (a superseded-label archive and
 a label-mutation audit trail); the aid never assigns verdicts on its own; 150/150 rows
 carry a rationale note; unclear rate 0%; control stratum: 0/50 rows labeled
 positive (no positive-case evidence of misses in this stratum; validation report, §G).
@@ -367,7 +367,7 @@ controls).
 
 | Class | Supported | Unsupported | Text-support rate |
 |---|---|---|---|
-| *cross_tool_shadowing* | 1 | 3 | 0.25 |
+| *cross_tool_shadowing* † | 1 | 3 | 0.25 |
 | *file_read_sensitive* | 1 | 1 | 0.50 |
 | *second_person_imperative* (channel) | 4 | 17 | 0.19 |
 | *imperative_to_model* | 5 | 71 | 0.07 |
@@ -387,6 +387,18 @@ unsupported *model_addressed* instances include the 5 channel-only flags on cont
 carries two supported poison classes (*cross_tool_shadowing*, *imperative_to_model*),
 while rows 35, 60, 94 and 95 carry one each (*imperative_to_model*) — 6 instances on 5
 rows (the frozen label set).
+
+† *cross_tool_shadowing* is adjudicated instance by instance from the frozen row notes: row 12
+supported (a priority-capture transfer — the universal, all-caps *"ALWAYS CALL THIS TOOL FIRST
+BEFORE CALLING ANY OTHER TOOLS"* instruction that re-orders the agent's use of other tools),
+rows 19 and 33 unsupported (same-server toolkit/workflow guidance, overview→details within one
+toolkit), and row 55 unsupported (dependency/setup guidance, not an instruction to alter how
+other tools are used). The count coincides with the row-verdict apportionment (§5) but no longer
+inherits from it; *stealth_concealment*'s nine instances were checked the same way (each carries an
+instance-level false-positive note, 0/9 unchanged), and the remaining classes stay apportioned —
+including the one disagreement apportionment produces in the other direction (*file_read_sensitive*,
+row 94 noted as a false positive on a positive row), so the headline 15/268 is unchanged (claims
+ledger C-027).
 
 ### 6.3 The five TP rows and four mechanisms
 

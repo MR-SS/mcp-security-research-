@@ -1,6 +1,6 @@
 {
   "schema": "mcp-measurement/reproducibility-manifest/1",
-  "generated_utc": "2026-10-06T08:08:03Z",
+  "generated_utc": "2026-10-14T00:00:00Z",
   "baseline_commit": "769b7d968eb207d5b4e0fac46202e15945ebde75",
   "note": "This manifest does not hash itself. 'unknown' means not established, not empty.",
   "frozen_inputs": [
@@ -85,24 +85,24 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "3578375a485ed7541b903310775f91e594ae5bb722f8a6d1c17b81fccb394604",
+      "sha256": "d97b7a18b4a359b03d55aef93ec5cf48e1363db24f88483a208761a5441418ae",
       "role": "traceable manuscript record (edited this revision)",
       "status": "derived",
-      "bytes": 76388
+      "bytes": 77556
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "36be85292ed12c69e668b1505c352c5f3b769f423417a22662f73ae1e622fb23",
+      "sha256": "7fca6e9b08be2475b57bdee8ccb0a13c99db64423dd2a1081cc0d2056d527c0d",
       "role": "authoritative publication copy (edited this revision)",
       "status": "derived",
-      "bytes": 73732
+      "bytes": 74900
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "a4b43a8db9c0b7694e6885f281617e386e7dd68ccdb5981a513097ebeb1317e0",
+      "sha256": "ce999d2d4c27bfbd80eb0e3ec79e919e0f35ed0a740fac7bcb7c6a96188500aa",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived",
-      "bytes": 831139
+      "bytes": 832356
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
@@ -148,10 +148,10 @@
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "72addf83ec0f5314f6c939ef2f58a4c4d8f25275275f4731941ad5117d25a080",
-      "role": "machine-readable claim ledger (22 claims)",
+      "sha256": "5bbb0de6ddca3e3e62fe8becb49b5f567f7c9504a0d5c8204f08032b528168a8",
+      "role": "machine-readable claim ledger (27 claims)",
       "status": "derived",
-      "bytes": 15936
+      "bytes": 17799
     },
     {
       "path": "pilot/derive_r4_numbers.py",
@@ -169,10 +169,10 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "f7c0e9d094d852898cb59d05b1beb3b3d74e87a48facfe2556c90858ca4e9090",
+      "sha256": "5e89f296f2b2cef30a4587bb8e3f422212d9d9cadfd9c5ac4f9652f259a8d155",
       "role": "offline verification entry point",
       "status": "derived",
-      "bytes": 18232
+      "bytes": 21794
     },
     {
       "path": "REVISION_AUDIT.md",
@@ -183,10 +183,10 @@
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "98739f3439c536493dd3152a691a4fef0b1d8d5e55e1aeea3664c3f55fc349f8",
+      "sha256": "22ec2890bf43a66fb16bd90580f48bd7b918e136492fa9c63fb01933fcd325a4",
       "role": "human-dependency list",
       "status": "derived",
-      "bytes": 10801
+      "bytes": 11909
     },
     {
       "path": "REVISION_REPORT.md",

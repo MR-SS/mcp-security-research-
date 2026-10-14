@@ -121,8 +121,8 @@ Labels are **single-PI human judgments** made interactively in the terminal agai
 ### D3.
 **Q.** What is the per-class table actually derived from (apportionment rule) and its published limitation?
 
-The per-class table is derived from the **row verdict by apportionment**: every flag on a positive row counts as a supported instance of its class, every flag on a non-positive row as unsupported, `unclear` contributes nothing — no instance is ever judged on its own. The published limitation: because an instance is never separately judged, a class's supported count on a positive row is *inherited* from the row verdict, and class-level support recorded in a non-positive row's rationale is not counted.
-— Evidence: [paper/main_clean.md:272-278]; [pilot/label_sample.py `report()` (`tp[c]+=1` / `fp[c]+=1` per row label)]; [command → `verify_claims.py` C11 `apportionment reproduces every published cell: []`]; [AUTHOR_ACTION_REQUIRED.md A8].
+The per-class table is derived from the **row verdict by apportionment**: every flag on a positive row counts as a supported instance of its class, every flag on a non-positive row as unsupported, `unclear` contributes nothing — with **one class exempt**: `cross_tool_shadowing`, whose four fired instances (rows 12, 19, 33, 55) are adjudicated instance by instance from the frozen row notes (row 12 supported — a priority-capture transfer; rows 19/33 same-server toolkit/workflow guidance and row 55 dependency/setup guidance — unsupported), a per-instance cell of 1/4 = 0.25 that coincides with what apportionment produces but no longer inherits from it. The published limitation stands for the other 12 classes: an instance is never separately judged, so a class's supported count on a positive row is *inherited* from the row verdict, class-level support recorded in a non-positive row's rationale is not counted, and the one disagreement running the other way (`file_read_sensitive`, apportioned 1/2 with row 94's note recording a false positive on a positive row) is left as published so the 15/268 headline does not drift.
+— Evidence: [paper/main_clean.md:272] (§5 exception clause); [paper/main_clean.md:391-401] (§6.2 † footnote); [command → `verify_claims.py` C11 `apportionment reproduces every published cell: []`, C14 `note-derived supported instances: [12]` / `note-derived unsupported instances: [19, 33, 55]` / `headline supported sum unchanged (15): 15`]; [pilot/label_sample.py `report()` (`tp[c]+=1` / `fp[c]+=1` per row label)]; [claims_ledger.jsonl C-027]; [AUTHOR_ACTION_REQUIRED.md A8].
 
 ### D4.
 **Q.** κ: packet composition, why 3-class == 2-class, why the negative-subset κ is 0, the SE method, and why this is NOT human–human reproducibility.
@@ -253,7 +253,7 @@ Defining files + hashes (all in `reproducibility_manifest.json`): **corpus** `da
 ### H3.
 **Q.** Which claims remain STATED_NOT_CHECKED or BLOCKED, and why?
 
-`STATED_NOT_CHECKED`: **RA-12** — the related-work metadata is *recorded* as verified (PI 2026-09-28; four 2026 works agent-verified 2026-09-29) but was **not re-fetched** in the offline passes. `BLOCKED` (in `AUTHOR_ACTION_REQUIRED.md`, all NEEDS-HUMAN unless noted): **A1** rows 58/70/72 full-text pass; **A2** title lock ("human-validated"); **A3** second *human* rater (pack built, unrun); **A4** description-ablation; **A5** release URL + Zenodo DOI (placeholders remain); **A6** disclosure status; **A7** related-work re-verification (optional); **A8** true per-instance adjudication; **A9** optional protocol reframing. Also unresolved: audit **§D Phase 4** (labeling chronology) and **Phase 5** (fixture selection / timeout exclusions).
+`STATED_NOT_CHECKED`: **RA-12** — the related-work metadata is *recorded* as verified (PI 2026-09-28; four 2026 works agent-verified 2026-09-29) but was **not re-fetched** in the offline passes. `BLOCKED` (in `AUTHOR_ACTION_REQUIRED.md`, all NEEDS-HUMAN unless noted): **A1** rows 58/70/72 full-text pass; **A2** title lock ("human-validated"); **A3** second *human* rater (pack built, unrun); **A4** description-ablation; **A5** release URL + Zenodo DOI (placeholders remain); **A6** disclosure status; **A7** related-work re-verification (optional); **A8** true per-instance adjudication (partially met for `cross_tool_shadowing` + `stealth_concealment`, C-027); **A9** optional protocol reframing. Also unresolved: audit **§D Phase 4** (labeling chronology) and **Phase 5** (fixture selection / timeout exclusions).
 — Evidence: [REVISION_AUDIT.md §C, §D, §F]; [AUTHOR_ACTION_REQUIRED.md A1-A9]; [reproducibility_manifest.json `unknowns`].
 
 ---
@@ -404,7 +404,7 @@ non-finding, kept prospective.
 | C4 | ANSWERED | Controls cannot reveal misses by construction; FN rate is definitional. |
 | D1 | ANSWERED | Single-PI labels with disclosed unversioned-AI drafting aid; PI owns every verdict. |
 | D2 | ANSWERED | 7 revisions (3/6/9/11/16 u→fp; 94/95 fp→tp), all in `labels.audit.jsonl`. |
-| D3 | ANSWERED | Per-class table is row-verdict apportionment, not per-instance adjudication (limitation stated). |
+| D3 | ANSWERED | Row-verdict apportionment (limitation stated) with one instance-adjudicated class, `cross_tool_shadowing` (1/4, C-027). |
 | D4 | ANSWERED | Packet n=30; 3-class==2-class; κ=0 is the prevalence paradox; delta-method SE; LLM rater ≠ human-human. |
 | D5 | ANSWERED | Rows 58/70/72 are excerpt-only and disclosed as pending/unresolved. |
 | E1 | ANSWERED | 6/124, 15/268 (stratum 15/263), 5/102, 4/42; cluster sensitivity 13/251. |
@@ -456,7 +456,7 @@ non-finding, kept prospective.
 2. **"Why doesn't your design estimate recall?"** — The controls were selected *for* zero flags and no content standard beyond the PI's read was applied, so a control can never be a missed poison row; the 0/50 FN rate is definitional, not measured. [paper/main_clean.md:258-264]
 3. **"Is the exec-priming (FL) 9/9 a steering result?"** — No: `[B]` is a marker-presence test satisfied by relaying the guide (the benign task), so the arm is task-conflated and excluded; instruction surfacing is 9/9, own-voice execution intent is 0/9. [paper/main_clean.md:673-700]
 4. **"Are your five positives attacks or vulnerabilities?"** — Neither: they are **attack-shaped mechanisms** in otherwise benign product descriptions, with no exploit path, no live target, and no filed CVE (Figure 2 step 4 deliberately not drawn). [paper/main_clean.md:758-770], [paper/main_clean.md:902-909]
-5. **"How is the per-class table computed?"** — By **row-verdict apportionment**, not per-instance adjudication: every flag on a positive row counts as supported, every flag on a non-positive row as unsupported — a disclosed limitation (A8). [paper/main_clean.md:272-278], [AUTHOR_ACTION_REQUIRED.md A8]
+5. **"How is the per-class table computed?"** — By **row-verdict apportionment**, not per-instance adjudication: every flag on a positive row counts as supported, every flag on a non-positive row as unsupported — a disclosed limitation (A8) — with one exception, `cross_tool_shadowing`, adjudicated instance by instance from the row notes (1/4: row 12 priority-capture transfer supported; rows 19/33 same-server, row 55 setup guidance unsupported). [paper/main_clean.md:272], [paper/main_clean.md:391-401], [claims_ledger.jsonl C-027], [AUTHOR_ACTION_REQUIRED.md A8]
 
 *Second-pass additions worth memorising (from §I):* the interval widths (7.9 pp on poison,
 18 pp on channel) — i.e. why this is a calibration of *order of magnitude*, not a point

@@ -127,6 +127,19 @@ rationales already contain class-level evidence the current rule discards — e.
 plausibly **move** the per-class numbers in both directions. That is a new annotation task, not an
 edit.
 
+**Partial status (2026-10-14, targeted fix).** One class now has a genuine instance-level artifact:
+`cross_tool_shadowing`'s four fired instances are adjudicated individually from the frozen row notes
+(row 12 supported — priority-capture transfer; rows 19 and 33 same-server toolkit/workflow guidance;
+row 55 dependency/setup guidance), giving a per-instance cell of 1/4 that coincides with the
+apportioned cell, and `stealth_concealment` was checked in the negative direction (9 instances, all
+carrying instance-level false-positive notes, 0/9). Recorded in `claims_ledger.jsonl` **C-027**,
+enforced by `scripts/verify_claims.py` **C14**, disclosed in the §5 exception clause and the §6.2
+footnote. This does **not** close A8: the other 11 classes keep the row-verdict rule, and the one
+disagreement running the other way (`file_read_sensitive`, apportioned 1/2 while row 94's note records
+a false positive on a positive row) remains as published, because a full pass would move the per-class
+numbers and the 15/268 headline — which the note above forbids. The 268-instance pass is still human
+work.
+
 **Acceptance criterion:** either an instance-level annotation artifact exists and the per-class table
 is regenerated from it (with the old figures preserved as historical), or the manuscript continues to
 describe the row-verdict apportionment and carries the disclosed limitation.

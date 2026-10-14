@@ -17,7 +17,8 @@ Checks
   C9  manuscript wording: superseded strings absent, corrected strings present
   C10 claims ledger: required fields, allowed statuses, no unbacked VERIFIED
   C13 FL criterion-[B] sub-branch accounting (propagation vs execution adoption)
-Only C1/C2/C3/C4/C5/C6/C7/C8/C11/C13 are artifact re-derivations. C9/C10 are
+  C14 cross_tool_shadowing per-instance adjudication (cell vs row-verdict apportionment)
+Only C1/C2/C3/C4/C5/C6/C7/C8/C11/C13/C14 are artifact re-derivations. C9/C10 are
 consistency checks against the manuscript and the ledger, not scientific
 validation of either.
 
@@ -195,6 +196,9 @@ REQUIRED = ["15/263", "ae1aff9f", "adjudicated from the 300-char excerpt",
             "by extraction, not by absence upstream",
             "1,484 of the 16,763 rows carry a", "name shared with at least",
             "per-class apportionment", "derived from the row verdict rather",
+            # C14: the one instance-adjudicated class and its footnote phrasing.
+            "adjudicated instance by instance", "priority-capture transfer",
+            "same-server toolkit",
             # RA-21: the FL arm is reported as propagation, not adoption.
             "marker-presence test", "text-propagation", "0/9",
             # A9 option C: FL is task-conflated; the live matrix tests two of four.
@@ -353,6 +357,59 @@ else:
            if e.get("sha256") and os.path.exists(p(*e["path"].split("/")))
            and e["sha256"] != sha256(p(*e["path"].split("/")))]
     check("every manifest hash matches the file on disk", bad, [])
+
+# ------------- C14 cross_tool_shadowing instance-level adjudication
+# C11 shows the published per-class table reproduces under the row-verdict apportionment
+# rule. C14 covers the single class whose cell is adjudicated instance by instance instead:
+# the frozen row notes in data/labels.jsonl type every fired cross_tool_shadowing instance
+# ("cross_tool_shadowing pattern fully present" = supported; "shadowing FP" = not), so the cell
+# can be derived from the notes rather than inherited from the row verdict. The count must
+# still agree with the apportioned cell (no headline drift), and stealth_concealment is
+# checked in the negative direction. Ledger: claims_ledger.jsonl C-027; manuscript: §6.2
+# footnote (both papers) + the §5 exception clause.
+print("C14 cross_tool_shadowing per-instance adjudication")
+CTS_ROWS = [12, 19, 33, 55]
+_cts = [i for i, r in enumerate(S)
+        if "cross_tool_shadowing" in _parse_flags(r.get("poison_flags"))]
+check("cross_tool_shadowing instances sit on rows", _cts, CTS_ROWS)
+_CTS_SUP = re.compile(r"cross_tool_shadowing pattern fully present")
+_CTS_UNS = re.compile(r"(?:cross_tool_shadowing|shadowing)\s+FP")
+_cts_sup, _cts_uns, _cts_untyped = [], [], []
+for _i in _cts:
+    _note = last.get(_i, {}).get("note", "")
+    _s, _u = bool(_CTS_SUP.search(_note)), bool(_CTS_UNS.search(_note))
+    if _s != _u:
+        (_cts_sup if _s else _cts_uns).append(_i)
+    else:
+        _cts_untyped.append(_i)
+check("every instance typed by its row note (exactly one marker)", _cts_untyped, [])
+check("note-derived supported instances", _cts_sup, [12])
+check("note-derived unsupported instances", _cts_uns, [19, 33, 55])
+_cts_cell = (len(_cts_sup), len(_cts_uns))
+check("per-instance cell totals 4 instances", sum(_cts_cell), 4)
+check("row-verdict apportionment agrees (no headline drift)",
+      sum(1 for _i in _cts if last.get(_i, {}).get("label") == "tp"), _cts_cell[0])
+_stl = [i for i, r in enumerate(S)
+        if "stealth_concealment" in _parse_flags(r.get("poison_flags"))]
+check("stealth_concealment instances sit on rows", _stl,
+      [0, 8, 13, 14, 15, 16, 18, 22, 27])
+check("stealth instances lacking an instance-level concealment note",
+      [_i for _i in _stl
+       if not re.search(r"(?i)stealth|conceal|hidden|invisible|silent",
+                        last.get(_i, {}).get("note", ""))], [])
+check("stealth_concealment supported instances",
+      sum(1 for _i in _stl if last.get(_i, {}).get("label") == "tp"), 0)
+check("validation_report.md cross_tool_shadowing cell == per-instance cell",
+      published.get("cross_tool_shadowing"), _cts_cell)
+check("validation_report.md stealth_concealment cell", published.get("stealth_concealment"), (0, 9))
+for _f in ("paper/main.md", "paper/main_clean.md"):
+    _t = re.sub(r"\s+", " ", open(p(*_f.split("/")), encoding="utf-8").read())
+    _m = re.search(r"\|\s*[*`]cross_tool_shadowing[*`][^|]*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|", _t)
+    check(f"{_f} cross_tool_shadowing cell",
+          (_m.group(1), _m.group(2), _m.group(3)) if _m else None, ("1", "3", "0.25"))
+    check(f"{_f} states the instance-level rule", "adjudicated instance by instance" in _t, True)
+check("headline supported sum unchanged (15)",
+      sum(t for t, _f in recomputed.values()), 15)
 
 # ------------------------------------------------------------------- verdict
 print()

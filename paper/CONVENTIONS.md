@@ -204,5 +204,23 @@
   adjustment" to the 13 fired classes, and explains the top-score selection-bias direction as
   non-identifiable from this sample (a directional hypothesis, not a bound). §8 frames i.i.d. as
   a modeling assumption and states the pooled-AASR interchangeability it cannot assume. §2 scopes
-  the authority-separation claim to the evaluated models ("we found no standard mechanism"); §10
+  the  authority-separation claim to the evaluated models ("we found no standard mechanism"); §10
   time-stamps the disclosure status. Gates: abstract **178/178**, parity **5**, derive/accounting exit 0.
+- **2026-10-14: `cross_tool_shadowing` per-instance reclassification (targeted fix, both papers).**
+  The one per-class cell whose instances the frozen row notes adjudicate individually now derives from
+  those notes rather than from the row verdict: `cross_tool_shadowing` = **1 supported** (row 12, a
+  priority-capture transfer — the universal all-caps "call this first before any other tools"
+  instruction) / **3 unsupported** (rows 19 and 33: same-server toolkit/workflow guidance; row 55:
+  dependency/setup guidance) = **0.25**, carried by a **†** mark on the class name plus a §6.2 footnote,
+  and announced by an exception clause in §5's per-class-apportionment paragraph. `stealth_concealment`
+  was checked the same way, in the negative direction (9 instances, each with an instance-level
+  false-positive note; **0/9** unchanged). Counts are **deliberately unchanged** — all-family 15/268,
+  poison 6/124, capability 5/102, channel 4/42 and every derived figure stay as published (A8: "the
+  numbers were not changed, and must not be"), because the four instances are already typed in the
+  notes and their verdicts match the apportioned cell. The other 11 classes stay row-verdict
+  apportioned; the one disagreement running the other way (`file_read_sensitive`, apportioned 1/2 while
+  row 94's note records a false positive on a positive row) is disclosed in the same footnote and left
+  as published. Enforced by `scripts/verify_claims.py` **C14** (cell == note-derived counts; Σ supported
+  == 15) and recorded in `claims_ledger.jsonl` **C-027**; `docs/REVIEWER_QA.md` D3 and
+  `AUTHOR_ACTION_REQUIRED.md` A8 carry the partial status. Gates at this commit: abstract **178/178**,
+  parity **5**, `derive_r4_numbers.py` exit 0, `trial_accounting --check` exit 0.
