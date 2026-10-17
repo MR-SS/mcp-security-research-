@@ -6,12 +6,12 @@
 
 ## 1. Mission
 
-Solo, part-time research project. Goal: an **arXiv preprint in ~8 weeks** measuring the security posture of the public **Model Context Protocol (MCP) ecosystem**.
+Solo, part-time research project. Goal: an **arXiv preprint in ~8 weeks** measuring the security posture of the public **Model Context Protocol (MCP)** ecosystem.
 
 - **Working title:** *Security Posture of Public MCP Servers: A Measurement Study of Dangerous Capabilities and Tool-Description Poisoning Surface*
 - **Single research question:** Among public MCP servers, what fraction expose dangerous capabilities, and what fraction ship tool descriptions with patterns exploitable for tool poisoning?
 - **OWASP mapping:** ASI04 (Agentic Supply Chain) + ASI02 (Tool Misuse & Exploitation), informing ASI03 and ASI05.
-- **Outputs:** (1) arXiv preprint, (2) public dataset + code with a Zenodo DOI, (3) 1–3 CVEs via responsible disclosure if real vulnerabilities are found.
+- **Outputs:** (1) arXiv preprint, (2) public dataset + code + machine-readable results with a Zenodo DOI, (3) 1–3 CVEs via responsible disclosure if real vulnerabilities are found.
 - **Constraints:** no GPU cluster, ~$300 total API budget (pilot ≤ $50), English artifacts, one author.
 
 **Differentiation:** prior work (MCPTox 2508.14925, MSB 2510.15994, MCP-TDP 2605.24069, MCPSecBench 2508.13220) builds *benchmarks*. This is the **first ecosystem-wide measurement** — the PyPI/npm-malware-measurement genre, applied to agentic tooling.
@@ -33,15 +33,18 @@ definition stays v1 so the triage queue remains comparable across runs. v2 (curr
 re-weighting v1 rules, never summed into any poisoning statistic or into `suspicion_score`.
 Any future detector change arrives as a versioned diff via Brief 03, with the Methods
 section freezing each version: no silent regex edits.
+10. **Results traceability (added 2026-10-17):** every number, table, or figure intended for the paper must be derived into `results/` using the schemas in `results/README.md`. A paper claim must identify its source result file, detector version, dataset snapshot, model configuration where relevant, and generating script or command. Never hand-edit derived result files.
 
 ## 3. Repository layout
 
-```
+```text
 PLAN.md              ← master plan (8-week timeline, pilot spec, risks, paper skeleton)
 AGENTS.md            ← this file (context for agents)
+EXPERIMENTS.md       ← research questions, threat model, metrics, validation and reporting protocol
 prompts/             ← self-contained mission briefs, one per task, numbered in order
 pilot/               ← working code: crawl_registry.py → analyze.py (smoke-tested)
 data/                ← outputs (JSONL/CSV); raw API snapshots in data/raw/
+results/             ← derived, paper-facing result artifacts; schemas in results/README.md
 FUTURE_WORK.md       ← parking lot for out-of-scope ideas
 ```
 
@@ -69,15 +72,15 @@ Open protocol (Anthropic, Nov 2024) connecting LLM apps to **servers** exposing 
 
 1. Crawl registry → `data/servers.jsonl` (**done at pilot scale: 108 servers → 18.5% ≥1 dangerous-capability flag; 1.9% poisoning-pattern candidates; 46% GitHub-linked**).
 2. Static heuristic scans → `data/analysis.csv` triage queue.
-3. Manual validation of top-100 candidates → report detector precision (this validation is itself a methodological contribution).
+3. Manual validation of top-100 candidates → write normalized labels and precision-by-class outputs to `results/detector_validation/`.
 4. GitHub enrichment: README + manifests + grep for tool-registration blocks (`@mcp.tool`, `server.tool(`, `ListToolsResult`).
-5. Live experiments (MCPTox-style): 5 real suspicious descriptions → 20–40 templated cases → 2–3 models → ASR/RR.
+5. Live experiments (MCPTox-style): 5 real suspicious descriptions → 20–40 templated cases → 2–3 models → write manifests, raw responses, and normalized outcomes to `results/live_experiments/`.
 6. Write-up: 8–10 pages, ACM/USENIX format → arXiv (note: first-time cs.CR submission needs an **endorser** — human task, flagged in PLAN.md).
 
 ## 6. Definition of done (paper-level)
 
-One table: % servers with dangerous capabilities (by class) · % with ≥1 poisoning flag (by class, with validated precision) · ASR/RR on real-world-derived cases · # disclosures filed — plus 3–4 figures, a labeled validation sample, a public artifact (code + dataset + DOI), and an Ethics section.
+One table: % servers with dangerous capabilities (by class) · % with ≥1 poisoning flag (by class, with validated precision) · ASR/RR on real-world-derived cases · # disclosures filed — plus 3–4 figures, a labeled validation sample, machine-readable result artifacts under `results/`, a public artifact (code + dataset + DOI), and an Ethics section.
 
 ## 7. If you are an agent receiving this file
 
-State which `prompts/NN-*.md` brief you were given, restate its acceptance criteria in your own words, flag anything in these rules that conflicts with the brief, and only then start work. When done, update `PLAN.md`'s timeline checkbox and note any newly discovered risks under §Risks there.
+State which `prompts/NN-*.md` brief you were given, restate its acceptance criteria in your own words, flag anything in these rules that conflicts with the brief, and only then start work. When done, update `PLAN.md`'s timeline checkbox, write derived outputs to the appropriate `results/` subdirectory, and note any newly discovered risks under §Risks there.

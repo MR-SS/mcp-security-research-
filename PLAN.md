@@ -10,7 +10,7 @@
 | **Working title** | Security Posture of Public MCP Servers: A Measurement Study of Dangerous Capabilities and Tool-Description Poisoning Surface |
 | **Single RQ** | Among public MCP servers, what fraction expose dangerous capabilities, and what fraction ship tool descriptions exploitable for tool poisoning? |
 | **OWASP mapping** | ASI04 (Agentic Supply Chain) + ASI02 (Tool Misuse) |
-| **Outputs** | 1) arXiv preprint · 2) dataset + code (Zenodo DOI) · 3) 1–3 CVEs if confirmed |
+| **Outputs** | 1) arXiv preprint · 2) dataset + code + machine-readable results (Zenodo DOI) · 3) 1–3 CVEs if confirmed |
 | **Budget** | ~$300 total (API), pilot ≤ $50 |
 | **Timeline** | 8 weeks × ~7 h/week |
 | **Agent context** | Everything an AI agent needs is in `AGENTS.md`; task briefs in `prompts/` |
@@ -24,6 +24,7 @@
 - Static heuristic analysis of server/tool descriptions
 - Limited live experiments (20–40 tests, 2–3 models, MCPTox-style)
 - Coordinated disclosure of confirmed findings
+- Machine-readable result artifacts under `results/`
 
 **OUT of scope (do not add):**
 - ❌ A new comprehensive benchmark (MCPTox/MSB own that space; we measure the ecosystem)
@@ -65,21 +66,37 @@
 
 ---
 
-## 4. Eight-week timeline
+## 4. Results artifact protocol
+
+All paper-facing numbers must be generated into `results/`, following [`results/README.md`](results/README.md).
+
+| Result type | Location | Required metadata |
+|---|---|---|
+| Detector validation | `results/detector_validation/` | Detector version, sample strategy, annotator IDs, adjudication date |
+| Live experiments | `results/live_experiments/` | Model version, temperature, prompt hash, seed, success criterion |
+| Aggregate composition | `results/aggregate/` | Snapshot ID, crawl depth, deduplication rule |
+| Figures | `results/figures/` | Source CSV and generating script |
+| Paper tables | `results/paper_tables/` | Exact table number, source result files, analysis command |
+
+Rule: **no number enters the paper unless it is reproducible from a frozen snapshot and a recorded analysis command.**
+
+---
+
+## 5. Eight-week timeline
 
 | Week | Work | Deliverable |
 |---|---|---|
 | 1 | Read the 6 key papers (AGENTS.md §5) · run pilot pipeline · **start arXiv endorser search** | servers.jsonl (pilot) |
 | 2 | Finish pilot · draft methods section rough | pilot table |
-| 3–4 | Full crawl ✅ (done 2026-09-21: 7,766 servers) · GitHub enrichment · label 100-sample for precision/recall | final dataset + validated detectors |
-| 5 | Full live experiments (40 tests, 3 models) · begin responsible disclosure | ASR results + disclosure tickets |
-| 6 | Full draft (8–10 pp, ACM/USENIX style) · **approved stretch: re-crawl the census and diff it against the 2026-09-21 snapshot → description-drift statistics over the ~89% mutable-remote surface (one figure, $0)** | draft v1 + drift figure |
-| 7 | Polish · public repo · Zenodo DOI · 1–2 external reviews (OWASP community) | draft v2 + artifact |
+| 3–4 | Full crawl ✅ (done 2026-09-21: 7,766 servers) · GitHub enrichment · label 100-sample for precision/recall | final dataset + validated detectors + `results/detector_validation/` |
+| 5 | Full live experiments (40 tests, 3 models) · begin responsible disclosure | ASR results + `results/live_experiments/` + disclosure tickets |
+| 6 | Full draft (8–10 pp, ACM/USENIX style) · **approved stretch: re-crawl the census and diff it against the 2026-09-21 snapshot → description-drift statistics over the ~89% mutable-remote surface (one figure, $0)** | draft v1 + drift figure + `results/paper_tables/` |
+| 7 | Polish · public repo · Zenodo DOI · 1–2 external reviews (OWASP community) | draft v2 + versioned artifact |
 | 8 | **Submit to arXiv** · update résumé/LinkedIn | ✅ arXiv ID |
 
 ---
 
-## 5. Risks
+## 6. Risks
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
@@ -92,12 +109,13 @@
 | **Registry is larger than any run's page cap** (cursor still live at page 200; 7,766 unique and rising) | **Realised** | All claims phrased as "first 20,000 registry entries (cursor order)"; another `--max-pages` run is a $0 one-flag change pending authorisation |
 | ~~No git repository → git-status stamp impossible~~ **RESOLVED 2026-09-21** | Closed | Repo initialised at the project root; pre-crawl checkpoint `0429072`; raw API snapshots committed (rule §2.6 satisfied) |
 | **Detector precision likely very low** (informal triage: the 15 highest-scoring rows are all benign substring matches — URLs, "never", "assistant:", ".env" — and the max `suspicion_score` over 7,766 rows is 4) | High | Brief 03 owns the validation protocol: label the top-100 + 50 random negatives, report precision per class, propose regex fixes as a versioned diff; never build a case study straight from `analysis.csv` |
+| **Results are not traceable to analyses** | Medium | Use `results/` schemas; every paper number needs a source CSV/JSONL and generating script |
 
 ---
 
-## 6. Paper skeleton (fill continuously, don't write at the end)
+## 7. Paper skeleton (fill continuously, don't write at the end)
 
-```
+```text
 1 Intro        — ecosystem explosion + 3 motivating real-world examples
 2 Background   — MCP in half a page + server-side supply-chain threat model
 3 Methodology  — collection, detectors, validation protocol, ethics
@@ -107,8 +125,10 @@
 7 Related      — MCPTox/MSB/MCP-TDP/MCPSecBench; our delta: first ecosystem-wide view
 ```
 
+Every table and figure in Sections 4–5 must cite its underlying file in `results/`.
+
 ---
 
-## 7. Delegation workflow
+## 8. Delegation workflow
 
 Work is delegated to AI agents via the briefs in `prompts/` (numbered in execution order). Each brief is self-contained: goal, inputs, outputs, acceptance criteria, and don'ts. Give an agent `AGENTS.md` + exactly one brief per run. Rule: a brief is merged only when its acceptance criteria are met and `PLAN.md` is updated.
