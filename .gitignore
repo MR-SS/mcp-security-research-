@@ -8,3 +8,7 @@ __pycache__/
 # local agent state — never commit
 .freebuff/
 .hermes/
+.cache/
+
+# LaTeX build artifact — ship the .tex, never the compiled PDF
+paper/latex/main.pdf

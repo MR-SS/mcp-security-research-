@@ -1,0 +1,24 @@
+{
+  "title": "Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions",
+  "creators": [
+    {
+      "name": "Nouri, Sajjad Rahim",
+      "affiliation": "Islamic Azad University, Ramsar Branch"
+    }
+  ],
+  "description": "An ecosystem-wide measurement study of the public Model Context Protocol (MCP) registry: what fraction of public servers expose dangerous capabilities, and what fraction ship tool descriptions with patterns exploitable for tool poisoning. The release pairs a registry-grounded crawl and GitHub enrichment of 16,763 MCP tool descriptions with heuristic detector outputs, a stratified human-validation sample, instance-level adjudication, and live ASR/refusal experiments, plus scripts that re-derive every number quoted in the manuscript (claim ledger, reproducibility manifest, gate battery, and trial accounting). Detector outputs are candidates rather than verdicts, and reported precision is explicitly sample-scoped. This is the pre-paper snapshot (v1.0.0) prepared for DOI citation.",
+  "keywords": [
+    "MCP security",
+    "poisoning",
+    "detector validation",
+    "replication",
+    "Model Context Protocol",
+    "tool poisoning",
+    "prompt injection",
+    "supply chain security"
+  ],
+  "license": {
+    "id": "mit"
+  },
+  "related_identifiers": []
+}
