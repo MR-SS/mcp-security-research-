@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A8 (r2) - full-text, instance-level adjudication of the 150-row validation sample.
+"""A8 (r3) - full-text, instance-level adjudication of the 150-row validation sample.
 
 Inputs (frozen; never written here):
   data/analysis_toollevel.csv  the frozen 150-row sample frame. Its `description`
@@ -88,7 +88,7 @@ OUT_SUMMARY = os.path.join(REPO, "data", "instance_summary.csv")
 OUT_JOIN = os.path.join(REPO, "data", "instance_join.csv")
 OUT_RECON = os.path.join(REPO, "data", "a8_reconciliation.md")
 
-RULE_VERSION = "A8-r2"
+RULE_VERSION = "A8-r3"
 ADJUDICATED = "2026-10-17"
 
 STRUCTURAL = {"zero_width_chars", "base64_blob"}
@@ -279,46 +279,99 @@ POISON = {
     (21, "fake_system_role"): ("unsupported", "declared-function"),
 }
 
-# --- CAPABILITY: the 15 instances no row note types -----------------------------------
+# --- CAPABILITY: the 27 instances no row note types -----------------------------------
+# Criterion (capability, not poison): does the text DECLARE that the tool does this thing?
+# A verdict may not rest on whether the text also instructs the reader - that is the poison
+# test. Each ground below names the trigger and what the text actually says about the
+# capability, so a capability cell can be audited without borrowing the poison criterion.
 CAPABILITY = {
-    (1, "shell_execution"): ("unsupported", "negated"),
-    (27, "shell_execution"): ("unsupported", "detection-vocab"),
-    (29, "secret_env_access"): ("unsupported", "negated"),
-    (35, "shell_execution"): ("unsupported", "description-of-behaviour"),
-    (39, "network_egress"): ("unsupported", "description-of-behaviour"),
-    (39, "shell_execution"): ("unsupported", "description-of-behaviour"),
-    (42, "secret_env_access"): ("unsupported", "auth-wording"),
-    (43, "secret_env_access"): ("unsupported", "auth-wording"),
-    (44, "secret_env_access"): ("unsupported", "auth-wording"),
-    (45, "shell_execution"): ("unsupported", "product-copy"),
-    (46, "shell_execution"): ("unsupported", "description-of-behaviour"),
-    (58, "shell_execution"): ("unsupported", "product-copy"),
-    (67, "shell_execution"): ("unsupported", "description-of-behaviour"),
-    (85, "shell_execution"): ("unsupported", "description-of-behaviour"),
-    (94, "file_read_sensitive"): ("unsupported", "description-of-behaviour"),
+    # network_egress
+    (0, "network_egress"): ("supported",
+        "the declared function is sending an encrypted message to a remote agent or wallet, "
+        "so outbound transmission is the product itself (the PI row note also records the "
+        "covert-channel capability as real by design)"),
+    (1, "network_egress"): ("unsupported",
+        "explicitly denied: 'no code path to any execute/approve/sign/send/... endpoint'"),
+    (23, "network_egress"): ("supported",
+        "the tool submits a local folder to a conversion job, returns a jobId and is polled "
+        "for status, and the text anticipates an 'ambiguous network error' on a prior call"),
+    (33, "network_egress"): ("unsupported",
+        "the tool creates an inbound capture URL; it claims no outbound fetch"),
+    (39, "network_egress"): ("unsupported",
+        "the tool returns the exact HTTP request shape; the request is made by the caller "
+        "('Execute it with an x402-capable client')"),
+    # shell_execution
+    (1, "shell_execution"): ("unsupported",
+        "'never executes real process mutations' - the denial names execution"),
+    (27, "shell_execution"): ("unsupported",
+        "'shell injection' and 'reverse shells' are threats the scanner detects, not "
+        "commands it runs"),
+    (32, "shell_execution"): ("unsupported",
+        "'Execute content only when status is ready' gates prompt content; no shell, "
+        "terminal, subprocess or arbitrary-command claim"),
+    (35, "shell_execution"): ("unsupported",
+        "the tool returns canonical shell commands from an install guide; execution is "
+        "assigned to the agent's own shell"),
+    (39, "shell_execution"): ("unsupported",
+        "'Execute it with an x402-capable client' assigns execution to the client; no "
+        "shell or command claim"),
+    (45, "shell_execution"): ("unsupported",
+        "'from your terminal' names the user's shell and 'with one command' an install "
+        "step; the tool claims no command execution"),
+    (46, "shell_execution"): ("unsupported",
+        "'Execute an analysis tool' runs an analysis job; no shell, terminal, subprocess "
+        "or arbitrary-command claim"),
+    (58, "shell_execution"): ("unsupported",
+        "'the ERP enforcement shell' names the component that consumes the decision; the "
+        "tool 'never writes, posts, releases, or modifies' the record"),
+    (67, "shell_execution"): ("unsupported",
+        "execution is attributed to the client ('when the client can run code'); the tool "
+        "offers a scaffold"),
+    (85, "shell_execution"): ("unsupported",
+        "'terminal decision' uses terminal as an adjective (a final verdict); no shell or "
+        "command claim"),
+    # secret_env_access
+    (4, "secret_env_access"): ("supported",
+        "'Credentials are encrypted at rest, and scopes are granted per API key' - the "
+        "service holds and scopes credentials"),
+    (5, "secret_env_access"): ("supported",
+        "'deletes tokens.json' - the tool manages the stored token file"),
+    (6, "secret_env_access"): ("supported",
+        "the server reads ADAS_API_KEY from the environment ('Even if environment "
+        "variables (ADAS_API_KEY) are configured')"),
+    (27, "secret_env_access"): ("unsupported",
+        "'Detects credential theft' is a threat list, and 'no API key required' states the "
+        "absence of a credential"),
+    (29, "secret_env_access"): ("unsupported",
+        "the trigger is 'data sensitivity'/'execution mode' inside a policy evaluation; "
+        "the text claims no credential access ('without prompts or payloads')"),
+    (35, "secret_env_access"): ("unsupported",
+        "returns the install plan's list of *required* secrets, not secret material - no "
+        "reading or holding of credentials is claimed"),
+    (42, "secret_env_access"): ("unsupported",
+        "'Get API key at https://...' is a signup pointer, not a claim that the tool reads "
+        "or holds credentials"),
+    (43, "secret_env_access"): ("unsupported",
+        "'sign in with your account or use an API key' describes the user's authentication "
+        "method, not tool-side secret access"),
+    (44, "secret_env_access"): ("unsupported",
+        "same text as row 43 (duplicate registration): authentication method, not "
+        "tool-side secret access"),
+    (53, "secret_env_access"): ("unsupported",
+        "negated: 'NEVER asks for credentials - the user authenticates OUTSIDE Pi'"),
+    (95, "secret_env_access"): ("unsupported",
+        "returns install metadata that *names* environment variables; no access to their "
+        "values is claimed"),
+    # file_read_sensitive
+    (94, "file_read_sensitive"): ("unsupported",
+        "'filesystem' appears only as a category of user need in a registry-browsing tool; "
+        "the text claims no file reading, sensitive or otherwise"),
 }
 
 # --- Residual map: instances whose row note does not type the class --------------------
 # Kept from r1; each entry was re-checked against the full text resolved by r2. Keys are
 # (row_id, class).
 RESIDUAL = {
-    # network_egress: no outbound-network claim in the stored text.
-    (0, "network_egress"): ("unsupported", "no outbound-network claim: the 'webhook notifications' mention is in a do-not-use list"),
-    (1, "network_egress"): ("unsupported", "negated: 'no code path to any ... send ... webhook'"),
-    (23, "network_egress"): ("unsupported", "'download availability' is a quota-item mention in a helper tool"),
-    (33, "network_egress"): ("unsupported", "receives inbound requests (capture-all URL); no outbound fetch claimed"),
-    # secret_env_access: the text itself must establish credential/env handling.
-    (4, "secret_env_access"): ("supported", "'Credentials are encrypted at rest, and scopes are granted per API key' - the service handles credentials"),
-    (5, "secret_env_access"): ("supported", "'deletes tokens.json' - the tool manages the stored token file"),
-    (6, "secret_env_access"): ("supported", "names the environment variable the server checks (ADAS_API_KEY)"),
-    (27, "secret_env_access"): ("unsupported", "detection-list vocabulary ('Detects credential theft ...') and 'no API key required' (absence)"),
-    (35, "secret_env_access"): ("supported", "'returns ... required secrets' - declares the secret requirement"),
-    (53, "secret_env_access"): ("unsupported", "negated: 'NEVER asks for credentials'"),
-    (95, "secret_env_access"): ("supported", "returns 'environment variables' as part of the install metadata"),
-    # shell_execution: the tool must execute commands itself.
-    (98, "shell_execution"): ("supported", "'Execute a WP-CLI command' - the tool runs commands (deny-by-default allowlist)"),
-    (32, "shell_execution"): ("unsupported", "'Execute content only when status is ready' is a gated instruction about tool content, not shell execution"),
-    (32, "network_egress"): ("unsupported", "no outbound-network statement; the trigger is 'execute content' inside a gate"),
     # channel: is the audience/instruction channel really in use?
     (0, "model_addressed"): ("supported", "'Send a private encrypted message to another AI agent ... between autonomous agents'"),
     (3, "model_addressed"): ("supported", "'... for AI agents over MCP'"),
@@ -531,8 +584,8 @@ def main():
                 verdict, ground = RESIDUAL[(i, cls)]
                 provenance = "text-rule"
             elif fam == "capability" and (i, cls) in CAPABILITY:
-                verdict, key = CAPABILITY[(i, cls)]
-                provenance, ground = "text-rule", REASONS[key]
+                verdict, ground = CAPABILITY[(i, cls)]
+                provenance = "text-rule"
             else:
                 raise SystemExit(f"instance {i}:{cls} has no note typing and no table entry")
 

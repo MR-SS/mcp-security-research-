@@ -150,13 +150,15 @@ instance. Rows 19, 33 and 55 are same-server false-positive instances that **rem
 `cross_tool_shadowing` denominator** (1 supported / 3 unsupported = 0.25) and are counted
 unsupported; nothing is moved out of that denominator.
 
+**Capability audit (2026-10-17, rule A8-r3).** The r2 capability grounds had drifted into the poison test for seven instances ("no directive to the reader" cannot justify a capability verdict). Every one of the 27 capability instances with no PI note typing was re-read on the capability criterion — does the text declare that the tool does this? — and four verdicts moved: rows 0 and 23 now declare outbound egress (a messaging tool; a remote conversion job), while rows 35 and 95 only list *required* secrets or name environment variables, which is not access to them. Net family totals are unchanged; `network_egress` is 13/21 and `secret_env_access` 26/53, so the class-shape sentence is now 8 unsupported-dominated / 3 supported-dominated / 2 two-and-two. Ledger C-031.
+
 **What the pass found.** The published numbers are unchanged from the 2026-10-14 pass — that pass
 was already measured on the text, and r2 changed provenance and evidence, not verdicts: poison
 **6/124 (4.84%)**, `cross_tool_shadowing` 1/4, `stealth_concealment` 0/9, capability **44/102**,
 channel **32/42**, all-family **82/268 (30.60%)**, top-score stratum **78/263 (29.66%)**, duplicate-name
 collapse **75/251 (29.88%)**; two §6.2 rate cells corrected to **0.50** (`database_write`,
 `file_write_delete`). The apportionment's move (capability 5/102 → 44/102, channel 4/42 → 32/42,
-`secret_env_access` 3/53 → 28/53, `file_read_sensitive` 1/2 → 0/2 on row 94's note) is recorded in
+`secret_env_access` 3/53 → 26/53, `file_read_sensitive` 1/2 → 0/2 on row 94's note) is recorded in
 C-028 and `data/validation_family_split.csv`, which stays as the historical first-pass figure.
 
 **Recorded and enforced.** `claims_ledger.jsonl` **C-028** (the instance artifact and the recomputed

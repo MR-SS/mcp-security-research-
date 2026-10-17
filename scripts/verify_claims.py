@@ -25,7 +25,9 @@ Checks
       published table by C15)
   C15 A8 instance-level adjudication: data/INSTANCE_VERDICTS.csv drives the published
       per-class and family counts (§6.1-§6.2)
-Only C1/C2/C3/C4/C5/C6/C7/C8/C11/C13/C14/C15 are artifact re-derivations. C9/C10 are
+  C16 control-stratum channel status: the sampling sentence in both manuscripts and the
+      built HTML matches the artifact (four supported, one unsupported on row 119)
+Only C1/C2/C3/C4/C5/C6/C7/C8/C11/C13/C14/C15/C16 are artifact re-derivations. C9/C10 are
 consistency checks against the manuscript and the ledger, not scientific
 validation of either.
 
@@ -215,7 +217,8 @@ SUPERSEDED = ["trigger withdrew on full text", "1,484/16,763", "Flagged non-TP s
 # main.md keeps repo paths (backticked `server::tool`) where main_clean.md does not,
 # so phrase-level requirements are split into fragments both files must satisfy.
 REQUIRED = ["78/263 = 29.66%", "four supported channel instances",
-            "seven carry more", "four carry more supported than unsupported",
+            "eight carry more", "three carry more supported than unsupported",
+            "four supported and one unsupported",
             "split two-and-two", "over-trigger on row 119",
             "ae1aff9f", "adjudicated from the 300-char excerpt",
             "by extraction, not by absence upstream",
@@ -577,15 +580,14 @@ else:
     # class-level shape stated in §6.1, and the stratum split stated in §6.1/§6.2
     _half = {c: (_csv_cells[c][0], _csv_cells[c][1] - _csv_cells[c][0]) for c in _csv_cells}
     check("classes with more unsupported than supported instances",
-          sum(1 for c in _half if _half[c][0] < _half[c][1]), 7)
+          sum(1 for c in _half if _half[c][0] < _half[c][1]), 8)
     check("classes with no supported instance",
           sorted(c for c in _half if _half[c][0] == 0),
           ["exfiltration_language", "fake_system_role", "file_read_sensitive",
            "stealth_concealment"])
     check("classes with more supported than unsupported instances",
           sorted(c for c in _half if _half[c][0] > _half[c][1]),
-          ["model_addressed", "network_egress", "second_person_imperative",
-           "secret_env_access"])
+          ["model_addressed", "network_egress", "second_person_imperative"])
     check("classes splitting two-and-two",
           sorted(c for c in _half if _half[c][0] == _half[c][1]),
           ["database_write", "file_write_delete"])
@@ -627,6 +629,47 @@ else:
     if _rec:
         check("ledger headline equals the recomputed artifact",
               (_rec.get("numerator"), _rec.get("denominator")), (_supported, len(_iv)))
+
+# ------------- C16 control-stratum channel status (prose vs artifact)
+# The control rows are defined by the frame (zero capability- and zero poison-family flags);
+# the channel flags they carry are adjudicated in data/INSTANCE_VERDICTS.csv. C16 recomputes
+# that status from the artifact and requires the sampling sentence in BOTH manuscripts and in
+# the built HTML to state it. The sentence previously read "all unsupported" while the
+# artifact held four supported instances, and no table comparison could see it: prose that
+# describes a table has to be checked against the table.
+print("C16 control-stratum channel status vs the sampling sentence")
+if not os.path.exists(_iv_path):
+    check("C16 needs data/INSTANCE_VERDICTS.csv", False, True)
+else:
+    _ctl_ids = [i for i, r in enumerate(S)
+                if not _parse_flags(r.get("capability_flags"))
+                and not _parse_flags(r.get("poison_flags"))]
+    check("control rows in the frame", len(_ctl_ids), 50)
+    _ivmap = {(int(r["row_id"]), r["flag"]): r for r in _iv}
+    _ctl_rows = [k for k in _ivmap if k[0] in set(_ctl_ids)]
+    check("channel instances on control rows", len(_ctl_rows), 5)
+    _csup = sum(1 for k in _ctl_rows if _ivmap[k]["supported"] == "1")
+    _cuns = sum(1 for k in _ctl_rows if _ivmap[k]["unsupported"] == "1")
+    check("control channel supported / unsupported", (_csup, _cuns), (4, 1))
+    check("the unsupported control instance",
+          sorted(k for k in _ctl_rows if _ivmap[k]["supported"] == "0"),
+          [(119, "channel:model_addressed")])
+    _WORDS = {0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
+    _phrase = f"{_WORDS[_csup]} supported and {_WORDS[_cuns]} unsupported"
+    check("sentence phrase implied by the artifact", _phrase,
+          "four supported and one unsupported")
+    for _f in ("paper/main.md", "paper/main_clean.md", "paper/preview/paper.html"):
+        _raw = open(p(*_f.split("/")), encoding="utf-8").read()
+        _txt = re.sub(r"<[^>]+>", " ", _raw) if _f.endswith(".html") else _raw
+        _txt = re.sub(r"\s+", " ", _txt)
+        _i = _txt.find("Control channel status, computed from the frozen CSV")
+        check(f"{_f}: sampling control sentence present", _i >= 0, True)
+        _sent = _txt[_i:_i + 900] if _i >= 0 else ""
+        check(f"{_f}: sentence states the recomputed status", _phrase in _sent, True)
+        check(f"{_f}: stale 'all unsupported' claim absent from the control sentence",
+              "all unsupported" in _sent, False)
+        check(f"{_f}: over-trigger row named in the control sentence",
+              "row 119" in _sent, True)
 
 # ------------------------------------------------------------------- verdict
 print()

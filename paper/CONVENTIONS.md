@@ -285,3 +285,21 @@
   structural check (unique pairs / no gaps, exactly one verdict per row, quotes ⊆ full text, tables
   and ledger == recomputation); `claims_ledger.jsonl` **C-030** added and **C-028** re-scoped. Gates:
   abstract **179/179**, parity **5**, `derive_r4_numbers.py` exit 0, `trial_accounting --check` exit 0.
+
+- **2026-10-17 (b): capability criterion audited; control-channel prose corrected (both papers).**
+  Two defects, both in prose that described a table rather than in the table. (i) The sampling
+  section said the five control-row channel flags were "all unsupported"; the artifact holds
+  **four supported** (rows 111, 112, 123, 149) and **one unsupported** (row 119, the
+  *"Create with 35+ AI models"* over-trigger). Both manuscripts now say so, and **C16** recomputes
+  the status from `data/INSTANCE_VERDICTS.csv` and requires the sentence in both papers *and* the
+  built HTML — table matching could not catch a stale sentence. (ii) Seven capability instances
+  carried a ground borrowed from the poison test ("no directive to the reader"). Capability
+  verdicts now answer only the capability question — does the text **declare** that the tool does
+  this? — and all 27 non-note-typed capability instances were re-read: `network_egress`
+  **11/21 → 13/21** (rows 0 and 23 declare outbound transmission) and `secret_env_access`
+  **28/53 → 26/53** (rows 35 and 95 list *required* secrets or name environment variables, which
+  is not access to them). Family totals do not move (poison 6/124, capability 44/102, channel
+  32/42, all 82/268), so the abstract is unchanged; §6.1's class shape becomes **8**
+  unsupported-dominated / **3** supported-dominated / **2** two-and-two, and §6.2's cells are
+  `network_egress` 13 | 8 | 0.62 and `secret_env_access` 26 | 27 | 0.49. Rule version **A8-r3**;
+  ledger **C-031**/**C-032**. Sign-off status is unchanged: 132 `pi-note` / 136 `text-rule`.

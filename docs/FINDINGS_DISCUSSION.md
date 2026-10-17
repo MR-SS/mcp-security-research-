@@ -124,7 +124,7 @@ table — this list is the semantic (note-derived) version:
   each of these poison classes still carries no supported instance except where noted), but
   four of these classes turn out to be *trigger-justified* far more often than the apportionment
   suggested — `database_write` 2/4, `file_write_delete` 2/4, `model_addressed` 19/21,
-  `network_egress` 11/21 — i.e. the regex is right about the capability it names and wrong about
+  `network_egress` 13/21 — i.e. the regex is right about the capability it names and wrong about
   the row being malicious. Read the list above as *poisoning-precision* classes, not as broken
   regexes.
 - **Paraphrase recall gap on the highest-value mechanisms — rows 60/94/95**: the two most

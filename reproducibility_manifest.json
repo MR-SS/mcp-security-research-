@@ -85,24 +85,24 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "98e5b8f67c7979d4d8e0caa49d37f532e7bec0ebe8ad8d3462bf79da1e4efa32",
-      "role": "traceable manuscript record (edited this revision: 2026-10-17)",
+      "sha256": "bd4e27f0e22b048a2d91ef68bf516cc0fc085c9111822407e30a897284462223",
+      "role": "traceable manuscript record (edited this revision: 2026-10-17b)",
       "status": "derived",
-      "bytes": 81753
+      "bytes": 81958
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "1d83313e5fc718fac0c7febb6bc58d0e577ce417866e381e471ecccc523b1d58",
-      "role": "authoritative publication copy (edited this revision: 2026-10-17)",
+      "sha256": "b07c8ba594c4b819600a7cee6b516aaa88f666d94d6fe9ae4972783df6afb7c4",
+      "role": "authoritative publication copy (edited this revision: 2026-10-17b)",
       "status": "derived",
-      "bytes": 79095
+      "bytes": 79300
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "c1f8b548579e29266a5f7b62046a029eeb289504c7e18bcd04380933753f139d",
+      "sha256": "a5b8219a74a4b2ba5a11b4086908546ca238681656e1e7ecd64539aa1290e372",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived",
-      "bytes": 844064
+      "bytes": 843902
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
@@ -120,7 +120,7 @@
     },
     {
       "path": "paper/preview/make_figures.py",
-      "sha256": "d04c1223b2ae947cf2029c6feb1c5ffaefcaba6a4a38a17406a0c61ec1f0b2fc",
+      "sha256": "f3386bda6ace7484423a464fbb2e8a50743a7eccdc617130ec9a1e64d9f54db8",
       "role": "figure generator; fails loud on value mismatch",
       "status": "derived",
       "bytes": 13166
@@ -134,10 +134,10 @@
     },
     {
       "path": "paper/preview/figs/fig-2-perclass.png",
-      "sha256": "2d3648c14601c47739d3912e2423f98f944e3d419b127da51295c3e9547eeec9",
+      "sha256": "e410d61c197b2ee923d86b4e1391dc163573b7e02e4c973e83d765d4b992faa4",
       "role": "per-class text-support figure",
       "status": "derived",
-      "bytes": 191176
+      "bytes": 190888
     },
     {
       "path": "paper/preview/figs/fig-3-trials.png",
@@ -148,10 +148,10 @@
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "6a8152028c208352088cc60fefeaa5a51149f2beb2d2230c964b0799c2cfc86d",
-      "role": "machine-readable claim ledger (30 claims)",
+      "sha256": "4d66c4c317861196f6f2a4e2dfa05d41cc309b5cf4f3f9aa360156c69d18b634",
+      "role": "machine-readable claim ledger (32 claims)",
       "status": "derived",
-      "bytes": 24126
+      "bytes": 26818
     },
     {
       "path": "pilot/derive_r4_numbers.py",
@@ -169,10 +169,10 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "e182ca13483b2611e2ec12c69392c9415e10eb7499b68b94b852b4244a459cb9",
+      "sha256": "5e116e6574dd93639dd92b87b62772f2998c53f0f1fa7f79cb17d1e2950e4b91",
       "role": "offline verification entry point",
       "status": "derived",
-      "bytes": 34549
+      "bytes": 37370
     },
     {
       "path": "REVISION_AUDIT.md",
@@ -183,10 +183,10 @@
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "5dfd5ec01e6b52abd5846448c9794748e62a442c9d5c5c2aaa2b1aa043e12b0f",
+      "sha256": "2fcf7eba4f4d13235bcd9cec85bee3112e6282dfe2b2b98160fa5ec4bd07f15c",
       "role": "human-dependency list",
       "status": "derived",
-      "bytes": 14974
+      "bytes": 15754
     },
     {
       "path": "REVISION_REPORT.md",
@@ -204,24 +204,24 @@
     },
     {
       "path": "data/INSTANCE_VERDICTS.csv",
-      "sha256": "e57e79a9bf71b476033cebdd6ef7f1a3b2f497f8b394b8e7dfa7141ddd008a0d",
-      "role": "A8 instance-level adjudication, r2 (2026-10-17): one row per fired flag, supported/unsupported against the FULL stored text, verbatim quote, provenance tag",
+      "sha256": "205b52baaf589eafb8ba93693915e60830078448d30be4e577b898a89fe6421a",
+      "role": "A8 instance-level adjudication, r3 (2026-10-17): one row per fired flag, supported/unsupported against the FULL stored text, verbatim quote, provenance tag",
       "status": "derived",
-      "bytes": 59395
+      "bytes": 60175
     },
     {
       "path": "data/instance_summary.csv",
-      "sha256": "5b999a6366d586460b5a0f5a99403cb6c7281223a262bf78144da261279a9bfc",
+      "sha256": "bbee662127c8f5db413593a59aaf4da518f2a39ac13e1ec6c759e67255f6cf42",
       "role": "per-class/family/all counts and Wilson 95% intervals derived from data/INSTANCE_VERDICTS.csv",
       "status": "derived",
       "bytes": 885
     },
     {
       "path": "pilot/adjudicate_instances.py",
-      "sha256": "9b62971e61e73d81ae6d1666ffaef734ea2c80d323b8fa7e08b69b6eeeca4378",
-      "role": "producer of data/INSTANCE_VERDICTS.csv, data/instance_join.csv, data/instance_summary.csv and data/a8_reconciliation.md; prefix join asserted unique",
+      "sha256": "f99bf101922ca2a5e9ed9e2ce9b437f5e99619792dc2b8ab371931ff2b5581c9",
+      "role": "producer of data/INSTANCE_VERDICTS.csv, data/instance_join.csv, data/instance_summary.csv and data/a8_reconciliation.md; POISON and CAPABILITY tables carry one ground per instance",
       "status": "derived",
-      "bytes": 40314
+      "bytes": 42611
     },
     {
       "path": "data/instance_join.csv",
@@ -234,7 +234,7 @@
       "path": "data/a8_reconciliation.md",
       "role": "A8-r2 adjudication rule, row-label conflict log (empty), denominator framing for rows 19/33/55, near-miss list, provenance note",
       "status": "derived",
-      "sha256": "6a8fd0cdab2f355bc9f5d381c6fd79fec451d80b7cfc68c609bb8a3b64f3cceb",
+      "sha256": "03d75923b7999ef15fde592dc4cdfb09182a37d635c1b5c03c167e68fcd84efb",
       "bytes": 2411
     }
   ],
@@ -290,10 +290,10 @@
     "null_hashes": []
   },
   "revision": {
-    "rule_version": "A8-r2",
+    "rule_version": "A8-r3",
     "date": "2026-10-17",
-    "summary": "Instance-level adjudication rebuilt on a provable full-text join (excerpt is a prefix of the scanned text; 150/150 rows, 0 excerpt-only) and re-adjudicated without row-label provenance. Artifact schema row_id | flag | supported | unsupported | evidence_quote | note. Published numbers unchanged.",
-    "supersedes": "the r1 instance artifact of 2026-10-14 (commit ff78920), whose join heuristic resolved 20 rows to a different tool's text and whose 102 poison verdicts followed the row label",
+    "summary": "Full-text instance adjudication (r2) plus a capability-criterion audit and a control-channel prose correction: capability verdicts now rest on whether the text declares the capability (4 verdicts moved, family totals unchanged), and the sampling sentence states the measured control status (4 supported / 1 unsupported) in both papers and the built HTML.",
+    "supersedes": "the r1 instance artifact (2026-10-14, ff78920) and the r2 join/provenance correction (fa20695); this revision changes no family-level number",
     "frozen_inputs_touched": false
   }
 }

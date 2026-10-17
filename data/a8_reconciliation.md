@@ -1,6 +1,6 @@
 # A8 reconciliation record
 
-- Rule version: **A8-r2**
+- Rule version: **A8-r3**
 - Adjudication date: **2026-10-17**
 - Inputs: `data/analysis_toollevel.csv` (frame), `data/labels.jsonl` (labels and row notes), `data/github_tools.jsonl` (full stored text). None is written here.
 - Join: each frame excerpt resolves to the one distinct stored text that starts with it (`data/instance_join.csv`). 107 exact, 43 prefix, 43 rows where the full text is longer than the 300-character excerpt, 0 excerpt-only.
