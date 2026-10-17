@@ -1,6 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software or dataset, please cite it as below."
 title: "Calibrating the Alarms: A Registry-Grounded, Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool Descriptions"
+<<<<<<< HEAD
 type: software
 authors:
   - family-names: Nouri
@@ -25,3 +26,32 @@ abstract: >-
   detector outputs are candidates validated by manual review; reported precision is
   sample-scoped. Code, frozen data, and claim-verification scripts accompany this
   release.
+=======
+abstract: "An ecosystem-wide measurement study of the public Model Context Protocol (MCP) registry: a registry-grounded crawl and GitHub enrichment of 16,763 tool descriptions, heuristic detector outputs, a stratified human-validation sample, instance-level adjudication, and live ASR/refusal experiments, with scripts that re-derive every quoted number. Detector outputs are candidates rather than verdicts; reported precision is sample-scoped. Pre-paper snapshot v1.0.0."
+authors:
+  - family-names: Nouri
+    given-names: Sajjad Rahim
+    affiliation: "Islamic Azad University, Ramsar Branch, Iran"
+    orcid: "https://orcid.org/0009-0003-4076-3037"
+version: v1.0.0
+date-released: 2026-10-17
+type: software
+license: MIT
+repository-code: "https://github.com/MR-SS/mcp-security-research-"
+url: "https://zenodo.org/records/23435929"
+identifiers:
+  - description: "Versioned DOI for this snapshot (v1.0.0)"
+    type: doi
+    value: "10.5281/zenodo.23435929"
+  - description: "Concept DOI (resolves to the latest version of this record)"
+    type: doi
+    value: "10.5281/zenodo.23435928"
+keywords:
+  - Model Context Protocol
+  - MCP security
+  - tool poisoning
+  - detector validation
+  - measurement study
+  - reproducibility
+  - prompt injection
+>>>>>>> 824abc0 (Create CITATION.cff)
