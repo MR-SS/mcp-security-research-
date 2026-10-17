@@ -259,3 +259,29 @@
   verdict, **35** assistant-drafted text-bound judgments pending PI sign-off — asserted in C15). Gates
   at this commit: abstract **179/179**, parity **5**, `derive_r4_numbers.py` exit 0,
   `trial_accounting --check` exit 0, `verify_claims.py` ALL CHECKS PASSED (117 checks).
+
+- **2026-10-17: A8-r2 — full-text re-adjudication, no row-label provenance (both papers).**
+  The r1 artifact was rebuilt on a provable join. The frame's `description` is a 300-character
+  **excerpt** of the text the detector scanned, and `(server_name, tool_name)` is not unique in
+  `data/github_tools.jsonl` (74 of the 150 sample rows sit on a key with more than one distinct
+  description; `generic:unnamed` is a catch-all), so r1's "candidate that reproduces the flag set"
+  heuristic resolved **20 rows to a different tool's text**. A row now joins iff exactly one stored
+  text under its key starts with its excerpt: **150/150** resolved (**107** exact, **43** where the
+  stored text is longer — longest **1,547** characters), **0** excerpt-only, audited row by row in
+  `data/instance_join.csv`. Artifact schema is now `row_id | flag | supported | unsupported |
+  evidence_quote | note`; every quote is asserted to be a substring of the row's **full** stored
+  text. The 102 poison instances that r1 decided from the row verdict (`row-rule`) are adjudicated
+  individually in an explicit 124-entry table in `pilot/adjudicate_instances.py`, and a poison
+  verdict that conflicts with its row label is written to `data/a8_reconciliation.md` instead of
+  being absorbed — the conflict set is **empty**, so the five TP row labels stand untouched.
+  **Framing correction:** `cross_tool_shadowing` rows 19/33/55 are same-server false positives that
+  **remain in the denominator** (1/4) and are counted unsupported; the earlier "reclassification"
+  wording never meant moving instances out, and the §5/§6.2 text now says so. **No published number
+  moved** (r1 == r2 verdict-for-verdict: poison **6/124**, capability **44/102**, channel **32/42**,
+  all-family **82/268**, stratum **78/263**, collapse **75/251**); 15 evidence quotes changed to the
+  rows' own text. Provenance is now two tags only — **132** `pi-note`, **136** `text-rule` — with the
+  adjudication date (**2026-10-17**), rule version (**A8-r2**) and the AI-assistance role stated in §5;
+  the paper claims no independent human reliability. `verify_claims.py` **C15** was rewritten as a
+  structural check (unique pairs / no gaps, exactly one verdict per row, quotes ⊆ full text, tables
+  and ledger == recomputation); `claims_ledger.jsonl` **C-030** added and **C-028** re-scoped. Gates:
+  abstract **179/179**, parity **5**, `derive_r4_numbers.py` exit 0, `trial_accounting --check` exit 0.

@@ -1,7 +1,7 @@
 {
   "schema": "mcp-measurement/reproducibility-manifest/1",
-  "generated_utc": "2026-10-14T00:00:00Z",
-  "baseline_commit": "769b7d968eb207d5b4e0fac46202e15945ebde75",
+  "generated_utc": "2026-10-17T00:00:00Z",
+  "baseline_commit": "ff78920364e76e01aef57109c82b3ca0a698afd4",
   "note": "This manifest does not hash itself. 'unknown' means not established, not empty.",
   "frozen_inputs": [
     {
@@ -85,24 +85,24 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "e2eaefc1dd4deb0f3c84463c255c786e865affef9522f2ae7b191f6e87b6a338",
-      "role": "traceable manuscript record (edited this revision)",
+      "sha256": "98e5b8f67c7979d4d8e0caa49d37f532e7bec0ebe8ad8d3462bf79da1e4efa32",
+      "role": "traceable manuscript record (edited this revision: 2026-10-17)",
       "status": "derived",
-      "bytes": 80987
+      "bytes": 81753
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "6d4717db475090090b8f7d1e8a596e46b1ff4abe614e8dae3bd310a9cd0338a5",
-      "role": "authoritative publication copy (edited this revision)",
+      "sha256": "1d83313e5fc718fac0c7febb6bc58d0e577ce417866e381e471ecccc523b1d58",
+      "role": "authoritative publication copy (edited this revision: 2026-10-17)",
       "status": "derived",
-      "bytes": 78429
+      "bytes": 79095
     },
     {
       "path": "paper/preview/paper.html",
-      "sha256": "43671ad008ddf293392748e502779542ba90e02c819086d6a26726595edb0f06",
+      "sha256": "c1f8b548579e29266a5f7b62046a029eeb289504c7e18bcd04380933753f139d",
       "role": "built reviewer HTML, self-contained (3 base64 figures, 12 references)",
       "status": "derived",
-      "bytes": 843280
+      "bytes": 844064
     },
     {
       "path": "paper/preview/paper-reviewer-copy.pdf",
@@ -148,17 +148,17 @@
     },
     {
       "path": "claims_ledger.jsonl",
-      "sha256": "d0eb6344976621ac5a1de16ed98f065234a1767419700e082bb3029d68c185a4",
-      "role": "machine-readable claim ledger (29 claims)",
+      "sha256": "6a8152028c208352088cc60fefeaa5a51149f2beb2d2230c964b0799c2cfc86d",
+      "role": "machine-readable claim ledger (30 claims)",
       "status": "derived",
-      "bytes": 22401
+      "bytes": 24126
     },
     {
       "path": "pilot/derive_r4_numbers.py",
-      "sha256": "72aa39488d49eb71ebe7d24f79c76944e43b2e2f916ec96b67629cbb57d9919b",
+      "sha256": "fdb72f2ea0586e4284eda2802983e700d0a8c532b747dbde58651bdf1b65e1bc",
       "role": "assert-guarded derivation of headline numbers",
       "status": "derived",
-      "bytes": 18865
+      "bytes": 19030
     },
     {
       "path": "experiments/trial_accounting.py",
@@ -169,10 +169,10 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "bffcb68f8923ba54bf623c3f351ffe67dce7c51fde70811a9c61fd64b4f1c23e",
+      "sha256": "e182ca13483b2611e2ec12c69392c9415e10eb7499b68b94b852b4244a459cb9",
       "role": "offline verification entry point",
       "status": "derived",
-      "bytes": 31218
+      "bytes": 34549
     },
     {
       "path": "REVISION_AUDIT.md",
@@ -183,10 +183,10 @@
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "0e01bc8eb7ad65aff8b24f622d68cbe10db2424982346ce57c653d27d3d10ace",
+      "sha256": "5dfd5ec01e6b52abd5846448c9794748e62a442c9d5c5c2aaa2b1aa043e12b0f",
       "role": "human-dependency list",
       "status": "derived",
-      "bytes": 14356
+      "bytes": 14974
     },
     {
       "path": "REVISION_REPORT.md",
@@ -204,24 +204,38 @@
     },
     {
       "path": "data/INSTANCE_VERDICTS.csv",
-      "sha256": "89e23f58e9dac9399804fc0fa9f18aaddd7a0a1de3d29d4b223ae3d9f4de9483",
-      "role": "A8 instance-level adjudication: one supported/unsupported verdict per fired flag, with a verbatim evidence quote and a provenance tag",
+      "sha256": "e57e79a9bf71b476033cebdd6ef7f1a3b2f497f8b394b8e7dfa7141ddd008a0d",
+      "role": "A8 instance-level adjudication, r2 (2026-10-17): one row per fired flag, supported/unsupported against the FULL stored text, verbatim quote, provenance tag",
       "status": "derived",
-      "bytes": 58791
+      "bytes": 59395
     },
     {
       "path": "data/instance_summary.csv",
       "sha256": "5b999a6366d586460b5a0f5a99403cb6c7281223a262bf78144da261279a9bfc",
-      "role": "per-class/family/all summary of the instance verdicts with Wilson intervals (published table source)",
+      "role": "per-class/family/all counts and Wilson 95% intervals derived from data/INSTANCE_VERDICTS.csv",
       "status": "derived",
       "bytes": 885
     },
     {
       "path": "pilot/adjudicate_instances.py",
-      "sha256": "9738c3d5c6087e4cfd7419f4a22953ad4c46baef0409cb3c7f5e5b5395662697",
-      "role": "producer of data/INSTANCE_VERDICTS.csv and data/instance_summary.csv (fails loud on count mismatch)",
+      "sha256": "9b62971e61e73d81ae6d1666ffaef734ea2c80d323b8fa7e08b69b6eeeca4378",
+      "role": "producer of data/INSTANCE_VERDICTS.csv, data/instance_join.csv, data/instance_summary.csv and data/a8_reconciliation.md; prefix join asserted unique",
       "status": "derived",
-      "bytes": 20488
+      "bytes": 40314
+    },
+    {
+      "path": "data/instance_join.csv",
+      "role": "per-row join audit for the 150-row frame: excerpt length, full-text length, method (exact/prefix), candidate count, excerpt_only, full_equals_excerpt",
+      "status": "derived",
+      "sha256": "f0952bc9c349d6e83788642db068c3733dda4108f601a4eb8c9f44a411b34c73",
+      "bytes": 11331
+    },
+    {
+      "path": "data/a8_reconciliation.md",
+      "role": "A8-r2 adjudication rule, row-label conflict log (empty), denominator framing for rows 19/33/55, near-miss list, provenance note",
+      "status": "derived",
+      "sha256": "6a8fd0cdab2f355bc9f5d381c6fd79fec451d80b7cfc68c609bb8a3b64f3cceb",
+      "bytes": 2411
     }
   ],
   "sample_identity": {
@@ -274,5 +288,12 @@
   "self_check": {
     "note": "No entry may have a null hash; scripts/verify_claims.py C12 asserts every entry matches the file on disk.",
     "null_hashes": []
+  },
+  "revision": {
+    "rule_version": "A8-r2",
+    "date": "2026-10-17",
+    "summary": "Instance-level adjudication rebuilt on a provable full-text join (excerpt is a prefix of the scanned text; 150/150 rows, 0 excerpt-only) and re-adjudicated without row-label provenance. Artifact schema row_id | flag | supported | unsupported | evidence_quote | note. Published numbers unchanged.",
+    "supersedes": "the r1 instance artifact of 2026-10-14 (commit ff78920), whose join heuristic resolved 20 rows to a different tool's text and whose 102 poison verdicts followed the row label",
+    "frozen_inputs_touched": false
   }
 }

@@ -246,8 +246,10 @@ def main():
     _verdicts = {}
     _vpath = os.path.join(os.path.dirname(SAMPLE), "INSTANCE_VERDICTS.csv")
     for _v in _csv.DictReader(open(_vpath, encoding="utf-8")):
+        assert (_v["supported"], _v["unsupported"]) in (("1", "0"), ("0", "1")), (
+            f"instance {_v['row_id']} {_v['flag']} is not exactly one of supported/unsupported")
         _verdicts[(int(_v["row_id"]), _v["flag"].split(":", 1)[1])] = (
-            _v["instance_verdict"] == "supported")
+            _v["supported"] == "1")
     assert len(_verdicts) == 268, f"instance verdicts {len(_verdicts)} != 268"
     s_inst = sum(_verdicts.values())
     assert s_inst == 82, f"supported instances {s_inst} != 82"

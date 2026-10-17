@@ -271,7 +271,7 @@ human-in-the-terminal via `pilot/label_sample.py` with
 per-class TP rules; the master rule: *"Separate THE TOOL'S DECLARED FUNCTION from AN
 ADDED BEHAVIORAL INSTRUCTION TO THE MODEL."* Labeling is two-level: (a) the **row-level
 verdict** — a row is `tp` iff at least one poison flag is genuinely supported by the
-visible text (the master rule); capability and channel flags never decide a row; and (b) **per-class adjudication** — every flag instance carries its own verdict: the earlier default derived the per-class table from the row verdict (every flag on a `tp` row counted as supported, every flag on a `fp` row as unsupported, `unclear` rows contributing nothing) — a **first-pass default**, kept in the replication package as the earlier figure (`data/validation_family_split.csv`) but no longer the published table. `data/INSTANCE_VERDICTS.csv` now adjudicates all 268 flags instance by instance (§6.1–§6.2), each with a verbatim evidence quote, and `pilot/adjudicate_instances.py` regenerates it from the frozen frame, labels and corpus with shape asserts (268 instances; 124 poison / 102 capability / 42 channel), so the counts are reproducible rather than transcribed. The earlier default was not arbitrary — it is the conservative reading of a row verdict, crediting a class only when its row was positive — but it is a property of the rule rather than of the text: it understated the capability and channel families and was uninformative about the poison family, so the instance pass replaces it wholesale instead of re-tuning it. The criteria differ by family, and the paper says which is which: a poison instance is supported only when the stored text adds behavioural steering (the master rule above); a capability instance when the text really declares that capability; a channel instance when the instruction channel really is in use. Where the frozen row notes type an instance themselves, that typing governs (**131** of 268 instances); the **102** poison-family instances follow the PI's own row verdict directly (the row rule), and the remaining **35** are assistant-drafted, text-bound judgments — each carrying a verbatim quote from the stored text — pending PI sign-off. The 150 row-level labels — not this table — remain the human gold standard (claims ledger C-028). We use
+visible text (the master rule); capability and channel flags never decide a row; and (b) **per-class adjudication** — the §6.2 table is built from per-instance verdicts, not from the row verdict: the earlier default (every flag on a `tp` row counted as supported, every flag on a `fp` row as unsupported, `unclear` rows contributing nothing) is a **first-pass default now superseded by measured per-instance data**, kept in the replication package as the earlier figure (`data/validation_family_split.csv`) but no longer the published table. `data/INSTANCE_VERDICTS.csv` adjudicates all 268 flags instance by instance (§6.1–§6.2), each against the **full stored text** rather than the excerpt: the frame's 300-character excerpt resolves to exactly one stored description by prefix (`data/instance_join.csv`: 150 rows, 107 exact, 43 where the stored text is longer — up to 1,547 characters — and none excerpt-only), and `pilot/adjudicate_instances.py` regenerates the table from the frozen frame, labels and corpus with shape asserts (268 instances; 124 poison / 102 capability / 42 channel). The earlier default was not arbitrary — it is the conservative reading of a row verdict, crediting a class only when its row was positive — but it is a property of the rule rather than of the text: it understated capability and channel support and said nothing about the poison family. **No verdict is inherited from a row label**: the poison family is decided flag by flag against the text, and a decision that conflicts with the row label is logged rather than absorbed (`data/a8_reconciliation.md`; none did). The criteria differ by family, and the paper says which is which: a poison instance is supported only when the full stored text adds behavioural steering (the master rule above); a capability instance when the text really declares that capability; a channel instance when the instruction channel really is in use. Where the frozen row notes type an instance themselves, that typing governs (**132** of 268 instances); the other **136** are assistant-drafted, text-bound adjudications, each carrying a verbatim quote from the full stored text — pending PI sign-off. Adjudication date **2026-10-17**, rule version **A8-r2**; the AI-assisted pass corrects instance-level data only, is not an independent human reliability measurement, and is not reported as one. The 150 row-level labels — not this table — remain the human gold standard (claims ledger C-028, C-030). We use
 the term *false positive* only in this poison-detection sense — a row whose poison-family
 flags fired but none is supported by the visible text — and otherwise say *flagged non-TP*.
 Every mutation goes through supersede/audit rails (`labels.jsonl.superseded`,
@@ -415,16 +415,18 @@ on the five TP rows: row 12 carries two supported poison classes (`cross_tool_sh
 inherited by its flags: the poison column is the calibration number (a supported poison
 instance means the text adds behavioural steering), while the capability and channel columns
 count instances whose own claim is true — a tool that really does read SQL, fetch a URL or
-hold a key is a supported *capability* flag and still not a malicious row. The four
-instances that carried a class-level verdict in the frozen row notes
-(`cross_tool_shadowing` rows 12, 19, 33 and 55: one priority-capture transfer, two
-same-server toolkit/workflow guidance, one dependency/setup guidance) were re-checked
-individually and keep their notes' verdicts; the table is regenerated by
-`pilot/adjudicate_instances.py` and summarized in `data/instance_summary.csv`, which carries
-the Wilson intervals and the per-instance provenance counts — **131 instances** typed from
-the PI's own row notes, **102** decided by the PI's own row verdict (the poison row rule),
-**35** assistant-drafted text-bound judgments (each with a stored-text quote) pending PI
-sign-off (claims ledger C-028).
+hold a key is a supported *capability* flag and still not a malicious row. The four instances that carried a class-level verdict in the frozen row notes
+(`cross_tool_shadowing` rows 12, 19, 33 and 55: one priority-capture transfer, two same-server
+toolkit/workflow guidance, one dependency/setup guidance) were re-checked individually and
+keep their notes' verdicts; rows 19, 33 and 55 remain in that class's denominator and are
+counted unsupported — nothing is moved out of it. Every verdict is judged against the full
+stored text (`data/instance_join.csv`), not the excerpt, and every quote in the artifact is
+a substring of that text. The table is regenerated by `pilot/adjudicate_instances.py` and
+summarized in `data/instance_summary.csv`, which carries the Wilson intervals and the
+per-instance provenance counts — **132 instances** typed from the PI's own row notes and
+**136** assistant-drafted, text-bound adjudications (each with a full-text quote) pending PI
+sign-off, adjudicated **2026-10-17** under rule version **A8-r2** (claims ledger C-028,
+C-030).
 
 ### 6.3 The five TP rows and four mechanisms
 

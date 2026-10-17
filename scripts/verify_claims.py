@@ -439,60 +439,110 @@ for _f in ("paper/main.md", "paper/main_clean.md"):
 check("headline supported sum unchanged (15)",
       sum(t for t, _f in recomputed.values()), 15)
 
-# ------------- C15 A8 instance-level adjudication (published per-class table)
-# The published per-class and family counts come from data/INSTANCE_VERDICTS.csv, not from
-# the row-verdict apportionment (C11 keeps checking that historical table reproduces).
-# C15 ties the artifact to the manuscript: the per-class cells in both papers, the family
-# sums, the headline numerator and the 268-instance coverage must all agree, and the poison
-# family must still satisfy the row rule (a row is positive iff at least one poison flag is
-# supported).
-print("C15 instance-level adjudication drives the published table")
+# ------------- C15 A8 instance-level adjudication (structure only)
+# data/INSTANCE_VERDICTS.csv is the instance record behind the published per-class and
+# family counts. C15 is deliberately STRUCTURAL: it does not re-adjudicate anything, it
+# checks that the record is complete and internally consistent and that both manuscripts
+# and the ledger reproduce from it.
+#   (a) exactly 268 unique (row_id, flag) pairs - no duplicates, no gaps against the
+#       fired flags of the frozen frame;
+#   (b) each row is exactly one of supported/unsupported (1/0), and every evidence_quote
+#       is a non-empty substring of that row's FULL stored text, resolved by prefix join;
+#   (c) the per-class cells, rate column, family sums and headline in both papers equal a
+#       direct recomputation from the CSV;
+#   (d) the ledger's headline record equals the same recomputation.
+# Ledger: claims_ledger.jsonl C-030. Manuscript: §5 (labeling protocol), §6.2 reading note.
+print("C15 instance-level adjudication: structure, full-text quotes, tables, ledger")
 _iv_path = p("data", "INSTANCE_VERDICTS.csv")
+_join_path = p("data", "instance_join.csv")
 if not os.path.exists(_iv_path):
     check("data/INSTANCE_VERDICTS.csv exists", False, True)
 else:
     _iv = list(csv.DictReader(open(_iv_path, encoding="utf-8")))
-    check("instance verdict rows", len(_iv), 268)
-    check("verdict values are supported/unsupported",
-          sorted({r["instance_verdict"] for r in _iv}), ["supported", "unsupported"])
-    _families = collections.Counter(r["flag"].split(":", 1)[0] for r in _iv)
-    check("family coverage", dict(_families),
-          {"poison": 124, "capability": 102, "channel": 42})
-    _supported = sum(1 for r in _iv if r["instance_verdict"] == "supported")
+    check("artifact columns", list(_iv[0].keys()) if _iv else None,
+          ["row_id", "flag", "supported", "unsupported", "evidence_quote", "note"])
+    check("artifact rows", len(_iv), 268)
+
+    # (a) pairs: unique, and exactly the frame's fired flags
+    _pairs = [(r["row_id"], r["flag"]) for r in _iv]
+    check("unique (row_id, flag) pairs", len(set(_pairs)), len(_pairs))
+    _expect = set()
+    for _i, _r in enumerate(S):
+        for _fam, _fld in (("capability", "capability_flags"),
+                           ("poison", "poison_flags"),
+                           ("channel", "addressing_flags")):
+            for _c in _parse_flags(_r.get(_fld)):
+                _expect.add((str(_i), f"{_fam}:{_c}"))
+    check("no missing instances vs the frame", sorted(_expect - set(_pairs)), [])
+    check("no extra instances vs the frame", sorted(set(_pairs) - _expect), [])
+    check("family coverage", dict(collections.Counter(
+        r["flag"].split(":", 1)[0] for r in _iv)),
+        {"poison": 124, "capability": 102, "channel": 42})
+
+    # (b) one verdict per row; every quote lives in the FULL stored text
+    check("every row is exactly one of supported/unsupported",
+          [(r["row_id"], r["flag"]) for r in _iv
+           if (r["supported"], r["unsupported"]) not in (("1", "0"), ("0", "1"))], [])
+    _pool = collections.defaultdict(set)
+    for _line in open(p("data", "github_tools.jsonl"), encoding="utf-8"):
+        if _line.strip():
+            _t = json.loads(_line)
+            _pool[(_t.get("server_name"), _t.get("tool_name"))].add(
+                _t.get("tool_description") or "")
+
+    def _full_text(_i):
+        """The stored text the frame excerpt was cut from: the one distinct candidate
+        under (server_name, tool_name) that starts with the excerpt."""
+        _row = S[int(_i)]
+        _server, _sep, _tool = _row["name"].partition("::")
+        _ex = _row["description"] or ""
+        _cands = _pool.get((_server, _tool), set())
+        _exact = [c for c in _cands if c == _ex]
+        if len(_exact) == 1:
+            return _exact[0]
+        _pref = sorted([c for c in _cands if c.startswith(_ex)], key=len)
+        return _pref[0] if len(_pref) == 1 else None
+
+    check("every row resolves to one full stored text",
+          [_p for _p in _pairs if _full_text(_p[0]) is None], [])
+    check("every evidence quote is a substring of the full stored text",
+          [(r["row_id"], r["flag"]) for r in _iv
+           if not r["evidence_quote"] or _full_text(r["row_id"]) is None
+           or r["evidence_quote"] not in _full_text(r["row_id"])], [])
+    if os.path.exists(_join_path):
+        _jn = list(csv.DictReader(open(_join_path, encoding="utf-8")))
+        check("join audit rows", len(_jn), 150)
+        check("rows adjudicated on an excerpt only",
+              [_r["row_id"] for _r in _jn if _r["excerpt_only"] != "no"], [])
+        check("rows whose stored text is longer than the excerpt",
+              sum(1 for _r in _jn if int(_r["full_len"]) > int(_r["excerpt_len"])), 43)
+    else:
+        check("data/instance_join.csv exists", False, True)
+
+    # provenance: two tags only, and no verdict inherited from the row label
+    _tag = collections.Counter(r["note"].split("]")[0].strip("[") for r in _iv)
+    check("provenance tags", sorted(_tag), ["pi-note", "text-rule"])
+    check("instances still decided by the row rule ('row-rule' provenance)",
+          [r["row_id"] for r in _iv if "row-rule" in r["note"]], [])
+    check("provenance counts", (_tag["pi-note"], _tag["text-rule"]), (132, 136))
+
+    # (c) recompute every published count from the artifact
+    _supported = sum(1 for r in _iv if r["supported"] == "1")
     check("supported instances", _supported, 82)
     check("family supported sums to the headline",
-          sum(1 for r in _iv if r["instance_verdict"] == "supported"
+          sum(1 for r in _iv if r["supported"] == "1"
               and r["flag"].startswith("poison:")), 6)
     check("capability supported sum",
-          sum(1 for r in _iv if r["instance_verdict"] == "supported"
+          sum(1 for r in _iv if r["supported"] == "1"
               and r["flag"].startswith("capability:")), 44)
     check("channel supported sum",
-          sum(1 for r in _iv if r["instance_verdict"] == "supported"
+          sum(1 for r in _iv if r["supported"] == "1"
               and r["flag"].startswith("channel:")), 32)
-    check("every instance carries an evidence quote",
-          [r["row_id"] for r in _iv if not r["evidence_quote"]], [])
-    _tag = collections.Counter(r["note"].split("]")[0].strip("[") for r in _iv)
-    check("every instance carries a provenance tag",
-          sorted(_tag), ["pi-note", "row-rule", "text-rule"])
-    check("provenance counts stated in §5/§6.2",
-          (_tag["pi-note"], _tag["row-rule"], _tag["text-rule"]), (131, 102, 35))
-    check("every row-rule instance is a poison instance",
-          sorted({r["flag"].split(":", 1)[0] for r in _iv
-                  if r["note"].startswith("[row-rule]")}), ["poison"])
-    # the row rule must still hold instance by instance on the poison family
-    _poison_bad = []
-    for r in _iv:
-        if not r["flag"].startswith("poison:"):
-            continue
-        _want = last.get(int(r["row_id"]), {}).get("label") == "tp"
-        if (r["instance_verdict"] == "supported") != _want:
-            _poison_bad.append((r["row_id"], r["flag"], r["instance_verdict"]))
-    check("poison instances agree with the row rule", _poison_bad, [])
-    # per-class cells: artifact vs both manuscripts
+
     _csv_cells = collections.defaultdict(lambda: [0, 0])
     for r in _iv:
         _c = r["flag"].split(":", 1)[1]
-        _csv_cells[_c][0] += r["instance_verdict"] == "supported"
+        _csv_cells[_c][0] += r["supported"] == "1"
         _csv_cells[_c][1] += 1
     check("artifact classes", len(_csv_cells), 13)
     for _f in ("paper/main.md", "paper/main_clean.md"):
@@ -502,15 +552,12 @@ else:
                       r"\|\s*[*`]([a-z_]+)[*`](?:\s*\(channel\))?\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|",
                       _t)}
         check(f"{_f}: per-class rows parsed", len(_cells), 13)
-        # the manuscript cell is (supported, unsupported); the artifact holds
-        # (supported, total), so compare against the complementary column
         _drift = [(_c, _cells.get(_c), (_csv_cells[_c][0], _csv_cells[_c][1] - _csv_cells[_c][0]))
                   for _c in sorted(_csv_cells)
                   if _cells.get(_c) is None
                   or (_cells[_c][0], _cells[_c][1])
                   != (_csv_cells[_c][0], _csv_cells[_c][1] - _csv_cells[_c][0])]
         check(f"{_f}: every per-class cell equals the instance counts", _drift, [])
-        # the published rate column must be supported / total, not a stale rate
         _rbad = [(_c, _cells[_c][2], f"{_csv_cells[_c][0] / _csv_cells[_c][1]:.2f}")
                  for _c in sorted(_csv_cells)
                  if _cells.get(_c)
@@ -520,6 +567,13 @@ else:
         check(f"{_f}: family rates present",
               all(s in _t for s in ("44/102 (43.14%)", "32/42 (76.19%)",
                                     "6 of 124 instances (4.84%)", "75/251 (29.88%)")), True)
+        check(f"{_f}: provenance counts present",
+              ("**132 instances**" in _t and "**136**" in _t), True)
+        check(f"{_f}: full-text join stated",
+              ("150 rows, 107 exact, 43" in _t and "none excerpt-only" in _t), True)
+        check(f"{_f}: row-label conflicts logged, not absorbed",
+              "logged rather than absorbed" in _t, True)
+
     # class-level shape stated in §6.1, and the stratum split stated in §6.1/§6.2
     _half = {c: (_csv_cells[c][0], _csv_cells[c][1] - _csv_cells[c][0]) for c in _csv_cells}
     check("classes with more unsupported than supported instances",
@@ -539,15 +593,15 @@ else:
     _ctl_iv = [r for r in _iv if int(r["row_id"]) in _ctl_ids]
     check("control-row instances in the artifact", len(_ctl_iv), 5)
     check("supported control-row instances",
-          sum(1 for r in _ctl_iv if r["instance_verdict"] == "supported"), 4)
+          sum(1 for r in _ctl_iv if r["supported"] == "1"), 4)
     check("the unsupported control instance is row 119 channel:model_addressed",
-          [(r["row_id"], r["flag"]) for r in _ctl_iv
-           if r["instance_verdict"] == "unsupported"],
+          [(r["row_id"], r["flag"]) for r in _ctl_iv if r["supported"] == "0"],
           [("119", "channel:model_addressed")])
     check("top-score stratum supported instances",
           (sum(1 for r in _iv if int(r["row_id"]) not in _ctl_ids
-               and r["instance_verdict"] == "supported"),
+               and r["supported"] == "1"),
            len(_iv) - len(_ctl_iv)), (78, 263))
+
     # summary artifact agrees with the verdicts
     _sum_path = p("data", "instance_summary.csv")
     if os.path.exists(_sum_path):
@@ -558,8 +612,21 @@ else:
         check("instance_summary poison row", _sm.get("poison"), (6, 124))
         check("instance_summary capability row", _sm.get("capability"), (44, 102))
         check("instance_summary channel row", _sm.get("channel"), (32, 42))
+        _sm_drift = [(c, _sm.get(c), (_csv_cells[c][0], _csv_cells[c][1]))
+                     for c in sorted(_csv_cells)
+                     if _sm.get(c) != (_csv_cells[c][0], _csv_cells[c][1])]
+        check("instance_summary every class row", _sm_drift, [])
     else:
         check("data/instance_summary.csv exists", False, True)
+
+    # (d) the ledger's headline record is the same recomputation
+    _led = [json.loads(x) for x in open(p("claims_ledger.jsonl"), encoding="utf-8")
+            if x.strip()]
+    _rec = next((r for r in _led if r.get("claim_id") == "C-030"), None)
+    check("ledger record C-030 exists", _rec is not None, True)
+    if _rec:
+        check("ledger headline equals the recomputed artifact",
+              (_rec.get("numerator"), _rec.get("denominator")), (_supported, len(_iv)))
 
 # ------------------------------------------------------------------- verdict
 print()

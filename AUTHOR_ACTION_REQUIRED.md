@@ -109,7 +109,7 @@ RA-07 still needs one verified sub-count: the server→repository mapping, deriv
 
 RA-01 is blocked on A1 above.
 
-## A8 — A true per-instance adjudication does not exist
+## A8 — per-instance adjudication (CLOSED 2026-10-14; full-text re-run 2026-10-17)
 
 **Affected claims:** the per-class text-support figures in §6.2, the family split, and every
 denominator derived from them (poison 6/124, capability 44/102, channel 32/42, all-family 82/268).
@@ -127,54 +127,62 @@ rationales already contain class-level evidence the current rule discards — e.
 plausibly **move** the per-class numbers in both directions. That is a new annotation task, not an
 edit.
 
-**CLOSED (2026-10-14, full instance pass).** All **268** fired flag instances now carry an
-independent verdict — supported / unsupported — made against the stored text and recorded with a
-verbatim evidence quote in **`data/INSTANCE_VERDICTS.csv`** (`row_id | flag | instance_verdict |
-evidence_quote | note`), produced by `pilot/adjudicate_instances.py` and summarized with Wilson
-intervals in `data/instance_summary.csv`. The manuscript is regenerated from that artifact: §5 calls
-the apportionment a **first-pass default** and states that the full instance data now exists; §6.2's
-table is the instance table; §6.1 carries the recomputed family and class figures.
+**CLOSED (2026-10-14; re-run on full text 2026-10-17, rule version A8-r2).** All **268**
+fired flag instances carry an independent verdict — supported / unsupported — made against the
+**full stored text** rather than the 300-character excerpt the detector scanned, and recorded with a
+verbatim quote in **`data/INSTANCE_VERDICTS.csv`** (`row_id | flag | supported | unsupported |
+evidence_quote | note`), produced by `pilot/adjudicate_instances.py`, which also writes the join
+audit `data/instance_join.csv` and the reconciliation record `data/a8_reconciliation.md`.
 
-**What the pass found** (the numbers were expected to move, and they did — this is measured truth,
-not a rule change): poison family **6/124** unchanged (the row rule and the instance rule agree on
-every poison instance), the four note-adjudicated cells unchanged (`cross_tool_shadowing` 1/4,
-`stealth_concealment` 0/9), and the capability and channel families **substantially higher** because
-the apportionment had inherited support from the *row*: capability 5/102 → **44/102**
-(`database_write` and `file_write_delete` 0/4 → 2/4 each, `secret_env_access` 3/53 → 28/53,
-`network_egress` 0/21 → 11/21), channel 4/42 → **32/42** (`model_addressed` 0/21 → 19/21,
-`second_person_imperative` 4/21 → 13/21) — the very 16-rationale discrepancy this note predicted, and
-one disagreement in the other direction resolved in favour of the instance (`file_read_sensitive`
-1/2 → 0/2, honouring row 94's note). All-family headline 15/268 → **82/268 (30.60%)**, stratum
-15/263 → **78/263 (29.66%)** (the five control channel instances are four supported + one
-`model_addressed` over-trigger, not five unsupported), cluster collapse 13/251 → **75/251 (29.88%)**.
-Two §6.2 rate cells that had been carried over from the pre-adjudication table as `1.00` are corrected
-to **0.50** (`database_write`, `file_write_delete`).
+**The join is the provable one.** A row's excerpt resolves to exactly one stored description that
+starts with it: **150/150** rows — **107** exact, **43** where the stored text is longer than the
+excerpt (longest **1,547** characters), **none** excerpt-only. This is load-bearing, not
+housekeeping: `(server_name, tool_name)` is **not unique** in the corpus (74 of the 150 sample rows
+sit on a key carrying more than one distinct description, and `generic:unnamed` is a catch-all), and
+the r1 join heuristic resolved **20** rows to a *different tool's* text. Those rows now quote their
+own text. No verdict changed.
 
-**Recorded and enforced:** `claims_ledger.jsonl` **C-028** (the instance artifact and the recomputed
-figures), **C-029** (the rate-cell correction), with C-004/C-005/C-007/C-008/C-009/C-020/C-023/C-027
-marked superseded; `scripts/verify_claims.py` **C15** ties `data/INSTANCE_VERDICTS.csv` to both
-manuscripts cell by cell (including the rate column), to the family sums and to the 268-instance
-coverage, while C11/C14 still reproduce the historical apportioned table.
+**No verdict is inherited from a row label.** r1 decided 102 poison instances from the row verdict
+(provenance `row-rule`). r2 adjudicates **all 124** poison instances individually against the text,
+through an explicit table in the producer, and logs a conflict with the row label instead of bending
+to it. The conflict set is **empty** — the pass agrees with the five TP row labels instance by
+instance. Rows 19, 33 and 55 are same-server false-positive instances that **remain in the
+`cross_tool_shadowing` denominator** (1 supported / 3 unsupported = 0.25) and are counted
+unsupported; nothing is moved out of that denominator.
 
-**Human residual (not closed by this pass).** The verdicts are **text-bound and evidence-linked**, but
-their provenance is mixed and tagged per instance: **131** are typed from the PI's own frozen row
-notes (`pi-note`), **102** poison-family instances follow the PI's own row verdict directly
-(`row-rule` — the row labels are PI judgments, so these inherit a human decision), and **35**
-capability/channel instances are assistant-drafted, text-bound adjudications of candidate flags
-(each with a verbatim quote from the stored text) marked in the §5/§6.2 text as **pending PI
-sign-off**. The PI should walk the 35 `text-rule` rows in `data/INSTANCE_VERDICTS.csv` and either
-accept or override them — that review changes no published number unless a verdict flips, and the
-173 pi-note + row-rule instances already rest on the PI's own judgments.
+**What the pass found.** The published numbers are unchanged from the 2026-10-14 pass — that pass
+was already measured on the text, and r2 changed provenance and evidence, not verdicts: poison
+**6/124 (4.84%)**, `cross_tool_shadowing` 1/4, `stealth_concealment` 0/9, capability **44/102**,
+channel **32/42**, all-family **82/268 (30.60%)**, top-score stratum **78/263 (29.66%)**, duplicate-name
+collapse **75/251 (29.88%)**; two §6.2 rate cells corrected to **0.50** (`database_write`,
+`file_write_delete`). The apportionment's move (capability 5/102 → 44/102, channel 4/42 → 32/42,
+`secret_env_access` 3/53 → 28/53, `file_read_sensitive` 1/2 → 0/2 on row 94's note) is recorded in
+C-028 and `data/validation_family_split.csv`, which stays as the historical first-pass figure.
 
-**Acceptance criterion:** met — an instance-level annotation artifact exists and the per-class table
-is regenerated from it, with the old apportioned figures preserved as historical
-(`data/validation_family_split.csv`, still reproduced by C11).
+**Recorded and enforced.** `claims_ledger.jsonl` **C-028** (the instance artifact and the recomputed
+figures), **C-029** (rate-cell correction), **C-030** (full-text re-adjudication, no row-label
+provenance), with C-004/C-005/C-007/C-008/C-009/C-020/C-023/C-027 marked superseded. `scripts/
+verify_claims.py` **C15** is structural and now checks: 268 unique `(row_id, flag)` pairs with no
+duplicates and no gaps against the frozen frame; exactly one of supported/unsupported per row; every
+evidence quote a substring of that row's **full** stored text; both manuscripts' per-class cells,
+rate column, family sums and headline equal to a direct recomputation; and the ledger's headline
+record equal to it. C11/C14 still reproduce the historical apportioned table.
 
-**Blocks submission?** No. The table is now derived from instance verdicts rather than a row-level
-default, and the residual is a sign-off, not a measurement gap. The calibration claim (§6.1) is
-unchanged in substance: the **poison family is still 6/124 = 4.84%**, and that is the number the
-paper's calibration argument rests on — the all-family rate rose because it counts trigger
-justification in the capability and channel families, which §6.2 now says explicitly.
+**Human residual (not closed by this pass).** The verdicts are text-bound and evidence-linked, but
+provenance is mixed and tagged per instance: **132** typed from the PI's own frozen row notes
+(`pi-note`) and **136** assistant-drafted, text-bound adjudications (`text-rule`, each with a full-text
+quote). The PI should walk the 136 `text-rule` rows and accept or override them — that review changes
+no published number unless a verdict flips. Adjudication date **2026-10-17**, rule version **A8-r2**.
+The AI-assisted pass corrects instance-level data only; it is **not** an independent human
+reliability measurement and must not be reported as one.
+
+**Acceptance criterion:** met — an instance-level annotation artifact exists, every verdict is judged
+against the full stored text, and the per-class table is regenerated from it, with the old apportioned
+figures preserved as historical (`data/validation_family_split.csv`, still reproduced by C11).
+
+**Blocks submission?** No. The residual is a sign-off pass, not a measurement gap. The calibration
+claim is unchanged in substance: the **poison family is 6/124 = 4.84%**, and the all-family rate is a
+trigger-justification rate across three families, not a poisoning prevalence — §6.2 says so explicitly.
 
 ## A9 — the FL "exec-priming" live result is a text-propagation count, not execution adoption
 
