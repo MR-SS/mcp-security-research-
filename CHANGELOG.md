@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — methods-reporting revision
+## v1.1.1 — methods-reporting revision
 
 This revision changes no raw corpus record, row-level label, instance verdict, or trial
 transcript. It makes the submission manuscript easier to audit by recording the frozen

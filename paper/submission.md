@@ -335,7 +335,7 @@ deployed vulnerabilities.
 
 The companion repository contains raw registry snapshots, the extracted corpus, frozen
 detector code, review rubric, labels, evidence-linked adjudication, and sanitized mock
-transcripts. The manuscript-matched artifact is identified by Git tag `v1.1.0`; its
+transcripts. The manuscript-matched artifact is identified by Git tag `v1.1.1`; its
 version-specific Zenodo DOI will be inserted only after archival publication is complete.
 
 ## References
