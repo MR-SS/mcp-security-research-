@@ -15,6 +15,8 @@ local stub client and touches no network (see selftest.py).
 """
 from __future__ import annotations
 
+import copy
+import hashlib
 import json
 import os
 import re
@@ -96,7 +98,7 @@ TASKS = {
 }
 
 
-def fixture_tool(case_id: str) -> MockTool:
+def fixture_tool(case_id: str, description_override: Optional[str] = None) -> MockTool:
     """Import the case's mock module lazily; register its MockTool."""
     module = {
         "wf": "wf_verify",
@@ -108,11 +110,18 @@ def fixture_tool(case_id: str) -> MockTool:
     }[case_id]
     import importlib
 
-    return getattr(importlib.import_module(f"experiments.mocks.{module}"), "MOCK")
+    tool = getattr(importlib.import_module(f"experiments.mocks.{module}"), "MOCK")
+    if description_override is None:
+        return tool
+    # A matched ablation changes exactly one field: the case tool description.
+    # The tool name, JSON Schema, dispatcher, fillers, task and system prompt are fixed.
+    schema = copy.deepcopy(tool.schema)
+    schema["function"]["description"] = description_override
+    return MockTool(tool.name, schema, tool.dispatch)
 
 
-def build_tools(case_id: str) -> List[MockTool]:
-    return [fixture_tool(case_id), *FILLER_TOOLS]
+def build_tools(case_id: str, description_override: Optional[str] = None) -> List[MockTool]:
+    return [fixture_tool(case_id, description_override), *FILLER_TOOLS]
 
 
 def build_request_payload(model: str, messages: List[dict], tools: List[MockTool],
@@ -327,11 +336,13 @@ def judge(case_id: str, transcript: List[dict], tool_log: List[dict]) -> dict:
 # Trial runner
 # --------------------------------------------------------------------------
 def run_trial(model: str, case_id: str, rep: int, out_dir: Path,
-              client: Optional[Context] = None, register: bool = False) -> dict:
+              client: Optional[Context] = None, register: bool = False,
+              description_override: Optional[str] = None,
+              variant: str = "source", ledger_path: Optional[Path] = None) -> dict:
     if case_id not in CASES:
         raise ValueError(f"unknown case {case_id!r}; known: {', '.join(CASES)}")
     verify_against_corpus()  # fail loudly on any fixture drift (§0)
-    tools = build_tools(case_id)
+    tools = build_tools(case_id, description_override)
     tool_by_name = {t.name: t for t in tools}
 
     messages: List[dict] = [
@@ -343,16 +354,20 @@ def run_trial(model: str, case_id: str, rep: int, out_dir: Path,
 
     out_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    path = out_dir / f"{case_id}_{model}_{rep}_{ts}.jsonl"
+    path = out_dir / f"{case_id}_{variant}_{model}_{rep}_{ts}.jsonl"
+    effective_description = tools[0].schema["function"]["description"]
 
     def emit(record: dict) -> None:
         with open(path, "a", encoding="utf-8") as fh:
             fh.write(json.dumps(redact(record), ensure_ascii=False) + "\n")
 
     emit({"ts": datetime.now(timezone.utc).isoformat(), "event": "trial_header",
-          "model": model, "case": case_id, "rep": rep, "max_turns": MAX_TURNS,
+          "model": model, "case": case_id, "variant": variant, "rep": rep, "max_turns": MAX_TURNS,
           "fixture": {"name": FIXTURES[case_id].name, "row_id": FIXTURES[case_id].row_id,
-                      "sha256": FIXTURES[case_id].sha256, "role": FIXTURES[case_id].role},
+                      "source_sha256": FIXTURES[case_id].sha256,
+                      "effective_description_sha256": hashlib.sha256(
+                          effective_description.encode("utf-8")).hexdigest(),
+                      "role": FIXTURES[case_id].role},
           "env": {"OPENAI_BASE_URL": "<set>" if client else "<offline-stub>",
                   "OPENAI_API_KEY": "<set>" if client else "<offline-stub>"}})
 
@@ -368,14 +383,14 @@ def run_trial(model: str, case_id: str, rep: int, out_dir: Path,
         if isinstance(raw, dict) and "__infra__" in raw:
             infra = {"ts": datetime.now(timezone.utc).isoformat(),
                      "event": "trial_record", "model": model, "case": case_id,
-                     "rep": rep, "verdict": "infra_failure", "criterion": "INFRA",
+                     "variant": variant, "rep": rep, "verdict": "infra_failure", "criterion": "INFRA",
                      "evidence": f"{raw['__infra__']} after 1 retry (round {turn})",
                      "transcript": path.name, "git_dirty": _git_dirty()}
             emit(infra)
             if register:
                 _register_run(model, case_id, rep,
                               {"verdict": "infra_failure", "criterion": "INFRA"},
-                              path.name)
+                              path.name, variant=variant, ledger_path=ledger_path)
             print(f"  [infra] {model} {case_id} rep{rep}: {infra['evidence']} "
                   f"— excluded from ASR (§6), resume skips it")
             return infra
@@ -417,13 +432,14 @@ def run_trial(model: str, case_id: str, rep: int, out_dir: Path,
 
     verdict = judge(case_id, transcript, tool_log)
     record = {"ts": datetime.now(timezone.utc).isoformat(), "event": "trial_record",
-              "model": model, "case": case_id, "rep": rep,
+              "model": model, "case": case_id, "variant": variant, "rep": rep,
               "verdict": verdict["verdict"], "criterion": verdict["criterion"],
               "evidence": verdict["evidence"], "transcript": path.name,
               "git_dirty": _git_dirty()}
     emit(record)
     if register:
-        _register_run(model, case_id, rep, verdict, path.name)
+        _register_run(model, case_id, rep, verdict, path.name,
+                      variant=variant, ledger_path=ledger_path)
     return record
 
 
@@ -438,12 +454,13 @@ def _git_dirty() -> bool:
         return True
 
 
-def _register_run(model: str, case_id: str, rep: int, verdict: dict, transcript_name: str) -> None:
+def _register_run(model: str, case_id: str, rep: int, verdict: dict, transcript_name: str,
+                  variant: str = "source", ledger_path: Optional[Path] = None) -> None:
     """Append the per-trial outcome to the ASR ledger (counts first, protocol §7)."""
-    log = REPO_ROOT / "data" / "live_tests" / "trials_ledger.jsonl"
+    log = ledger_path or REPO_ROOT / "data" / "live_tests" / "trials_ledger.jsonl"
     log.parent.mkdir(parents=True, exist_ok=True)
     entry = {"ts": datetime.now(timezone.utc).isoformat(), "model": model,
-             "case": case_id, "rep": rep, "verdict": verdict["verdict"],
+             "case": case_id, "variant": variant, "rep": rep, "verdict": verdict["verdict"],
              "criterion": verdict["criterion"], "transcript": transcript_name,
              "git_dirty": _git_dirty()}
     with open(log, "a", encoding="utf-8") as fh:

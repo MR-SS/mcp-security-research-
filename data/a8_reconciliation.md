@@ -28,4 +28,5 @@ The instance verdict is never bent toward the frozen row label. Entries below ar
 
 - `pi-note`: 132 instances typed by the PI's own frozen row note.
 - `text-rule`: 136 assistant-drafted, text-bound adjudications against the full stored text.
-- The AI-assisted pass corrects instance-level data. It is **not** an independent human reliability measurement and must not be reported as one. PI sign-off on the text-rule rows remains the author action (`AUTHOR_ACTION_REQUIRED.md` A8).
+- **Human sign-off closed 2026-10-28:** the PI reviewed and accepted all 136 `text-rule` verdicts in the append-only `data/instance_signoffs.jsonl`; no final sign-off differs from the frozen table.
+- The AI-assisted pass supplied drafts, not an independent human rater. The completed sign-off is not an inter-rater reliability measurement and must not be reported as one.

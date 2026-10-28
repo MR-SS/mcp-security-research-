@@ -170,13 +170,13 @@ evidence quote a substring of that row's **full** stored text; both manuscripts'
 rate column, family sums and headline equal to a direct recomputation; and the ledger's headline
 record equal to it. C11/C14 still reproduce the historical apportioned table.
 
-**Human residual (not closed by this pass).** The verdicts are text-bound and evidence-linked, but
-provenance is mixed and tagged per instance: **132** typed from the PI's own frozen row notes
-(`pi-note`) and **136** assistant-drafted, text-bound adjudications (`text-rule`, each with a full-text
-quote). The PI should walk the 136 `text-rule` rows and accept or override them — that review changes
-no published number unless a verdict flips. Adjudication date **2026-10-17**, rule version **A8-r2**.
-The AI-assisted pass corrects instance-level data only; it is **not** an independent human
-reliability measurement and must not be reported as one.
+**Human sign-off (closed 2026-10-28).** The verdicts are text-bound and evidence-linked, with
+provenance tagged per instance: **132** typed from the PI's own frozen row notes (`pi-note`) and
+**136** assistant-drafted, text-bound adjudications (`text-rule`, each with a full-text quote).
+The PI reviewed and accepted all 136 `text-rule` rows in the append-only
+`data/instance_signoffs.jsonl`; no final sign-off changed a frozen verdict. The AI-assisted pass
+supplied drafts only; this is not an independent human reliability measurement and must not be
+reported as one.
 
 **Acceptance criterion:** met — an instance-level annotation artifact exists, every verdict is judged
 against the full stored text, and the per-class table is regenerated from it, with the old apportioned

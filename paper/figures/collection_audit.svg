@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="410" viewBox="0 0 900 410" role="img" aria-labelledby="title desc">
+  <title id="title">Registry collection and audit flow</title>
+  <desc id="desc">A flow diagram from 60,000 registry version records to 16,763 source-extracted descriptions, 698 poison-pattern candidates, and a 150-row purposive review with five supported rows.</desc>
+  <style>
+    text{font-family:Arial,Helvetica,sans-serif;fill:#1f2933}.h{font-size:19px;font-weight:700}.n{font-size:25px;font-weight:700}.l{font-size:14px}.s{font-size:12px;fill:#52616b}.box{rx:10;ry:10;stroke-width:1.2}.arrow{stroke:#8091a0;stroke-width:2;fill:none;marker-end:url(#a)}
+  </style>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8091a0"/></marker></defs>
+  <text x="40" y="36" class="h">From registry records to the purposive audit</text>
+  <text x="40" y="59" class="s">Counts at each stage are descriptive; the review stratum is not a population sample.</text>
+  <rect x="40" y="94" width="178" height="92" class="box" fill="#e8f1fb" stroke="#4d83b7"/>
+  <text x="129" y="128" text-anchor="middle" class="n">60,000</text><text x="129" y="151" text-anchor="middle" class="l">version records</text><text x="129" y="171" text-anchor="middle" class="s">cursor-bounded prefix</text>
+  <path d="M218 140H264" class="arrow"/>
+  <rect x="267" y="94" width="178" height="92" class="box" fill="#e8f1fb" stroke="#4d83b7"/>
+  <text x="356" y="128" text-anchor="middle" class="n">17,167</text><text x="356" y="151" text-anchor="middle" class="l">latest server records</text><text x="356" y="171" text-anchor="middle" class="s">after deduplication</text>
+  <path d="M445 140H491" class="arrow"/>
+  <rect x="494" y="94" width="178" height="92" class="box" fill="#e8f1fb" stroke="#4d83b7"/>
+  <text x="583" y="128" text-anchor="middle" class="n">11,288</text><text x="583" y="151" text-anchor="middle" class="l">GitHub-linked servers</text><text x="583" y="171" text-anchor="middle" class="s">public source only</text>
+  <path d="M672 140H718" class="arrow"/>
+  <rect x="721" y="94" width="138" height="92" class="box" fill="#e8f1fb" stroke="#4d83b7"/>
+  <text x="790" y="128" text-anchor="middle" class="n">16,763</text><text x="790" y="151" text-anchor="middle" class="l">tool descriptions</text><text x="790" y="171" text-anchor="middle" class="s">4,725 repositories</text>
+  <path d="M790 186V230" class="arrow"/>
+  <rect x="654" y="234" width="205" height="88" class="box" fill="#fff2dc" stroke="#db9d3c"/>
+  <text x="756" y="267" text-anchor="middle" class="n">698</text><text x="756" y="290" text-anchor="middle" class="l">poison-pattern candidates</text><text x="756" y="309" text-anchor="middle" class="s">scanner output, not findings</text>
+  <path d="M654 278H535" class="arrow"/>
+  <rect x="321" y="234" width="211" height="88" class="box" fill="#f3edf9" stroke="#8c6bb1"/>
+  <text x="426" y="267" text-anchor="middle" class="n">150</text><text x="426" y="290" text-anchor="middle" class="l">rows reviewed in full</text><text x="426" y="309" text-anchor="middle" class="s">100 high-score + 50 controls</text>
+  <path d="M321 278H202" class="arrow"/>
+  <rect x="40" y="234" width="159" height="88" class="box" fill="#e8f4ea" stroke="#5d9c6b"/>
+  <text x="119" y="267" text-anchor="middle" class="n">5 / 100</text><text x="119" y="290" text-anchor="middle" class="l">supported rows</text><text x="119" y="309" text-anchor="middle" class="s">in high-score stratum</text>
+  <line x1="40" y1="357" x2="859" y2="357" stroke="#d5dde3"/>
+  <text x="40" y="384" class="s">The figure separates coverage, detector candidates, and text-bound review outcomes; it does not estimate malicious prevalence.</text>
+</svg>

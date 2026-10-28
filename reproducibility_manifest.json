@@ -85,17 +85,17 @@
   "derived_artifacts": [
     {
       "path": "paper/main.md",
-      "sha256": "bd4e27f0e22b048a2d91ef68bf516cc0fc085c9111822407e30a897284462223",
-      "role": "traceable manuscript record (edited this revision: 2026-10-17b)",
+      "sha256": "3b246aec366c9119ce280920d38e9ac779f72f5748bf881b3c99c76d331715b3",
+      "role": "traceable manuscript record (A8 sign-off and A10 source-neutral wording synchronized 2026-10-28)",
       "status": "derived",
-      "bytes": 81958
+      "bytes": 83026
     },
     {
       "path": "paper/main_clean.md",
-      "sha256": "b07c8ba594c4b819600a7cee6b516aaa88f666d94d6fe9ae4972783df6afb7c4",
-      "role": "authoritative publication copy (edited this revision: 2026-10-17b)",
+      "sha256": "e66e184651daaecb2b58cbd8c386824f9ff02cda51a1cf6e826687bdf26c146e",
+      "role": "authoritative publication copy (A8 sign-off and A10 source-neutral wording synchronized 2026-10-28)",
       "status": "derived",
-      "bytes": 79300
+      "bytes": 80368
     },
     {
       "path": "paper/preview/paper.html",
@@ -169,10 +169,10 @@
     },
     {
       "path": "scripts/verify_claims.py",
-      "sha256": "5e116e6574dd93639dd92b87b62772f2998c53f0f1fa7f79cb17d1e2950e4b91",
+      "sha256": "c14998a0ecddfcca4ebbfc64b63c1d47b08073032eb2dccd11a96747de69c103",
       "role": "offline verification entry point",
       "status": "derived",
-      "bytes": 37370
+      "bytes": 38928
     },
     {
       "path": "REVISION_AUDIT.md",
@@ -183,10 +183,10 @@
     },
     {
       "path": "AUTHOR_ACTION_REQUIRED.md",
-      "sha256": "2fcf7eba4f4d13235bcd9cec85bee3112e6282dfe2b2b98160fa5ec4bd07f15c",
+      "sha256": "90065417cc6828b16b10222fea8f954a06209dc079348e7e8188b71283f02320",
       "role": "human-dependency list",
       "status": "derived",
-      "bytes": 15754
+      "bytes": 15672
     },
     {
       "path": "REVISION_REPORT.md",
@@ -231,11 +231,74 @@
       "bytes": 11331
     },
     {
+      "path": "data/live_tests/ablation_trials_ledger.jsonl",
+      "role": "append-only 36-cell WF/DP matched source-versus-neutral ablation ledger; last attempt per cell is authoritative",
+      "status": "derived",
+      "sha256": "c85e88d7d67922a9070631540f3ff9b2b7da3fa90b0ee037cd594d2337ecd279",
+      "bytes": 13639
+    },
+    {
+      "path": "experiments/run_ablation.py",
+      "role": "A10 matched-description ablation runner with one end-of-batch infrastructure retry",
+      "status": "derived",
+      "sha256": "c00a9a43d777033a4fecff8d2e0b25266b9ac07eed3d082c2a9a14da0afe0447",
+      "bytes": 6077
+    },
+    {
+      "path": "experiments/summarize_ablation.py",
+      "role": "recomputes final last-wins A10 cells and source/neutral counts",
+      "status": "derived",
+      "sha256": "f24ccc66b96fa47d516194e423e4f6b9abd3489c35f80141365cd0b880c1c3b5",
+      "bytes": 2201
+    },
+    {
+      "path": "data/instance_signoffs.jsonl",
+      "role": "append-only PI review decisions for the 136 A8 text-rule verdicts; last decision per row_id|flag is authoritative",
+      "status": "derived",
+      "sha256": "f82c8e1f3e0ba9c7b10aa1307e0647474835485bb000d2711b5693b50f910642",
+      "bytes": 41822
+    },
+    {
       "path": "data/a8_reconciliation.md",
       "role": "A8-r2 adjudication rule, row-label conflict log (empty), denominator framing for rows 19/33/55, near-miss list, provenance note",
       "status": "derived",
-      "sha256": "03d75923b7999ef15fde592dc4cdfb09182a37d635c1b5c03c167e68fcd84efb",
-      "bytes": 2411
+      "sha256": "52b0ab2cb7ac22a4fb70e4f5f9e0f535d57b1addc5e2a6b5f043484695f9b629",
+      "bytes": 2544
+    },
+    {
+      "path": "paper/submission.md",
+      "role": "focused submission manuscript with verified references, review tables, and A10 model-level results",
+      "status": "derived",
+      "sha256": "dddabb7c442d9cd0e0d48fcd8e13c599a90af50f29a7698b6ecdec64e7ccab3f",
+      "bytes": 20854
+    },
+    {
+      "path": "paper/REFERENCE_AUDIT.md",
+      "role": "source-by-source audit of every reference in the submission manuscript",
+      "status": "derived",
+      "sha256": "ca7784f5b481e44c0a70633f853b87b5c53103b0b2c27add25c5864feafcaea3",
+      "bytes": 1632
+    },
+    {
+      "path": "paper/figures/collection_audit.png",
+      "role": "collection and purposive-review flow figure for the submission manuscript",
+      "status": "derived",
+      "sha256": "06b9a8341b6488ca52665fe96a4c37339ab2b14d2ae3873be343e21d17bb1f74",
+      "bytes": 244695
+    },
+    {
+      "path": "paper/figures/ablation_results.png",
+      "role": "matched WF/DP source-neutral ablation figure for the submission manuscript",
+      "status": "derived",
+      "sha256": "ded0b557d23dd47abee2caaba64aa6201ec3ec710d1826212574fce02aae4808",
+      "bytes": 154669
+    },
+    {
+      "path": "output/pdf/mcp_security_measurement_submission.pdf",
+      "role": "rendered submission PDF from paper/submission.md",
+      "status": "derived",
+      "sha256": "c799b140962a45ed8489671c411ad66a1f7bdc3071f9dadd6759146067cf7f37",
+      "bytes": 382034
     }
   ],
   "sample_identity": {

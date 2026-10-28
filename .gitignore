@@ -10,5 +10,8 @@ __pycache__/
 .hermes/
 .cache/
 
+# Local render scratch space (release PDFs live under output/pdf/)
+tmp/
+
 # LaTeX build artifact — ship the .tex, never the compiled PDF
 paper/latex/main.pdf

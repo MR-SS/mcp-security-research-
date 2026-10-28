@@ -229,14 +229,14 @@ REQUIRED = ["78/263 = 29.66%", "four supported channel instances",
             "same-server toolkit", "data/INSTANCE_VERDICTS.csv",
             "82 are supported by the stored", "44/102 (43.14%)", "32/42 (76.19%)",
             "instance-level text-support rate 82/268, 30.6%", "75/251 (29.88%)",
-            "78/263 = 29.66%", "69.4%", "pending PI sign-off",
+            "78/263 = 29.66%", "69.4%", "reviewed and accepted by the PI",
             # RA-21: the FL arm is reported as propagation, not adoption.
             "marker-presence test", "text-propagation", "0/9",
-            # A9 option C: FL is task-conflated; the live matrix tests two of four.
-            "WF+DP only", "two of the four", "task-conflated",
-            "5/6, deepseek-v4.1-flash 6/6",
+            # A10: only WF's matched source/neutral comparison supports a wording claim.
+            "task-conflated", "Matched description ablation", "task-confounded",
+            "6/9", "0/9",
             # Phase-set D statistical caveats (3.8-3.12) + §2/§10 wording.
-            "independent Bernoulli draws", "interchangeability we do not claim",
+            "independent Bernoulli draws",
             "modeling assumption", "directional hypothesis, not a bound",
             "we found no standard mechanism", "No CVEs have been filed (as of"]
 for f in ("paper/main.md", "paper/main_clean.md"):
@@ -670,6 +670,32 @@ else:
               "all unsupported" in _sent, False)
         check(f"{_f}: over-trigger row named in the control sentence",
               "row 119" in _sent, True)
+
+# -------- C17 matched description ablation: final cells and manuscript claims
+print("C17 matched WF/DP description ablation")
+_ablation = p("data", "live_tests", "ablation_trials_ledger.jsonl")
+if not os.path.exists(_ablation):
+    check("ablation ledger exists", False, True)
+else:
+    _attempts = [json.loads(x) for x in open(_ablation, encoding="utf-8") if x.strip()]
+    _last = {}
+    for _row in _attempts:
+        _last[(_row["case"], _row["variant"], _row["model"], _row["rep"])] = _row
+    _expected = {(c, v, m, r) for c in ("wf", "dp") for v in ("source", "neutral")
+                 for m in ("glm-5.3", "deepseek-v4.1-flash", "gemini-3.8-flash")
+                 for r in (1, 2, 3)}
+    check("ablation final cells", set(_last), _expected)
+    check("ablation final infra failures", sum(r["verdict"] == "infra_failure" for r in _last.values()), 0)
+    def _ab_count(case, variant):
+        return sum(r["verdict"] == "success" for (c, v, _m, _rep), r in _last.items()
+                   if (c, v) == (case, variant))
+    check("WF source / neutral", (_ab_count("wf", "source"), _ab_count("wf", "neutral")), (6, 0))
+    check("DP source / neutral", (_ab_count("dp", "source"), _ab_count("dp", "neutral")), (9, 9))
+    for _f in ("paper/main.md", "paper/main_clean.md", "paper/submission.md"):
+        _raw = open(p(*_f.split("/")), encoding="utf-8").read()
+        _flat = re.sub(r"\s+", " ", _raw)
+        check(f"{_f}: WF ablation claim", "6/9" in _flat and "0/9" in _flat, True)
+        check(f"{_f}: DP task-confounded claim", "task-confounded" in _flat, True)
 
 # ------------------------------------------------------------------- verdict
 print()

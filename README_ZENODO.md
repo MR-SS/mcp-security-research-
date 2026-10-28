@@ -1,6 +1,21 @@
-# Zenodo release — Calibrating the Alarms (v1.0.0)
-Registry-grounded, human-validated measurement of poisoning detectors on 16,763 MCP tool descriptions; code + data snapshot for citation via DOI.
-Frozen artifacts: `data/` (crawl, `github_tools.jsonl`, `labels.jsonl`, `analysis_toollevel.csv`, instance verdicts, live-test ledger), `claims_ledger.jsonl`, `reproducibility_manifest.json`, `paper/main_clean.md`, `paper/FACTS_VERIFIED.md`, `docs/`, `scripts/`, `experiments/` — hashes in the manifest; do not edit.
-Re-derive: `python3 scripts/gate_battery.py` (4/4) · `python3 scripts/verify_claims.py` (all claims) · `python3 experiments/trial_accounting.py --check` (54|54|51|3).
-Disclaimer: public metadata and public source only, no third-party server code executed; detector outputs are *candidates*, not verdicts, precision is sample-scoped; all genuine findings go through 90-day coordinated disclosure — contact the author before reuse.
-Snapshot pre-paper (arXiv pending); license MIT for code and data, manuscript CC BY 4.0.
+# Zenodo release — Calibrating the Alarms (v1.1.0)
+
+Manuscript-matched archive for *Calibrating the Alarms: A Registry-Grounded,
+Human-Validated Measurement of Poisoning Detectors on 16,763 MCP Tool
+Descriptions*.
+
+Frozen artifacts include the public registry snapshots, `github_tools.jsonl`,
+the 150-row frame and labels, `INSTANCE_VERDICTS.csv`, append-only instance
+sign-offs, the matched-ablation ledger and sanitized transcripts, manuscript
+sources and PDF, the claim ledger, and all verification scripts. Hashes appear
+in `reproducibility_manifest.json`.
+
+Re-derive: `python3 scripts/verify_claims.py`, `python3 scripts/gate_battery.py`,
+and `python3 experiments/summarize_ablation.py`.
+
+Public metadata and public source only; no third-party server code was executed.
+Detector outputs are candidates, not verdicts, and all support rates are
+sample-scoped. License: MIT for code/data; CC BY 4.0 for the manuscript.
+
+This archive supersedes Zenodo v1.0.0 (10.5281/zenodo.23435929). Insert the new
+version-specific DOI only after the Zenodo publication succeeds.

@@ -1,0 +1,14 @@
+Artifact: mcp_security_measurement_submission.pdf
+Generated: 2026-10-28 17:09:27 +0330
+Source: paper/submission.md
+Generator: Pandoc with pdfLaTeX
+Git HEAD at generation: b0e4d94
+Working-tree state at generation: dirty (see repository status recorded in the build session)
+SHA-256: c799b140962a45ed8489671c411ad66a1f7bdc3071f9dadd6759146067cf7f37
+
+Validation completed after generation:
+- python3 scripts/verify_claims.py (ALL CHECKS PASSED)
+- python3 scripts/gate_battery.py (BATTERY PASSED, 4/4)
+- PDF visual QA rendered with Poppler at 140 dpi (seven pages inspected, including both figures)
+- Reference audit: all ten retained references were checked against primary records; each is cited in the manuscript body.
+- Release-candidate synchronization: controls are explicitly non-informative for recall, and the WF/DP table reports every model-condition cell.

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430" role="img" aria-labelledby="title desc">
+  <title id="title">Matched description ablation results</title>
+  <desc id="desc">Bars show source and neutral outcomes in nine trials per mechanism. Workflow-priority capture was six of nine under source wording and zero of nine neutral. Credential funnel was nine of nine in both conditions and is task-confounded.</desc>
+  <style>
+    text{font-family:Arial,Helvetica,sans-serif;fill:#1f2933}.h{font-size:19px;font-weight:700}.l{font-size:15px}.s{font-size:12px;fill:#52616b}.v{font-size:16px;font-weight:700}.axis{stroke:#596b77;stroke-width:1}.grid{stroke:#d9e1e6;stroke-width:1}.source{fill:#397db7}.neutral{fill:#bcc9d3}
+  </style>
+  <text x="45" y="35" class="h">Matched description ablation in the mocked harness</text>
+  <text x="45" y="57" class="s">Same task, tool schema, fillers, gateway, models, and judge; only the tool description changed.</text>
+  <line x1="158" y1="110" x2="158" y2="320" class="axis"/><line x1="158" y1="320" x2="830" y2="320" class="axis"/>
+  <line x1="158" y1="250" x2="830" y2="250" class="grid"/><line x1="158" y1="180" x2="830" y2="180" class="grid"/><line x1="158" y1="110" x2="830" y2="110" class="grid"/>
+  <text x="145" y="324" text-anchor="end" class="s">0</text><text x="145" y="254" text-anchor="end" class="s">3</text><text x="145" y="184" text-anchor="end" class="s">6</text><text x="145" y="114" text-anchor="end" class="s">9</text>
+  <text x="52" y="195" class="l">Outcome trials</text><text x="52" y="214" class="s">per condition</text>
+  <rect x="273" y="180" width="92" height="140" class="source"/><rect x="382" y="320" width="92" height="0" class="neutral"/>
+  <text x="319" y="170" text-anchor="middle" class="v">6/9</text><text x="428" y="303" text-anchor="middle" class="v">0/9</text>
+  <rect x="600" y="110" width="92" height="210" class="source"/><rect x="709" y="110" width="92" height="210" class="neutral"/>
+  <text x="646" y="100" text-anchor="middle" class="v">9/9</text><text x="755" y="100" text-anchor="middle" class="v">9/9</text>
+  <text x="374" y="350" text-anchor="middle" class="l">Workflow-priority capture</text><text x="700" y="350" text-anchor="middle" class="l">Credential funnel</text>
+  <rect x="274" y="374" width="16" height="16" class="source"/><text x="297" y="387" class="s">source description</text><rect x="431" y="374" width="16" height="16" class="neutral"/><text x="454" y="387" class="s">neutral description</text>
+  <text x="45" y="416" class="s">Interpretation: wording contributed to priority capture in this harness; credential-funnel results are task-confounded and are not causal evidence.</text>
+</svg>
