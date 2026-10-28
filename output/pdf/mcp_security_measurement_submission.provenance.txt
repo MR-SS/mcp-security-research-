@@ -1,10 +1,10 @@
 Artifact: mcp_security_measurement_submission.pdf
-Generated: 2026-10-28 17:09:27 +0330
+Generated: 2026-10-28 17:14:33 +0330
 Source: paper/submission.md
 Generator: Pandoc with pdfLaTeX
-Git HEAD at generation: b0e4d94
-Working-tree state at generation: dirty (see repository status recorded in the build session)
-SHA-256: c799b140962a45ed8489671c411ad66a1f7bdc3071f9dadd6759146067cf7f37
+Git revision at manuscript freeze: 25caa8aed39f7ee5bd2330fa117a1d430cd77757
+Working-tree state at generation: manuscript-release metadata update pending commit
+SHA-256: 2c12ab9bbf7b43136edcaf7f37e385215637e6a496ca60330921f28ac51840ff
 
 Validation completed after generation:
 - python3 scripts/verify_claims.py (ALL CHECKS PASSED)
