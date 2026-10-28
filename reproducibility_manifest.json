@@ -269,15 +269,15 @@
       "path": "paper/submission.md",
       "role": "focused submission manuscript with verified references, review tables, and A10 model-level results",
       "status": "derived",
-      "sha256": "aaeb0cce18ff6add5985fea757765e94116fc04b5933e73970067177cf79a1b4",
+      "sha256": "e5ad26a63ced7505092fd2dc1ee38c94c97ac3042917319043fcab8fd7d1cd28",
       "bytes": 22753
     },
     {
       "path": "CHANGELOG.md",
       "role": "version-to-version reporting and adjudication provenance",
       "status": "derived",
-      "sha256": "fd55dca02a5b4ca8278814a07578b2d8a29a0cb257f6d78f4a8ff87195fa6286",
-      "bytes": 1281
+      "sha256": "b6cb883bf640562f8d6eff0768c9a70dfaea33b09c62e6c105122cd9241fc86f",
+      "bytes": 1277
     },
     {
       "path": "paper/REFERENCE_AUDIT.md",
@@ -304,8 +304,8 @@
       "path": "output/pdf/mcp_security_measurement_submission.pdf",
       "role": "rendered submission PDF from paper/submission.md",
       "status": "derived",
-      "sha256": "1b2525bb372dc97248ea8ffa05171d60b8fcb9abf9007a91f30c151188815f8c",
-      "bytes": 390506
+      "sha256": "6a989ef4ac1217617735b948458f1eed1b31f9c3a9c08b47eb20ff014fde8639",
+      "bytes": 390396
     }
   ],
   "sample_identity": {
