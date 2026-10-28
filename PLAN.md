@@ -96,6 +96,8 @@
 
 - [x] **Release-candidate synchronization (2026-10-28).** Manuscript sources, submission PDF, release metadata, and README were reconciled to the final A8 PI sign-off and A10 ablation ledger without changing frozen inputs or labels. The submission text now states that detector-negative controls do not estimate recall, reports model-level A10 cells, and uses source--neutral difference language for WF. Zenodo v1.1.0 publication remains contingent on a tag-backed archive and its version-specific DOI.
 
+- [x] **Methods-reporting revision (2026-10-28).** The submission manuscript now records the frozen detector identity and ranking rule, control-selection seed, author-adjudicated status, and the operational WF endpoint; it distinguishes 12 condition-cells from 36 trials and removes the unsupported detector-miss claim. No raw input, label, verdict, or transcript changed; `CHANGELOG.md` records the all-family 15/268 → 82/268 adjudication transition.
+
 | Week | Work | Deliverable |
 |---|---|---|
 | 1 | Read the 6 key papers (AGENTS.md §5) · run pilot pipeline · **start arXiv endorser search** | servers.jsonl (pilot) |
