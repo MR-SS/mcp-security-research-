@@ -49,8 +49,9 @@ The paper makes three contributions.
 1. A reproducible, registry-grounded corpus of 16,763 source-extracted tool descriptions,
    together with detector candidate rates and explicit coverage limits.
 2. A fixed high-score discovery sample reviewed under a text-bound rubric. The
-   central result is that only 6 of 124 poison-family flag instances are supported in
-   that purposive review stratum; the remaining detector output is best treated as a
+   primary result is five rubric-positive descriptions among 100 high-score rows.
+   Supplementary flag-level adjudication supports 6 of 124 poison-family instances in
+   the same purposive review stratum; the remaining detector output is best treated as a
    triage queue.
 3. An error taxonomy and a small mocked tool-calling study. Together, they
    distinguish instruction-shaped text worth reviewing from claims about deployed
@@ -120,7 +121,12 @@ purposive review frame so that those denominators are not conflated.
 
 ### 4.2 Frozen detector
 
-The detector uses frozen regular-expression checks. Its capability family covers network
+We evaluate an author-developed, frozen lexical baseline intended for candidate generation;
+it is not presented as representative of MCP security scanners generally. Version 1 of the
+baseline is recoverable at commit `6cca247`; version 2 retains its ranking rule and adds
+two separately reported instruction-channel checks. The baseline contains 18 checks: seven
+capability checks, nine poison checks (including two structural checks), and two channel
+checks. Its capability family covers network
 egress, shell execution, file access, secret/environment access, database writes, and
 package installation. Its poison family covers imperative-to-model, exfiltration,
 concealment, cross-tool shadowing, fake-system-role, important-tag, and sensitive-file
@@ -130,11 +136,21 @@ The detector is a candidate generator. It makes no verdict about malware, exploi
 or author intent. The current version adds channel measurements without changing the
 earlier suspicion-score definition used to select the review queue.
 
+| Reproducibility item | Frozen procedure |
+|---|---|
+| Ranking | `suspicion_score = capability flags + 3 × poison flags`; channel flags do not contribute |
+| Tie-breaking | Stable descending sort: ties retain corpus order |
+| High-score frame | First 100 rows after that ranking |
+| Controls | 50 uniform-random rows with zero capability and poison flags; channel flags may remain |
+| Control selection | Seed 42 over the frozen frame |
+| Review text | Full stored description, rather than the 300-character CSV excerpt |
+
 ### 4.3 Human review as discovery, not prevalence estimation
 
 A high-score discovery design was used to identify concrete instruction-shaped cases for
 close reading and safe mock evaluation. The fixed frame contains the top 100 rows by frozen
-suspicion score plus 50 randomly selected rows with no capability or poison flags. This
+suspicion score plus 50 randomly selected rows with no capability or poison flags; some
+controls can carry a channel flag. This
 design is useful for finding rare cases; it is not a probability sample of all detector
 hits.
 
@@ -149,6 +165,8 @@ instance assessments are typed from the author's row notes and 136 began as AI-a
 text-bound drafts. The author reviewed and accepted all 136 in an append-only sign-off
 record. The row-level human labels remain the primary validation result; the flag-level
 table is supplementary rule analysis, not an independent reliability measurement.
+Reference labels were adjudicated by the author; no independent human inter-rater
+validation is claimed.
 
 ### 4.4 Mocked behavior study
 
@@ -160,11 +178,18 @@ unconditional priority capture and a credential funnel. They are behavioral obse
 the presence of the source-derived description, not evidence of an exploit against a real
 server.
 
-A matched ablation held the tool name, schema, task, filler tools, and mock responses
-constant; only the description was replaced with a capability-neutral version. The 36-trial
-matrix covers source and neutral conditions for each mechanism, model, and
-three-repetition cell. It is a causal test inside this mocked harness, not a claim about
-live MCP servers.
+A matched description-replacement experiment held the tool name, schema, task, filler
+tools, mock responses, system prompt, maximum turns, and judge constant; only the
+description was replaced with a capability-neutral version. It has 12 condition-cells
+(two mechanisms × two description conditions × three models), with three repetitions per
+cell, for 36 trials. The locked panel comprises `glm-5.3`, `deepseek-v4.1-flash`, and
+`gemini-3.8-flash` through the AvalAI OpenAI-compatible gateway. Requests used temperature
+0; each trial began with a fresh message list, and the 36-trial order was randomized with
+seed 20261028. A transient transport failure received one end-of-batch retry; the
+append-only ledger preserves all 55 attempts and takes the last record for each scheduled
+trial. The workflow-priority endpoint is success only when the case tool is the first tool
+called in the transcript. This matched contrast tests whether that endpoint changes when
+instruction-bearing wording is removed; it does not make a claim about live MCP servers.
 
 ## 5. Results
 
@@ -185,9 +210,9 @@ non-TP text. The controls were selected for detector-negative status and therefo
 estimate false negatives, recall, or the prevalence of steering outside the flagged stratum.
 
 At the poison-flag level, six of 124 reviewed instances are supported by the steering
-rubric. This 4.8% quantity is the most useful calibration number for the paper, but it is
-limited to the purposive discovery stratum. It is neither an estimate of detector precision
-over all 698 poison-flagged descriptions nor an estimate of malicious prevalence.
+rubric. This supplementary 4.8% quantity is limited to the purposive discovery stratum.
+It is neither an estimate of detector precision over all 698 poison-flagged descriptions
+nor an estimate of malicious prevalence.
 
 | Review unit | Frame | Result | Interpretation |
 |---|---|---:|---|
@@ -209,10 +234,10 @@ untrusted content. Eleven are ordinary parameter names or API terminology that o
 the detector's keywords. Other groups are template duplication, ordinary product-flow
 documentation, declared sending functionality, authentication wording, and bare URLs.
 
-This is a substantive result. The detector does not merely miss hostile paraphrases; it
-also mistakes defenses for attacks. A production triage system should therefore model
-negation, defensive vocabulary, scope, and repeated templates before ranking text as
-high-risk.
+This is a substantive result. The observed errors show that lexical overlap can cause
+ordinary documentation and defensive instructions to be flagged as steering. A production
+triage system should therefore model negation, defensive vocabulary, scope, and repeated
+templates before ranking text as high-risk.
 
 | Frequent non-TP pattern | Rows in the 95 flagged non-TP rows |
 |---|---:|
@@ -251,7 +276,8 @@ guide. The remaining source-derived arms observed priority capture and credentia
 behavior in the mocked environment. No live server, real credential, shell, or external
 network target was used.
 
-The matched ablation completed all 36 final cells after retrying transient gateway failures.
+The matched ablation completed all 36 trials across 12 condition-cells after retrying
+transient gateway failures.
 For workflow-priority capture, the source description triggered the endpoint in 6/9 trials
 (GLM 3/3, DeepSeek 3/3, Gemini 0/3), while its neutral twin triggered it in 0/9. Within
 this harness, the contrast supports a contribution from the description wording.
@@ -293,12 +319,11 @@ it redirects another tool, and whether negation or defensive language changes it
 
 Several limitations shape the interpretation. The corpus is a cursor-bounded,
 GitHub-linked, source-extracted subset of the registry. The review frame was designed to
-find cases, not estimate a population rate. One author supplied the reference labels, and
-the second rater was an unversioned consumer LLM rather than an independent human
-annotator. Descriptions can be truncated during source extraction, and the detector is
-English-oriented. The matched ablation covers two mechanisms, three models, and one mocked
-gateway deployment; a redesigned credential-funnel task and broader replication remain
-future work.
+find cases, not estimate a population rate, and its reference labels were supplied by one
+author rather than independently double-annotated. Descriptions can be truncated during
+source extraction, and the detector is English-oriented. The matched ablation covers two
+mechanisms, three models, and one mocked gateway deployment; a redesigned credential-funnel
+task and broader replication remain future work.
 
 ## 8. Ethics and artifact availability
 
