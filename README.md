@@ -1,5 +1,8 @@
 # Security Posture of Public MCP Servers
 
+> **Research portfolio note (November 2026):** This is an independent, ongoing measurement project and pre-paper research artifact, not a peer-reviewed publication. The [archived snapshot DOI (10.5281/zenodo.23435929)](https://doi.org/10.5281/zenodo.23435929) identifies a specific version; candidate detector matches must not be interpreted as verified incidents or vulnerability disclosures. Refer to the versioned dataset, methods and limitations below.
+
+
 A measurement study of the public **Model Context Protocol (MCP)** ecosystem: what fraction of public servers expose dangerous capabilities, and what fraction ship metadata with patterns that are exploitable for **tool poisoning**?
 
 **Research questions**
